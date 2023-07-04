@@ -49,10 +49,10 @@ export default function LoginComponent() {
             JSON.stringify({...userData, loggedIn: true}),
           );
         } else {
-          Alert.alert('Error', 'Invalid Details');
+          Alert.alert('Error', 'Detalhes inválidos');
         }
       } else {
-        Alert.alert('Error', 'User does not exist');
+        Alert.alert('Error', 'Usuário não existe');
       }
     }, 3000);
   };
