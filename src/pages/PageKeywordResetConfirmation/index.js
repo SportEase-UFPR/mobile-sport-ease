@@ -5,17 +5,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
 import LogoSportEase from '../../../assets/logo-sport-ease.png';
-import Input from '../Inputs/input';
-import ButtonLogin from '../Buttons/buttonLogin';
-import COLORS from '../../colors/colors';
+import Input from '../../components/Inputs/input';
+import ButtonLogin from '../../components/Buttons/GreenButton';
 
-export default function LoginComponent() {
+export default function PageKeywordResetConfirmation() {
 
   // Variáveis
-  const [inputs, setInputs] = React.useState({email: '', senha: ''});
+  const [inputs, setInputs] = React.useState({ email: '', senha: '' });
   const [errors, setErrors] = React.useState({});
   const [loading, setLoading] = React.useState(false);
 
+  // Variável de login
   const validate = async () => {
     Keyboard.dismiss();
     let isValid = true;
@@ -46,23 +46,23 @@ export default function LoginComponent() {
           navigation.navigate('HomeScreen');
           AsyncStorage.setItem(
             'userData',
-            JSON.stringify({...userData, loggedIn: true}),
+            JSON.stringify({ ...userData, loggedIn: true }),
           );
         } else {
-          Alert.alert('Error', 'Detalhes inválidos');
+          Alert.alert('Erro', 'Usuário ou senha inválidos');
         }
       } else {
-        Alert.alert('Error', 'Usuário não existe');
+        Alert.alert('Erro', 'Usuário não existe');
       }
     }, 3000);
   };
 
   const handleOnchange = (text, input) => {
-    setInputs(prevState => ({...prevState, [input]: text}));
+    setInputs(prevState => ({ ...prevState, [input]: text }));
   };
 
   const handleError = (error, input) => {
-    setErrors(prevState => ({...prevState, [input]: error}));
+    setErrors(prevState => ({ ...prevState, [input]: error }));
   };
 
   // Incluindo fonte Poppins --------------
@@ -86,36 +86,36 @@ export default function LoginComponent() {
         <Text style={styles.headerText}> SportEase </Text>
       </View>
 
-      {/* INPUTS PARA LOGIN */}
+      {/* INPUTS PARA RESET DE SENHA */}
+
+      <Text style={styles.emphasisText}> Cadastrar nova senha </Text>
+
 
       <View style={styles.inputContainer}>
         <Input
-          onChangeText={text => handleOnchange(text, 'email')}
-          onFocus={() => handleError(null, 'email')}
-          iconName="email-outline"
-          placeholder="E-mail..."
-          error={errors.email}
+          onChangeText={text => handleOnchange(text, 'senha')}
+          onFocus={() => handleError(null, 'senha')}
+          iconName="senha-outline"
+          placeholder="Senha..."
+          password={true}
+          error={errors.senha}
         />
 
         <Input
           onChangeText={text => handleOnchange(text, 'senha')}
           onFocus={() => handleError(null, 'senha')}
-          iconName="email-outline"
-          placeholder="Senha..."
+          iconName="senha-outline"
+          placeholder="Confirmar senha..."
           password={true}
           error={errors.senha}
         />
 
       </View>
 
-      <Text style={[styles.simpleText, {marginBottom: 20}]}> Esqueci a senha </Text>
-
       <ButtonLogin
-        title={'Entrar'}
-        onPress={validate} 
+        title={'Atualizar senha'}
+        onPress={validate}
       />
-
-      <Text style={styles.simpleText}> Quero me cadastrar </Text>
 
 
     </View>

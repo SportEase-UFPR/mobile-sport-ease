@@ -2,7 +2,7 @@ import React from 'react';
 import {TouchableOpacity, Text, StyleSheet} from 'react-native';
 import COLORS from '../../colors/colors';
 
-const ButtonLogin = ({title, onPress = () => {}}) => {
+const GreenButton = ({title, onPress = () => {}}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -36,4 +36,4 @@ const style = StyleSheet.create({
     },
 });
 
-export default ButtonLogin;
+export default GreenButton;
