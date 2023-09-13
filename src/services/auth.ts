@@ -3,6 +3,7 @@
 export function SignIn() {
     // setando chamada fake com promise. INTEGRAR COM O BACK
     return new Promise(resolve => {
+        
         setTimeout(() => {
             resolve({
                 token: '123',

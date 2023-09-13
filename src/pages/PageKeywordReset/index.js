@@ -16,9 +16,8 @@ export default function PageLogin() {
   const navigation = useNavigation();
 
   // Variáveis
-  const [inputs, setInputs] = React.useState({ email: '', senha: '' });
+  const [inputs, setInputs] = React.useState({ email: '' });
   const [errors, setErrors] = React.useState({});
-  const [loading, setLoading] = React.useState(false);
 
   const handleOnchange = (text, input) => {
     setInputs(prevState => ({ ...prevState, [input]: text }));
@@ -26,6 +25,18 @@ export default function PageLogin() {
 
   const handleError = (error, input) => {
     setErrors(prevState => ({ ...prevState, [input]: error }));
+  };
+
+  const handleKeywordReset = async () => {
+    Keyboard.dismiss();
+    let isValid = true;
+    if (!inputs.email) {
+      handleError('O endereço de e-mail é obrigatório', 'email');
+      isValid = false;
+    }
+    if (isValid) {
+      Alert.alert('E-mail enviado!', 'e-mail enviado ao usuário');
+    }
   };
 
   // Incluindo fonte Poppins --------------
@@ -38,6 +49,7 @@ export default function PageLogin() {
   if (!loaded) {
     return null;
   }
+
   // Término do import das fontes ----------
 
   return (
@@ -49,22 +61,21 @@ export default function PageLogin() {
         <Text style={styles.headerText}> SportEase </Text>
       </View>
 
-      {/* INPUTS PARA LOGIN */}
+      {/* BODY SECTION */}
 
-      <Text style={{textAlign:'center', marginHorizontal:10}}> Informe o seu e-mail cadastrado na plataforma para receber as instruções e recuperar sua senha. </Text>
+      <Text style={{ textAlign: 'center', marginHorizontal: 10 }}> Informe o seu e-mail cadastrado na plataforma para receber as instruções e recuperar sua senha. </Text>
       <View style={styles.inputContainer}>
         <Input
           onChangeText={text => handleOnchange(text, 'email')}
           onFocus={() => handleError(null, 'email')}
-          iconName="email-outline"
-          placeholder="E-mail..."
+          placeholder="E-mail da conta..."
           error={errors.email}
         />
-
       </View>
 
       <ButtonLogin
         title={'Recuperar Senha'}
+        onPress={handleKeywordReset}
       />
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>

@@ -5,6 +5,8 @@ import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
+import AuthContext from '../../contexts/auth';
+
 import LogoSportEase from '../../../assets/logo-sport-ease.png';
 import Input from '../../components/Inputs/input';
 import ButtonLogin from '../../components/Buttons/GreenButton';
@@ -18,8 +20,7 @@ export default function PageLogin() {
   // Variáveis
   const [inputs, setInputs] = React.useState({ email: '', senha: '' });
   const [errors, setErrors] = React.useState({});
-  const [loading, setLoading] = React.useState(false);
-
+  const { signed, signIn } = React.useContext(AuthContext);
 
 
   // Variável de login
@@ -124,8 +125,9 @@ export default function PageLogin() {
         onPress={validate}
       />
 
-      <Text style={styles.simpleText}> Quero me cadastrar </Text>
-
+      <TouchableOpacity onPress={() => navigation.navigate('Autocadastro')}>
+        <Text style={styles.simpleText}> Quero me cadastrar </Text>
+      </TouchableOpacity>
 
     </View>
   );
