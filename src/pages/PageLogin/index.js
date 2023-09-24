@@ -21,10 +21,10 @@ export default function PageLogin() {
   const [inputs, setInputs] = React.useState({ email: '', senha: '' });
   const [errors, setErrors] = React.useState({});
   const { signed, signIn } = React.useContext(AuthContext);
+  const [loading, setLoading] = React.useState(false); // Estado para indicar o carregamento
 
-
-  // Variável de login
-  const validate = async () => {
+  // Validações de campo
+  const handleLogin = async () => {
     Keyboard.dismiss();
     let isValid = true;
     if (!inputs.email) {
@@ -36,33 +36,14 @@ export default function PageLogin() {
       isValid = false;
     }
     if (isValid) {
-      login();
-    }
-  };
-
-  const login = () => {
-    setLoading(true);
-    setTimeout(async () => {
+      setLoading(true); 
+      await signIn(inputs.email, inputs.senha);
       setLoading(false);
-      let userData = await AsyncStorage.getItem('userData');
-      if (userData) {
-        userData = JSON.parse(userData);
-        if (
-          inputs.email == userData.email &&
-          inputs.senha == userData.senha
-        ) {
-          navigation.navigate('HomeScreen');
-          AsyncStorage.setItem(
-            'userData',
-            JSON.stringify({ ...userData, loggedIn: true }),
-          );
-        } else {
-          Alert.alert('Erro', 'Usuário ou senha inválidos');
-        }
-      } else {
-        Alert.alert('Erro', 'Usuário não existe');
-      }
-    }, 3000);
+    }
+
+    if (!signed) {
+      Alert.alert('Cadastro não encontrado', 'Usuário ou senha inválidos!');
+    }
   };
 
   const handleOnchange = (text, input) => {
@@ -89,13 +70,11 @@ export default function PageLogin() {
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.headerContainer}>
-        <Image source={LogoSportEase}
-          style={{ width: 55.5, height: 55.5 }}></Image>
+        <Image source={LogoSportEase} style={{ width: 55.5, height: 55.5 }}></Image>
         <Text style={styles.headerText}> SportEase </Text>
       </View>
 
       {/* INPUTS PARA LOGIN */}
-
       <View style={styles.inputContainer}>
         <Input
           onChangeText={text => handleOnchange(text, 'email')}
@@ -104,7 +83,6 @@ export default function PageLogin() {
           placeholder="E-mail..."
           error={errors.email}
         />
-
         <Input
           onChangeText={text => handleOnchange(text, 'senha')}
           onFocus={() => handleError(null, 'senha')}
@@ -113,22 +91,22 @@ export default function PageLogin() {
           password={true}
           error={errors.senha}
         />
-
       </View>
 
       <TouchableOpacity onPress={() => navigation.navigate('Recuperar Senha')}>
         <Text style={[styles.simpleText, { marginBottom: 20 }]}>Esqueci a senha</Text>
       </TouchableOpacity>
 
+      {/* Botão de login com indicador de carregamento */}
       <ButtonLogin
-        title={'Entrar'}
-        onPress={validate}
+        title={loading ? 'Entrando...' : 'Entrar'}
+        onPress={handleLogin}
+        disabled={loading} // Desativa o botão enquanto a autenticação estiver em andamento
       />
 
       <TouchableOpacity onPress={() => navigation.navigate('Autocadastro')}>
         <Text style={styles.simpleText}> Quero me cadastrar </Text>
       </TouchableOpacity>
-
     </View>
   );
 }
