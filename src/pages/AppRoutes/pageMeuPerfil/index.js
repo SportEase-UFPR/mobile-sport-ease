@@ -1,25 +1,25 @@
 import React from 'react';
 import { View, Button, Text } from 'react-native';
 
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
-const PageHomescreen = ({ navigation }) => {
-    const { onLogout } = useAuth(); // Chama o hook aqui
+const PageMeuPerfil = ({ navigation }) => {
+    const { onLogout } = useAuth(); 
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text>Home ;D</Text>
             <Button
                 title="Deslogar"
-                onPress={onLogout} // Usa a função aqui
+                onPress={onLogout}
             />
         </View>
     );
 };
 
 
-PageHomescreen.navigationOptions = {
-    title: 'Home',
+PageMeuPerfil.navigationOptions = {
+    title: 'Meu Perfil',
 }
 
-export default PageHomescreen;
+export default PageMeuPerfil;

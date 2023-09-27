@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Dimensions } from "react-native";
-import COLORS from './src/colors/colors';
+import COLORS from '../../../colors/colors';
 
 // Recolhendo dimensão da tela
 var width = Dimensions.get('window').width; //full width
@@ -31,8 +31,7 @@ const styles = StyleSheet.create({
     },
 
     headerText: {
-      marginLeft:-10,
-      marginTop:5,
+      marginLeft:10,
       fontFamily: 'PoppinsSemiBold',
       fontSize: 22,
       color: COLORS.darkBlue,
