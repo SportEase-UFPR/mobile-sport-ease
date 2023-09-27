@@ -1,12 +1,11 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-
 // importar telas que o usuário poderá acessar antes de realizar login
-import PageLogin from '../pages/PageLogin';
-import PageKeywordReset from '../pages/PageKeywordReset';
-import PageKeywordResetConfirmation from '../pages/PageKeywordResetConfirmation';
-import PageAutocadastro from '../pages/PageAutocadastro';
+import PageLogin from '../pages/AuthRoutes/PageLogin';
+import PageKeywordReset from '../pages/AuthRoutes/PageKeywordReset';
+import PageKeywordResetConfirmation from '../pages/AuthRoutes/PageKeywordResetConfirmation';
+import PageAutocadastro from '../pages/AuthRoutes/PageAutocadastro';
 
 const AuthStack = createStackNavigator();
 

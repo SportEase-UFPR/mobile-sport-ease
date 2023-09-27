@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Dimensions } from "react-native";
-import COLORS from '../../colors/colors';
+import COLORS from '../../../colors/colors';
 
 // Recolhendo dimensão da tela
 var width = Dimensions.get('window').width; //full width
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
       marginBottom: 50
     },
     inputContainer: {
-      marginTop:50,
+      marginTop:20,
       textAlign: 'center',      
       width: width,
       paddingHorizontal:30,
@@ -43,8 +43,6 @@ const styles = StyleSheet.create({
       fontSize: 22,
       color: COLORS.darkBlue,
     }
-
-
   });
 
 export default styles

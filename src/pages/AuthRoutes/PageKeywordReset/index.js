@@ -5,13 +5,11 @@ import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
-import LogoSportEase from '../../../assets/logo-sport-ease.png';
-import Input from '../../components/Inputs/input';
-import ButtonLogin from '../../components/Buttons/GreenButton';
+import LogoSportEase from '../../../../assets/logo-sport-ease.png';
+import Input from '../../../components/Inputs/input';
+import ButtonLogin from '../../../components/Buttons/GreenButton';
 
-import authService from '../../services/auth';
-
-export default function PageLogin() {
+export default function PageKeywordReset() {
 
   const navigation = useNavigation();
 
@@ -41,9 +39,9 @@ export default function PageLogin() {
 
   // Incluindo fonte Poppins --------------
   const [loaded] = useFonts({
-    Poppins: require('../../../assets/fonts/Poppins/Poppins-Regular.ttf'),
-    PoppinsBold: require('../../../assets/fonts/Poppins/Poppins-Bold.ttf'),
-    PoppinsSemiBold: require('../../../assets/fonts/Poppins/Poppins-SemiBold.ttf'),
+    Poppins: require('../../../../assets/fonts/Poppins/Poppins-Regular.ttf'),
+    PoppinsBold: require('../../../../assets/fonts/Poppins/Poppins-Bold.ttf'),
+    PoppinsSemiBold: require('../../../../assets/fonts/Poppins/Poppins-SemiBold.ttf'),
   });
 
   if (!loaded) {

@@ -2,16 +2,12 @@ import * as React from 'react';
 import { View, Text, Image, Keyboard, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
-import AuthContext from '../../contexts/auth';
-
-import LogoSportEase from '../../../assets/logo-sport-ease.png';
-import Input from '../../components/Inputs/input';
-import ButtonLogin from '../../components/Buttons/GreenButton';
-
-import authService from '../../services/auth';
+import LogoSportEase from '../../../../assets/logo-sport-ease.png';
+import Input from '../../../components/Inputs/input';
+import ButtonLogin from '../../../components/Buttons/GreenButton';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export default function PageLogin() {
 
@@ -20,11 +16,17 @@ export default function PageLogin() {
   // Variáveis
   const [inputs, setInputs] = React.useState({ email: '', senha: '' });
   const [errors, setErrors] = React.useState({});
-  const { signed, signIn } = React.useContext(AuthContext);
   const [loading, setLoading] = React.useState(false); // Estado para indicar o carregamento
+  const { onLogin, onLogout } = useAuth();
+
+
+  function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  }
 
   // Validações de campo
   const handleLogin = async () => {
+    
     Keyboard.dismiss();
     let isValid = true;
     if (!inputs.email) {
@@ -36,13 +38,15 @@ export default function PageLogin() {
       isValid = false;
     }
     if (isValid) {
-      setLoading(true); 
-      await signIn(inputs.email, inputs.senha);
-      setLoading(false);
-    }
+      setLoading(true);
+      await sleep(500);
 
-    if (!signed) {
-      Alert.alert('Cadastro não encontrado', 'Usuário ou senha inválidos!');
+      const result = await onLogin(inputs.email, inputs.senha);
+      if (result && result.error) {
+        Alert.alert('Cadastro não encontrado', 'Usuário ou senha inválidos!');
+      }
+    
+      setLoading(false);
     }
   };
 
@@ -56,9 +60,9 @@ export default function PageLogin() {
 
   // Incluindo fonte Poppins --------------
   const [loaded] = useFonts({
-    Poppins: require('../../../assets/fonts/Poppins/Poppins-Regular.ttf'),
-    PoppinsBold: require('../../../assets/fonts/Poppins/Poppins-Bold.ttf'),
-    PoppinsSemiBold: require('../../../assets/fonts/Poppins/Poppins-SemiBold.ttf'),
+    Poppins: require('../../../../assets/fonts/Poppins/Poppins-Regular.ttf'),
+    PoppinsBold: require('../../../../assets/fonts/Poppins/Poppins-Bold.ttf'),
+    PoppinsSemiBold: require('../../../../assets/fonts/Poppins/Poppins-SemiBold.ttf'),
   });
 
   if (!loaded) {
