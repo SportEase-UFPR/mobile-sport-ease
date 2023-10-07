@@ -13,18 +13,15 @@ export default function PageLogin() {
 
   const navigation = useNavigation();
 
-  // Variáveis
   const [inputs, setInputs] = React.useState({ email: '', senha: '' });
   const [errors, setErrors] = React.useState({});
-  const [loading, setLoading] = React.useState(false); // Estado para indicar o carregamento
+  const [loading, setLoading] = React.useState(false);
   const { onLogin, onLogout } = useAuth();
-
 
   function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 
-  // Validações de campo
   const handleLogin = async () => {
     
     Keyboard.dismiss();
@@ -101,11 +98,10 @@ export default function PageLogin() {
         <Text style={[styles.simpleText, { marginBottom: 20 }]}>Esqueci a senha</Text>
       </TouchableOpacity>
 
-      {/* Botão de login com indicador de carregamento */}
       <ButtonLogin
         title={loading ? 'Entrando...' : 'Entrar'}
         onPress={handleLogin}
-        disabled={loading} // Desativa o botão enquanto a autenticação estiver em andamento
+        disabled={loading}
       />
 
       <TouchableOpacity onPress={() => navigation.navigate('Autocadastro')}>

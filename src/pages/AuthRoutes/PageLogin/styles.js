@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
       marginTop:50,
+      marginBottom:20,
       textAlign: 'center',      
       width: width,
       paddingHorizontal:30,

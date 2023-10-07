@@ -2,10 +2,15 @@ import React from 'react';
 import { Text, View, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { SimpleLineIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+
 
 import PageMeuPerfil from '../pages/AppRoutes/pageMeuPerfil';
 import styles from '../../styles';
 import { useFonts } from 'expo-font';
+import PageNovaReserva from '../pages/AppRoutes/pageNovaReserva';
 
 
 function LogoTitle() {
@@ -83,11 +88,41 @@ export default function AppRoutes() {
                     headerTitleAlign: 'left',
                 }}
             >
-                <Tab.Screen name="Tab1" component={Tab1Screen} />
-                <Tab.Screen name="Tab2" component={Tab2Screen} />
-                <Tab.Screen name="Tab3" component={Tab3Screen} />
-                <Tab.Screen name="Tab4" component={Tab4Screen} />
-                <Tab.Screen name="Meu Perfil" component={PageMeuPerfil} />
+                <Tab.Screen name="Tab1" component={Tab1Screen}
+                    options={{
+                        tabBarLabel: () => null,
+                        tabBarIcon: ({ focused, size }) => (
+                            <Feather name="home" size={24} color={focused ? 'green' : 'black'} />
+                        )
+                    }} />
+                <Tab.Screen name="Nova Reserva" component={PageNovaReserva}
+                    options={{
+                        tabBarLabel: () => null,
+                        tabBarIcon: ({ focused, size }) => (
+                            <Feather name="plus-square" size={24} color={focused ? 'green' : 'black'} />
+                        )
+                    }} />
+                <Tab.Screen name="Tab3" component={Tab3Screen}
+                    options={{
+                        tabBarLabel: () => null,
+                        tabBarIcon: ({ focused, size }) => (
+                            <Feather name="map-pin" size={24} color={focused ? 'green' : 'black'} />
+                        )
+                    }} />
+                <Tab.Screen name="Historico" component={Tab4Screen}
+                    options={{
+                        tabBarLabel: () => null,
+                        tabBarIcon: ({ focused, size }) => (
+                            <Feather name="clock" size={24} color={focused ? 'green' : 'black'} />
+                        )
+                    }} />
+                <Tab.Screen name="Meu Perfil" component={PageMeuPerfil}
+                    options={{
+                        tabBarLabel: () => null,
+                        tabBarIcon: ({ focused, size }) => (
+                            <Feather name="user" size={24} color={focused ? 'green' : 'black'} />
+                        )
+                    }} />
             </Tab.Navigator>
         </NavigationContainer>
     );

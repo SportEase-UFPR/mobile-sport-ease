@@ -10,12 +10,14 @@ const Input = ({
     error,
     password,
     onFocus = () => { },
+    disabled = false,
     ...props
 }) => {
     const [hidePassword, setHidePassword] = React.useState(password);
     const [isFocused, setIsFocused] = React.useState(false);
+
     return (
-        <View style={{ marginBottom: 20 }}>
+        <View>
             <Text style={style.label}>{label}</Text>
             <View
                 style={[
@@ -27,9 +29,11 @@ const Input = ({
                                 ? COLORS.darkBlue
                                 : COLORS.light,
                         alignItems: 'center',
+                        opacity: disabled ? 0.5 : 1,
                     },
                     style.shadowProp
-                ]}>
+                ]}
+            >
                 <TextInput
                     placeholder={placeholder}
                     autoCorrect={false}
@@ -39,7 +43,8 @@ const Input = ({
                     }}
                     onBlur={() => setIsFocused(false)}
                     secureTextEntry={hidePassword}
-                    style={{ flex: 1}}
+                    style={{ flex: 1 }}
+                    editable={!disabled}
                     {...props}
                 />
                 {password && (

@@ -10,7 +10,7 @@ import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/Inputs/input';
 import ButtonLogin from '../../../components/Buttons/GreenButton';
 
-export default function PageAutocadastro() {
+export default function PageEditarPerfil() {
 
   const navigation = useNavigation();
 
@@ -155,7 +155,7 @@ export default function PageAutocadastro() {
         </View>
 
         <ButtonLogin
-          title={'Cadastrar'}
+          title={'Editar'}
           onPress={validate}
         />
 
