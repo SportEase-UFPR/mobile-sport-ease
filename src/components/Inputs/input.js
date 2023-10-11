@@ -11,6 +11,7 @@ const Input = ({
     password,
     onFocus = () => { },
     disabled = false,
+    numeric = false, 
     ...props
 }) => {
     const [hidePassword, setHidePassword] = React.useState(password);
@@ -45,6 +46,7 @@ const Input = ({
                     secureTextEntry={hidePassword}
                     style={{ flex: 1 }}
                     editable={!disabled}
+                    keyboardType={numeric ? 'numeric' : 'default'}
                     {...props}
                 />
                 {password && (
@@ -66,7 +68,7 @@ const Input = ({
 
 const style = StyleSheet.create({
     label: {
-        marginVertical: 5,
+        marginBottom: 0,
         fontSize: 14,
         color: '#aaa',
     },

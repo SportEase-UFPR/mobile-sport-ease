@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: any) => {
                 authenticated: true
             });
 
-            //axios.defaults.headers.common['Authorization'] = `Bearer ${result.data.token}`;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${result.data.token}`;
             await SecureStore.setItemAsync(TOKEN_KEY, result.data.token);
             return result;
         } catch (e) {
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: any) => {
         try {
             console.log('chamado');
             await SecureStore.deleteItemAsync(TOKEN_KEY);
-            //axios.defaults.headers.common['Authorization'] = '';
+            axios.defaults.headers.common['Authorization'] = '';
             setAuthState({
                 token: null,
                 authenticated: false

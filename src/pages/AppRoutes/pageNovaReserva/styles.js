@@ -15,22 +15,34 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 40,
     color: COLORS.green
   },
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  inputContainer: {
+    marginVertical: 20,
+  },
+  inputContainerItem: {
     marginBottom: 20,
   },
-  listItemIcon: {
-    marginRight: 10,
+  containerHeader: {
+    fontSize: 18,
+    marginBottom: 10,
+    textAlign: 'left',
+    fontWeight: 'bold',
+    color: COLORS.green
   },
   listItemText: {
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.greyText
   },
   chevron: {
     alignSelf: 'flex-start'
+  },
+  buttonsContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   }
 });
 
