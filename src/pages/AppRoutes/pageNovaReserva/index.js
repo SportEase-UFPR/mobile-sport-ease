@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { listarEspacosEsportivos } from '../../../services/espacosEsportivosService';
 import { listarHorariosDisponiveis, solicitarLocacao } from '../../../services/locacaoService';
-import { Box, TextArea, Heading, Text, Pressable, ScrollView, FormControl, Input, WarningOutlineIcon, Select, CheckIcon, Button } from 'native-base';
+import { Box, TextArea, Heading, Text, Pressable, ScrollView, FormControl, Input, WarningOutlineIcon, Select, CheckIcon, Button, Divider } from 'native-base';
 
 
 const PageNovaReserva = () => {
@@ -141,16 +141,16 @@ const PageNovaReserva = () => {
     return (
         <ScrollView>
             <Box mt={25} mb={25} paddingX={5} >
-                <Heading color="green.500" fontSize={'4xl'} marginBottom={10}>
+                <Heading borderColor={'green.500'} borderLeftWidth={30} color="green.500" fontSize={'4xl'} marginBottom={10} paddingLeft={'12'}>
                     Nova solicitação de reserva
                 </Heading>
                 <Box mb={10}>
-                    <Text fontSize={'lg'} color="green.500" fontWeight={'semibold'}>Dados do local</Text>
+                    <Text fontSize={'2xl'} color="green.800" fontWeight={'semibold'}>Dados do local</Text>
                     <FormControl isRequired isInvalid={inputErrors.localInvalid} marginBottom={3}>
-                        <FormControl.Label>Selecione o local desejado </FormControl.Label>
+                        <FormControl.Label >Selecione o local desejado </FormControl.Label>
                         <Select
                             isReadOnly
-                            borderRadius={"md"}
+                            borderRadius={"lg"}
                             accessibilityLabel="Selecione o local desejado"
                             placeholder="Selecione um local..."
                             _selectedItem={{
@@ -178,6 +178,7 @@ const PageNovaReserva = () => {
                     <FormControl isRequired isInvalid={inputErrors.qntParticipantesInvalid}>
                         <FormControl.Label>Quantidade de participantes </FormControl.Label>
                         <Input
+                            borderRadius={"lg"}
                             variant="outline"
                             placeholder="Quantidade total de participantes..."
                             keyboardType="numeric"
@@ -192,13 +193,14 @@ const PageNovaReserva = () => {
                     </FormControl>
                 </Box>
                 <Box mb={10}>
-                    <Text fontSize={'lg'} color="green.500" fontWeight={'semibold'}>Dados da reserva</Text>
+                    <Text fontSize={'2xl'} color="green.800" fontWeight={'semibold'}>Dados da reserva</Text>
                     <FormControl isRequired isInvalid={inputErrors.dataReservaInvalid} marginBottom={3}>
                         <FormControl.Label>Selecione o dia da reserva </FormControl.Label>
                         <Pressable
                             onPress={showDatepicker}
                         >
                             <Input
+                                borderRadius={"lg"}
                                 variant="outline"
                                 placeholder="Selecione o dia da reserva"
                                 isReadOnly
@@ -254,6 +256,7 @@ const PageNovaReserva = () => {
                     <FormControl isRequired isInvalid={inputErrors.qntHorasInvalid}>
                         <FormControl.Label>Selecione a quantidade de horas a serem reservadas </FormControl.Label>
                         <Input
+                            borderRadius={"lg"}
                             variant="outline"
                             placeholder="Quantidade de horas da reserva..."
                             keyboardType="numeric"
@@ -269,10 +272,11 @@ const PageNovaReserva = () => {
                 </Box>
 
                 <Box mb={5}>
-                    <Text fontSize={'lg'} color="green.500" fontWeight={'semibold'}>Objetivo da reserva</Text>
+                    <Text fontSize={'2xl'} color="green.800" fontWeight={'semibold'}>Objetivo da reserva</Text>
                     <FormControl isRequired isInvalid={inputErrors.motivoSolicitacaoInvalid} marginBottom={3}>
                         <FormControl.Label>Inclua o motivo da solicitação </FormControl.Label>
                         <TextArea
+                            borderRadius={"lg"}
                             isInvalid={inputErrors.motivoSolicitacaoInvalid}
                             placeholder="Inclua uma breve descrição do motivo pelo qual você deseja reservar a área..."
                             onChangeText={(text) => {
