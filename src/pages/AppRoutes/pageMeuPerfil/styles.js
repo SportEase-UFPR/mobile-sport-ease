@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   chevron: {
-    alignSelf: 'flex-start'
+    alignSelf: 'center',
+    left: 0
   }
 });
 

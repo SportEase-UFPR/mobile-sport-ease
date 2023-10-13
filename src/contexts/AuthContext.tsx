@@ -76,9 +76,8 @@ export const AuthProvider = ({ children }: any) => {
 
     const logout = async () => {
         try {
-            console.log('chamado');
             await SecureStore.deleteItemAsync(TOKEN_KEY);
-            axios.defaults.headers.common['Authorization'] = '';
+            axios.defaults.headers.common['Authorization'] = null;
             setAuthState({
                 token: null,
                 authenticated: false

@@ -4,10 +4,12 @@ import { useForm, Controller } from "react-hook-form";
 import { SelectList } from 'react-native-dropdown-select-list';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import styles from './styles';
-import Input from '../../../components/Inputs/input';
+import Input from '../../../components/BasicTextInput';
 import { listarEspacosEsportivos } from '../../../services/espacosEsportivosService';
 import { listarHorariosDisponiveis, solicitarLocacao } from '../../../services/locacaoService';
-import GreenButton from '../../../components/Buttons/GreenButton';
+import GreenButton from '../../../components/BasicButton';
+import Divisor from '../../../components/Divisor';
+import BasicButton from '../../../components/BasicButton';
 
 const PageNovaReserva = () => {
     const [localReserva, setLocalReserva] = useState([]);
@@ -86,7 +88,6 @@ const PageNovaReserva = () => {
     };
 
     const submitHandler = async (formData) => {
-
         const novaDataReservaInicio = new Date(dataReserva);
         const [horas, minutos] = horarioInicioReserva.split(':').map(Number);
         novaDataReservaInicio.setHours(horas);
@@ -136,6 +137,7 @@ const PageNovaReserva = () => {
                             placeholder="Selecione o local da reserva"
                         />
                     </View>
+                    
                     <View style={styles.inputContainerItem}>
                         <Text style={styles.listItemText}>Quantidade de participantes *</Text>
                         <Controller
@@ -220,7 +222,7 @@ const PageNovaReserva = () => {
                     </View>
                 </View>
 
-                <GreenButton title={"Enviar"} onPress={handleSubmit(submitHandler)} />
+                <BasicButton color={'green'} title={"Enviar"} onPress={handleSubmit(submitHandler)} />
             </View>
         </ScrollView>
     );

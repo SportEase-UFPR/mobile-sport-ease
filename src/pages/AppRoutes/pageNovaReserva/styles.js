@@ -12,10 +12,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    fontSize: 24,
-    textAlign: 'center',
+    fontSize: 30,
+    textAlign: 'left',
     fontWeight: 'bold',
-    marginBottom: 40,
+    marginBottom: 20,
     color: COLORS.green
   },
   inputContainer: {

@@ -11,6 +11,7 @@ import PageMeuPerfil from '../pages/AppRoutes/pageMeuPerfil';
 import styles from '../../styles';
 import { useFonts } from 'expo-font';
 import PageNovaReserva from '../pages/AppRoutes/pageNovaReserva';
+import PageHomeScreen from '../pages/AppRoutes/pageHomeScreen';
 
 
 function LogoTitle() {
@@ -88,7 +89,7 @@ export default function AppRoutes() {
                     headerTitleAlign: 'left',
                 }}
             >
-                <Tab.Screen name="Tab1" component={Tab1Screen}
+                <Tab.Screen name="HomeScreen" component={PageHomeScreen}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (

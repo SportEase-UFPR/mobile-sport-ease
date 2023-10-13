@@ -5,8 +5,8 @@ import { useFonts } from 'expo-font';
 import styles from './styles';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
-import Input from '../../../components/Inputs/input';
-import ButtonLogin from '../../../components/Buttons/GreenButton';
+import Input from '../../../components/BasicTextInput';
+import BasicButton from '../../../components/BasicButton';
 import { useAuth } from '../../../contexts/AuthContext';
 
 export default function PageLogin() {
@@ -98,7 +98,7 @@ export default function PageLogin() {
         <Text style={[styles.simpleText, { marginBottom: 20 }]}>Esqueci a senha</Text>
       </TouchableOpacity>
 
-      <ButtonLogin
+      <BasicButton
         title={loading ? 'Entrando...' : 'Entrar'}
         onPress={handleLogin}
         disabled={loading}

@@ -8,12 +8,16 @@ import Routes from './src/routes';
 import AuthRoutes from './src/routes/auth.routes';
 import AppRoutes from './src/routes/app.routes';
 
+import { NativeBaseProvider, Text, Box } from "native-base";
+
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <AuthProvider>
-      <InnerApp />
+      <NativeBaseProvider>
+        <InnerApp />
+      </NativeBaseProvider>
     </AuthProvider>
   );
 }

@@ -7,8 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
-import Input from '../../../components/Inputs/input';
-import ButtonLogin from '../../../components/Buttons/GreenButton';
+import Input from '../../../components/BasicTextInput';
+import ButtonLogin from '../../../components/BasicButton';
 
 export default function PageEditarPerfil() {
 
