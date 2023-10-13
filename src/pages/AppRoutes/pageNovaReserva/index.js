@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, SafeAreaView, Button, ScrollView, TextInput, Alert } from 'react-native';
-import { useForm, Controller } from "react-hook-form";
-import { SelectList } from 'react-native-dropdown-select-list';
+import { Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import styles from './styles';
-import Input from '../../../components/BasicTextInput';
 import { listarEspacosEsportivos } from '../../../services/espacosEsportivosService';
 import { listarHorariosDisponiveis, solicitarLocacao } from '../../../services/locacaoService';
-import GreenButton from '../../../components/BasicButton';
-import Divisor from '../../../components/Divisor';
-import BasicButton from '../../../components/BasicButton';
+import { Box, TextArea, Heading, Text, Pressable, ScrollView, FormControl, Input, WarningOutlineIcon, Select, CheckIcon, Button } from 'native-base';
+
 
 const PageNovaReserva = () => {
-    const [localReserva, setLocalReserva] = useState([]);
-    const [espacosEsportivos, setEspacosEsportivos] = useState([]);
-    const [idEspacoEsportivo, setIdEspacoEsportivo] = useState(null);
-    const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
-    const [horarioInicioReserva, setHorarioInicioReserva] = useState([]);
-    const [horarioDisponivelData, setHorarioDisponivelData] = useState([]);
-    const [qntHoras, setQntHoras] = useState([]);
+    const [inputLocalReserva, setInputLocalReserva] = useState(null);
+    const [horarioInicioReserva, setHorarioInicioReserva] = useState(null);
+    const [horarioDisponivelData, setHorarioDisponivelData] = useState(null);
+    const [qntParticipantesReserva, setQntParticipantesReserva] = useState(null);
+    const [qntHoras, setQntHoras] = useState(null);
     const [motivoSolicitacao, setMotivoSolicitacao] = useState('');
     const [dataReserva, setDataReserva] = useState(new Date());
+    const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
+    const [espacosEsportivos, setEspacosEsportivos] = useState([]);
+
+    const [inputErrors, setInputErrors] = useState({})
+
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-
-    const { control, handleSubmit } = useForm();
 
     useEffect(() => {
         const carregarEspacosEsportivos = async () => {
@@ -40,19 +36,14 @@ const PageNovaReserva = () => {
     }, []);
 
     useEffect(() => {
-        if (idEspacoEsportivo && dataReserva) {
-            carregarHorariosDisponiveis(dataReserva, idEspacoEsportivo);
+        if (inputLocalReserva && dataReserva) {
+            carregarHorariosDisponiveis(dataReserva, inputLocalReserva);
         }
-    }, [idEspacoEsportivo, dataReserva]);
+    }, [inputLocalReserva, dataReserva]);
 
     useEffect(() => {
         setHorarioDisponivelData(horariosDisponiveis);
     }, [horariosDisponiveis]);
-
-    const findEspacoIdByName = (nomeEspaco) => {
-        const espaco = espacosEsportivos.find((item) => item.nome === nomeEspaco);
-        setIdEspacoEsportivo(espaco ? espaco.id : null);
-    };
 
     const carregarHorariosDisponiveis = async (dataReserva, idEspacoEsportivo) => {
         try {
@@ -83,147 +74,225 @@ const PageNovaReserva = () => {
         showMode('date');
     };
 
-    const showTimepicker = () => {
-        showMode('time');
-    };
 
-    const submitHandler = async (formData) => {
-        const novaDataReservaInicio = new Date(dataReserva);
-        const [horas, minutos] = horarioInicioReserva.split(':').map(Number);
-        novaDataReservaInicio.setHours(horas);
-        novaDataReservaInicio.setMinutes(0);
-        novaDataReservaInicio.setSeconds(0);
-        novaDataReservaInicio.setMilliseconds(0);
-        const novaDataReservaFim = new Date(novaDataReservaInicio);
-        novaDataReservaFim.setHours(horas+3);
-        
-        try {
-            const dadosDaLocacao = {
-                motivoSolicitacao: motivoSolicitacao,
-                qtdParticipantes: parseInt(formData.qntParticipantesReserva),
-                dataHoraInicioReserva: novaDataReservaInicio.toISOString(),
-                dataHoraFimReserva: novaDataReservaFim.toISOString(),
-                idEspacoEsportivo: idEspacoEsportivo,
-            };
+    const handleSubmit = async (formData) => {
+        console.log('chamou handleSubmit')
+        let isValid = true;
+        if (!inputLocalReserva) {
+            setInputErrors(prevErrors => ({ ...prevErrors, localInvalid: true }));
+            isValid = false;
+        }
+        if (!qntParticipantesReserva) {
+            setInputErrors(prevErrors => ({ ...prevErrors, qntParticipantesInvalid: true }));
+            isValid = false;
+        }
+        if (!dataReserva) {
+            setInputErrors(prevErrors => ({ ...prevErrors, dataReservaInvalid: true }));
+            isValid = false;
+        }
+        if (!horarioInicioReserva) {
+            setInputErrors(prevErrors => ({ ...prevErrors, horarioInicioReservaInvalid: true }));
+            isValid = false;
+        }
+        if (!qntHoras) {
+            setInputErrors(prevErrors => ({ ...prevErrors, qntHorasInvalid: true }));
+            isValid = false;
+        }
+        if (!motivoSolicitacao) {
+            setInputErrors(prevErrors => ({ ...prevErrors, motivoSolicitacaoInvalid: true }));
+            isValid = false;
+        }
+        if (isValid) {
+            const novaDataReservaInicio = new Date(dataReserva);
+            const [horas, minutos] = horarioInicioReserva.split(':').map(Number);
+            novaDataReservaInicio.setHours(horas);
+            novaDataReservaInicio.setMinutes(0);
+            novaDataReservaInicio.setSeconds(0);
+            novaDataReservaInicio.setMilliseconds(0);
+            const novaDataReservaFim = new Date(novaDataReservaInicio);
+            novaDataReservaFim.setHours(horas + 3);
 
-            const response = await solicitarLocacao(dadosDaLocacao);
+            console.log(motivoSolicitacao);
+            console.log(qntParticipantesReserva);
+            console.log(novaDataReservaInicio.toISOString());
+            console.log(novaDataReservaFim.toISOString());
+            console.log(inputLocalReserva)
+            try {
+                const dadosDaLocacao = {
+                    motivoSolicitacao: motivoSolicitacao,
+                    qtdParticipantes: parseInt(qntParticipantesReserva),
+                    dataHoraInicioReserva: novaDataReservaInicio.toISOString(),
+                    dataHoraFimReserva: novaDataReservaFim.toISOString(),
+                    idEspacoEsportivo: inputLocalReserva,
+                };
 
-            if (response) {
-                Alert.alert('Sucesso!', 'Solicitação criada com sucesso!');
+                const response = await solicitarLocacao(dadosDaLocacao);
+
+                if (response) {
+                    Alert.alert('Sucesso!', 'Solicitação criada com sucesso!');
+                }
+
+            } catch (error) {
+                Alert.alert('Erro!', 'Não foi possível seguir com a solicitação');
             }
-
-        } catch (error) {
-            Alert.alert('Erro!', 'Não foi possível seguir com a solicitação');
         }
     };
 
     return (
-        <ScrollView style={{ flex: 1 }}>
-            <View style={{ padding: 20 }}>
-                <Text style={styles.header}>Nova solicitação de reserva</Text>
-                <View style={styles.inputContainer}>
-                    <View style={styles.inputContainerItem}>
-                        <Text style={styles.containerHeader}>Dados do local</Text>
-                        <Text style={styles.listItemText}>Selecione o local desejado *</Text>
-
-                        <SelectList
-                            setSelected={(espaco) => {
-                                setLocalReserva(espaco);
-                                findEspacoIdByName(espaco)
+        <ScrollView>
+            <Box mt={25} mb={25} paddingX={5} >
+                <Heading color="green.500" fontSize={'4xl'} marginBottom={10}>
+                    Nova solicitação de reserva
+                </Heading>
+                <Box mb={10}>
+                    <Text fontSize={'lg'} color="green.500" fontWeight={'semibold'}>Dados do local</Text>
+                    <FormControl isRequired isInvalid={inputErrors.localInvalid} marginBottom={3}>
+                        <FormControl.Label>Selecione o local desejado </FormControl.Label>
+                        <Select
+                            isReadOnly
+                            borderRadius={"md"}
+                            accessibilityLabel="Selecione o local desejado"
+                            placeholder="Selecione um local..."
+                            _selectedItem={{
+                                bg: "black.500",
+                                endIcon: <CheckIcon size={5} />
+                            }} mt="1"
+                            onValueChange={(espaco) => {
+                                setInputErrors(prevErrors => ({ ...prevErrors, localInvalid: false }));
+                                setInputLocalReserva(espaco);
                             }}
-                            data={espacosEsportivos.map((espaco) => ({ label: espaco.nome, value: espaco.nome }))}
-                            save="localReserva"
-                            search={false}
-                            placeholder="Selecione o local da reserva"
-                        />
-                    </View>
-                    
-                    <View style={styles.inputContainerItem}>
-                        <Text style={styles.listItemText}>Quantidade de participantes *</Text>
-                        <Controller
-                            control={control}
-                            name='qntParticipantesReserva'
-                            render={({ field: { value, onChange } }) => (
-                                <Input
-                                    onChangeText={onChange}
-                                    value={value}
-                                    save="qntParticipantesReserva"
-                                    search={false}
-                                    placeholder="Indique a quantidade de pessoas"
-                                    numeric={true}
-                                />
-                            )}
-                        />
-                    </View>
-                </View>
-
-                <View style={styles.inputContainer}>
-                    <View style={styles.inputContainerItem}>
-                        <Text style={styles.containerHeader}>Dados da reserva</Text>
-                        <Text style={styles.listItemText}>Selecione o dia da reserva *</Text>
-                        <SafeAreaView>
-                            <Button onPress={showDatepicker} title="Selecione o dia da reserva..." />
-                            <Text>Data selecionada: {dataReserva.toLocaleDateString()}</Text>
-                            {show && (
-                                <DateTimePicker
-                                    testID="dateTimePicker"
-                                    value={dataReserva}
-                                    mode={mode}
-                                    is24Hour={false}
-                                    onChange={onChange}
-                                    minimumDate={new Date()}
-                                />
-                            )}
-                        </SafeAreaView>
-                    </View>
-                    <View style={styles.inputContainerItem}>
-                        <Text style={styles.listItemText}>Selecione o horário inicial da reserva *</Text>
-
-                        <SelectList
-                            setSelected={(value) => setHorarioInicioReserva(value)}
-                            data={horarioDisponivelData && horarioDisponivelData.horaInteira ?
-                                horarioDisponivelData.horaInteira.map((hora) => ({ label: hora.toString(), value: hora.toString() })) : []
+                        >
+                            {
+                                espacosEsportivos && espacosEsportivos.length > 0
+                                    ? espacosEsportivos.map((espaco, index) => (
+                                        <Select.Item key={index} label={espaco.nome} value={espaco.id} />
+                                    ))
+                                    : null
                             }
-                            save="horarioDisponivel"
-                            search={false}
-                            placeholder="Selecione o horário..."
-                        />
-                    </View>
-                    <View style={styles.inputContainerItem}>
-                        <Text style={styles.listItemText}>Selecione a quantidade de horas a serem reservadas *</Text>
-                        <Controller
-                            control={control}
-                            name='qntParticipantesReserva'
-                            render={({ field: { value, onChange } }) => (
-                                <Input
-                                    onChangeText={onChange}
-                                    value={value}
-                                    save="qntParticipantesReserva"
-                                    search={false}
-                                    placeholder="Indique a quantidade de horas..."
-                                    numeric={true}
-                                />
-                            )}
-                        />
-                    </View>
-                </View>
+                        </Select>
+                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                            Indique o local de reserva
+                        </FormControl.ErrorMessage>
+                    </FormControl>
 
-                <View style={styles.inputContainer}>
-                    <View style={styles.inputContainerItem}>
-                        <Text style={styles.containerHeader}>Objetivo da reserva</Text>
-                        <Text style={styles.listItemText}>Inclua o motivo da solicitação * </Text>
-                        <TextInput
-                            onChangeText={(text) => setMotivoSolicitacao(text)}
-                            value={motivoSolicitacao}
-                            placeholder="Detalhe o motivo da solicitação e inclua informações sobre os participantes"
-                            multiline={true}
-                            numberOfLines={4}
+                    <FormControl isRequired isInvalid={inputErrors.qntParticipantesInvalid}>
+                        <FormControl.Label>Quantidade de participantes </FormControl.Label>
+                        <Input
+                            variant="outline"
+                            placeholder="Quantidade total de participantes..."
+                            keyboardType="numeric"
+                            onChangeText={(text) => {
+                                setInputErrors(prevErrors => ({ ...prevErrors, qntParticipantesInvalid: false }));
+                                setQntParticipantesReserva(text)
+                            }}
                         />
-                    </View>
-                </View>
+                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                            Indique a quantidade de participantes
+                        </FormControl.ErrorMessage>
+                    </FormControl>
+                </Box>
+                <Box mb={10}>
+                    <Text fontSize={'lg'} color="green.500" fontWeight={'semibold'}>Dados da reserva</Text>
+                    <FormControl isRequired isInvalid={inputErrors.dataReservaInvalid} marginBottom={3}>
+                        <FormControl.Label>Selecione o dia da reserva </FormControl.Label>
+                        <Pressable
+                            onPress={showDatepicker}
+                        >
+                            <Input
+                                variant="outline"
+                                placeholder="Selecione o dia da reserva"
+                                isReadOnly
+                                value={dataReserva.toLocaleDateString()}
+                            />
+                        </Pressable>
+                        {show && (
+                            <DateTimePicker
+                                testID="dateTimePicker"
+                                value={dataReserva}
+                                mode={mode}
+                                is24Hour={false}
+                                onChange={(event, selectedDate) => {
+                                    onChange(event, selectedDate);
+                                    setInputErrors(prevErrors => ({ ...prevErrors, dataReservaInvalid: false }));
+                                }}
+                                minimumDate={new Date()}
+                            />
+                        )}
+                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                            Indique a data de reserva
+                        </FormControl.ErrorMessage>
+                    </FormControl>
 
-                <BasicButton color={'green'} title={"Enviar"} onPress={handleSubmit(submitHandler)} />
-            </View>
+                    <FormControl isRequired isInvalid={inputErrors.horarioInicioReservaInvalid} marginBottom={3}>
+                        <FormControl.Label>Selecione o horário inicial da reserva </FormControl.Label>
+                        <Select
+                            isReadOnly
+                            borderRadius={"md"}
+                            accessibilityLabel="Selecione o horário inicial da reserva"
+                            placeholder="Selecione o horário inicial..."
+                            _selectedItem={{
+                                bg: "black.500",
+                                endIcon: <CheckIcon size={5} />
+                            }} mt="1"
+                            onValueChange={(horario) => {
+                                setInputErrors(prevErrors => ({ ...prevErrors, horarioInicioReservaInvalid: false }));
+                                setHorarioInicioReserva(horario);
+                            }}
+                        >
+                            {
+                                horarioDisponivelData && horarioDisponivelData.horaInteira ?
+                                    horarioDisponivelData.horaInteira.map((horario, index) => (
+                                        <Select.Item key={index} label={horario.toString()} value={horario.toString()} />
+                                    )) : []
+
+                            }
+                        </Select>
+                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                            Indique o horário de início da reserva
+                        </FormControl.ErrorMessage>
+                    </FormControl>
+                    <FormControl isRequired isInvalid={inputErrors.qntHorasInvalid}>
+                        <FormControl.Label>Selecione a quantidade de horas a serem reservadas </FormControl.Label>
+                        <Input
+                            variant="outline"
+                            placeholder="Quantidade de horas da reserva..."
+                            keyboardType="numeric"
+                            onChangeText={(text) => {
+                                setQntHoras(text)
+                                setInputErrors(prevErrors => ({ ...prevErrors, qntHorasInvalid: false }));
+                            }}
+                        />
+                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                            Indique por quantas horas o local será reservado
+                        </FormControl.ErrorMessage>
+                    </FormControl>
+                </Box>
+
+                <Box mb={5}>
+                    <Text fontSize={'lg'} color="green.500" fontWeight={'semibold'}>Objetivo da reserva</Text>
+                    <FormControl isRequired isInvalid={inputErrors.motivoSolicitacaoInvalid} marginBottom={3}>
+                        <FormControl.Label>Inclua o motivo da solicitação </FormControl.Label>
+                        <TextArea
+                            isInvalid={inputErrors.motivoSolicitacaoInvalid}
+                            placeholder="Inclua uma breve descrição do motivo pelo qual você deseja reservar a área..."
+                            onChangeText={(text) => {
+                                setMotivoSolicitacao(text)
+                                setInputErrors(prevErrors => ({ ...prevErrors, motivoSolicitacaoInvalid: false }));
+                            }
+                            } />
+                        <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                            Indique o motivo da reserva
+                        </FormControl.ErrorMessage>
+                    </FormControl>
+                </Box>
+                <Button
+                    onPress={() => handleSubmit()}
+                    backgroundColor={'green.500'}
+                    size={'lg'}
+                    borderRadius={'full'}
+                >Enviar</Button>
+            </Box>
+
         </ScrollView>
     );
 };
