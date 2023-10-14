@@ -35,7 +35,7 @@ export default function PageHomeScreen() {
                             Quantidade de participantes:
                         </Text>
                         <Center>
-                            <Button size='lg' borderRadius='2xl' minW='3/5' backgroundColor={'success.500'} leftIcon={<CheckIcon />}>Confirmar uso</Button>
+                            <Button size='lg' borderRadius='2xl' minW='full' backgroundColor={'success.500'} leftIcon={<CheckIcon />}>Confirmar uso</Button>
                         </Center>
                     </Stack>
                 </Box>
@@ -65,7 +65,7 @@ export default function PageHomeScreen() {
                             Quantidade de participantes:
                         </Text>
                         <Center>
-                            <Button size='lg' borderRadius='2xl' minW='3/5' backgroundColor={'red.500'} leftIcon={<CloseIcon />}>Cancelar reserva</Button>
+                            <Button size='lg' borderRadius='2xl' minW='full' backgroundColor={'red.500'} leftIcon={<CloseIcon />}>Cancelar reserva</Button>
                         </Center>
                     </Stack>
                 </Box>
@@ -95,7 +95,7 @@ export default function PageHomeScreen() {
                             Quantidade de participantes:
                         </Text>
                         <Center>
-                            <Button size='lg' borderRadius='2xl' minW='3/5' backgroundColor={'red.500'} leftIcon={<CloseIcon />}>Cancelar reserva</Button>
+                            <Button size='lg' borderRadius='2xl' minW='full' backgroundColor={'red.500'} leftIcon={<CloseIcon />}>Cancelar reserva</Button>
                         </Center>
                     </Stack>
                 </Box>
