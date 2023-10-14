@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
       fontFamily: 'PoppinsSemiBold',
       fontSize: 22,
       color: COLORS.darkBlue,
+      lineHeight:50
     }
 
 

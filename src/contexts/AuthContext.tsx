@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: any) => {
                         console.log('O token está expirado');
                         setAuthState({
                             token: null,
-                            authenticated: false,
+                            authenticated: null,
                             id: null
                         });
                     } else {
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }: any) => {
             console.log('email:', email);
             console.log('senha', password);
             const result = await axios.post(`${API_URL}/login`, { login: email, senha: password });
-            const decodedToken = jwtDecode(result.data.token);  // Corrigido para usar result.data.token
+            const decodedToken = jwtDecode(result.data.token); 
             const id = decodedToken.idPessoa;
             setAuthState({
                 token: result.data.token,
