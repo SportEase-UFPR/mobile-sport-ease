@@ -7,12 +7,19 @@ import { Feather } from '@expo/vector-icons';
 
 export default function PageLocaisEsportivos({ navigation }) {
     const [espacosEsportivos, setEspacosEsportivos] = useState(['local']);
-    const [espacosEsportivosFiltrado, setEspacosEsportivosFiltrado] = useState(['']);
+    const [espacosEsportivosFiltrado, setEspacosEsportivosFiltrado] = useState(espacosEsportivos);
     const [isLoading, setIsLoading] = useState(true);
 
-    const handleFiltroLocais = () => {
+    const handleFiltroLocais = (text) => {
+        const filtrados = espacosEsportivos.filter(espaco => {
+            // Verifica se o nome do espaço esportivo corresponde
+            if (espaco.nome.toLowerCase().includes(text.toLowerCase())) return true;
 
-    }
+            // Verifica se algum esporte dentro da lista de esportes corresponde
+            return espaco.listaEsportes.some(esporte => esporte.nome.toLowerCase().includes(text.toLowerCase()));
+        });
+        setEspacosEsportivosFiltrado(filtrados);
+    };
 
     const carregarEspacosEsportivos = () => {
         setIsLoading(true);
@@ -20,6 +27,7 @@ export default function PageLocaisEsportivos({ navigation }) {
         LocacaoService.getEspacosEsportivos()
             .then(result => {
                 setEspacosEsportivos(result);
+                setEspacosEsportivosFiltrado(result);
                 setIsLoading(false);
             })
             .catch(error => {
@@ -36,8 +44,8 @@ export default function PageLocaisEsportivos({ navigation }) {
     return (
         <ScrollView>
             <Box mt={25} paddingX={5}>
-                <Heading borderColor={'green.500'} borderLeftWidth={20} color="green.500" fontSize={'3xl'} marginBottom={10} paddingLeft={'30px'}>
-                    Conheça os espaços esportivos
+                <Heading borderColor={'green.500'} borderLeftWidth={20} color={'green.500'} fontSize={'3xl'} marginBottom={10} paddingLeft={'30px'} noOfLines={2}>
+                    Conheça os espaços esportivos da UFPR
                 </Heading>
             </Box>
             <Box mb="10" paddingX={'30px'}>
@@ -47,11 +55,11 @@ export default function PageLocaisEsportivos({ navigation }) {
                 <Input
                     placeholder="nome ou esporte..."
                     variant="underlined" width="100%" fontSize="md" py="1" px="2" InputLeftElement={<SearchIcon />}
-                    onChangeText={handleFiltroLocais()}
+                    onChangeText={text => handleFiltroLocais(text)}
                 />
             </Box>
 
-            {espacosEsportivos.map((card, index) => (
+            {espacosEsportivosFiltrado.map((card, index) => (
                 <Box key={index} mb='5' mx='5' rounded="lg" overflow="hidden" borderColor="coolGray.200" borderWidth="1" borderRadius={'21'}
                     _dark={{
                         borderColor: "coolGray.600",
@@ -100,7 +108,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                             <Flex direction="row" align="center">
                                 <Feather name="users" size={15} color='black' />
                                 <Text ml='1' fontSize="md">
-                                    Capacidade de {card.capacidade} pessoa(s)
+                                    Capacidade para {card.capacidade} pessoa(s)
                                 </Text>
                             </Flex>
                             <Box my="5">
