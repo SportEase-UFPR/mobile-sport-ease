@@ -4,12 +4,15 @@ import { CheckBox } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import styles from './styles';
+import { useAuth } from '../../../contexts/AuthContext';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/BasicTextInput';
 import BasicButton from '../../../components/BasicButton';
 
 export default function PageAutocadastro() {
+
+  const { onCadastrar } = useAuth();
 
   const navigation = useNavigation();
 
@@ -28,7 +31,6 @@ export default function PageAutocadastro() {
     Keyboard.dismiss();
     let isValid = true;
 
-    // Add validations for all the fields
     if (!inputs.nomeCompleto) {
       handleError('Nome completo é obrigatório', 'nomeCompleto');
       isValid = false;
@@ -59,10 +61,27 @@ export default function PageAutocadastro() {
     }
   };
 
-  const autocadastro = () => {
-    // Integrar com o serviço de autocadastro
-    Alert.alert('Sucesso', 'Autocadastro realizado com sucesso!');
+  const autocadastro = async () => {
+    try {
+      const response = await onCadastrar({
+        nome: inputs.nomeCompleto,
+        email: inputs.email,
+        cpf: inputs.cpf,
+        alunoUFPR: isStudent,
+        grr: isStudent ? inputs.grr : null,
+        senha: inputs.senha
+      });
+
+      if (response.data && response.data.id) {
+        Alert.alert('Sucesso', 'Autocadastro realizado com sucesso!');
+      } else {
+        Alert.alert('Atenção', response.msg);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Houve um erro ao realizar o autocadastro. Verifique seus dados e tente novamente.');
+    }
   };
+
 
   const handleOnchange = (text, input) => {
     setInputs(prevState => ({ ...prevState, [input]: text }));

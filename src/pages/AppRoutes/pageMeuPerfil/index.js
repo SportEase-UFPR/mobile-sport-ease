@@ -1,28 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import styles from './styles';
 import { Box, Flex, Heading, Text, Pressable, Container, Center } from 'native-base';
 
-import PageEditarPerfil from '../pageEditarPerfil';
-
 import { useAuth } from '../../../contexts/AuthContext';
+import ClienteService from '../../../api/ClienteService';
 
 const PageMeuPerfil = ({ navigation }) => {
-    const { onLogout, authState } = useAuth();
+    const { onLogout } = useAuth();
+    const [headerText, setHeaderText] = useState('');
+
+
+    const carregarNomeUsuario = async () => {
+        const result = await ClienteService.getInformacoesUsuario();
+        if (result.nome) {
+            const primeiroNome = result.nome.split(' ')[0];
+            setHeaderText('Olá, ' + primeiroNome + '!');
+        } else {
+            setHeaderText('');
+        }
+    }
+
+    useEffect(() => {
+        carregarNomeUsuario();
+    }, [])
 
     return (
-        <Box mt={25} paddingX={5}>
-            <Heading color="green.500" fontSize={'4xl'} marginBottom={10}>
-                Olá, Fulano!
+        <Box mt={25} mb={25} paddingX={5}>
+
+            <Heading borderColor={'green.500'} borderLeftWidth={20} color="green.500" fontSize={'3xl'} marginBottom={10} paddingLeft={'30px'}>
+                {headerText}
             </Heading>
+
             <Pressable
                 onPress={() => navigation.navigate('PageEditarPerfil')}
                 overflow="hidden"
                 display="flex"
                 style={{ flexDirection: 'row', justifyContent: 'space-between' }}
                 marginBottom={5}>
-                
+
                 <Flex direction="row" align="center">
                     <Feather name="edit-2" size={24} color="black" style={styles.listItemIcon} />
                     <Text color="coolGray.800" fontWeight="medium" fontSize="xl">

@@ -2,21 +2,28 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import jwtDecode from 'jwt-decode';
+import AuthService from '../api/AuthService';
+import ApiClient from '../api/ApiClient';
+
+interface UserData {
+    nome: string;
+    email: string;
+    cpf: string;
+    alunoUFPR: boolean;
+    grr?: string;
+    senha: string;
+}
 
 interface AuthProps {
     authState?: { token: string | null; authenticated: boolean | null; userId: number | null; };
-    onRegister?: (email: string, password: string) => Promise<any>;
+    onCadastrar?: (userData: UserData) => Promise<any>;
     onLogin?: (email: string, password: string) => Promise<any>;
     onLogout?: () => Promise<any>;
 }
 
 const TOKEN_KEY = 'my-jwt';
 
-
-export const API_URL = 'http://10.0.2.2:8080';
-
 const AuthContext = createContext<AuthProps>({});
-const expToken = 'data-exp-token'
 
 export const useAuth = () => {
     return useContext(AuthContext);
@@ -45,7 +52,6 @@ export const AuthProvider = ({ children }: any) => {
                     console.log(decodedToken);
                     const expTimestamp = decodedToken.exp;
                     const id = decodedToken.idPessoa;
-                    console.log(id)
                     const currentTime = Math.floor(Date.now() / 1000);
 
                     if (expTimestamp < currentTime) {
@@ -58,8 +64,8 @@ export const AuthProvider = ({ children }: any) => {
                         });
                     } else {
                         // O token ainda é válido
-                        console.log('O token ainda é válido');
-                        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                        console.log('O token ainda é válido', );
+                        ApiClient.defaults.headers.common['Authorization'] = `${token}`;
                         setAuthState({
                             token: token,
                             authenticated: true,
@@ -75,28 +81,27 @@ export const AuthProvider = ({ children }: any) => {
     }, [])
 
 
-    const register = async (email: string, password: string) => {
+    const cadastrar = async (userData: UserData) => {
         try {
-            return await axios.post(`${API_URL}/INTEGRAR-COM-BACK`, { email, password });
+            const response = await AuthService.cadastrar(userData);
+            return response;
         } catch (e) {
-            return { error: true, msg: (e as any).response.data.msg };
+            return { error: true, msg: (e as any).response.data.message };
         }
     }
 
+
     const login = async (email: string, password: string) => {
         try {
-            console.log('email:', email);
-            console.log('senha', password);
-            const result = await axios.post(`${API_URL}/login`, { login: email, senha: password });
-            const decodedToken = jwtDecode(result.data.token); 
+            const result = await AuthService.login(email, password);
+            const decodedToken = jwtDecode(result.data.token);
             const id = decodedToken.idPessoa;
             setAuthState({
                 token: result.data.token,
                 authenticated: true,
                 id: id
             });
-
-            axios.defaults.headers.common['Authorization'] = `Bearer ${result.data.token}`;
+            ApiClient.defaults.headers.common['Authorization'] = `${result.data.token}`;
             await SecureStore.setItemAsync(TOKEN_KEY, result.data.token);
             return result;
         } catch (e) {
@@ -107,7 +112,7 @@ export const AuthProvider = ({ children }: any) => {
     const logout = async () => {
         try {
             await SecureStore.deleteItemAsync(TOKEN_KEY);
-            axios.defaults.headers.common['Authorization'] = null;
+            ApiClient.defaults.headers.common['Authorization'] = null;
             setAuthState({
                 token: null,
                 authenticated: false,
@@ -120,7 +125,7 @@ export const AuthProvider = ({ children }: any) => {
 
 
     const value = {
-        onRegister: register,
+        onCadastrar: cadastrar,
         onLogin: login,
         onLogout: logout,
         authState

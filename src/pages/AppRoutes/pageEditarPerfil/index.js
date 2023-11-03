@@ -29,7 +29,6 @@ export default function PageEditarPerfil() {
     Keyboard.dismiss();
     let isValid = true;
 
-    // Add validations for all the fields
     if (!inputs.nomeCompleto) {
       handleError('Nome completo é obrigatório', 'nomeCompleto');
       isValid = false;

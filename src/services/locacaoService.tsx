@@ -23,5 +23,3 @@ export const listarHorariosDisponiveis = async (requestData) => {
     }
 };
 
-
-

@@ -141,7 +141,7 @@ const PageNovaReserva = () => {
     return (
         <ScrollView>
             <Box mt={25} mb={25} paddingX={5} >
-                <Heading borderColor={'green.500'} borderLeftWidth={30} color="green.500" fontSize={'4xl'} marginBottom={10} paddingLeft={'12'}>
+                <Heading borderColor={'green.500'} borderLeftWidth={20} color="green.500" fontSize={'3xl'} marginBottom={10} paddingLeft={'30px'}>
                     Nova solicitação de reserva
                 </Heading>
                 <Box mb={10}>

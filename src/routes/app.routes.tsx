@@ -2,16 +2,17 @@ import React from 'react';
 import { Text, View, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { SimpleLineIcons } from '@expo/vector-icons';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Feather } from '@expo/vector-icons';
-
 
 import PageMeuPerfil from '../pages/AppRoutes/pageMeuPerfil';
 import styles from '../../styles';
 import { useFonts } from 'expo-font';
 import PageNovaReserva from '../pages/AppRoutes/pageNovaReserva';
 import PageHomeScreen from '../pages/AppRoutes/pageHomeScreen';
+import PageHistorico from '../pages/AppRoutes/pageHistorico';
+import PageEditarPerfil from '../pages/AppRoutes/pageEditarPerfil';
+import PageLocaisEsportivos from '../pages/AppRoutes/pageLocaisEsportivos';
 
 
 function LogoTitle() {
@@ -23,23 +24,7 @@ function LogoTitle() {
     );
 }
 
-
 // Componentes para cada aba
-function Tab1Screen() {
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Tab 1!</Text>
-        </View>
-    );
-}
-
-function Tab2Screen() {
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Tab 2!</Text>
-        </View>
-    );
-}
 
 function Tab3Screen() {
     return (
@@ -49,15 +34,21 @@ function Tab3Screen() {
     );
 }
 
-function Tab4Screen() {
+const ProfileStack = createStackNavigator();
+function MeuPerfilStack() {
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Tab 4!</Text>
-        </View>
+        <ProfileStack.Navigator>
+            <ProfileStack.Screen name="MeuPerfil" component={PageMeuPerfil}
+                options={{
+                    headerShown: false
+                }} />
+            <ProfileStack.Screen name="PageEditarPerfil" component={PageEditarPerfil}
+                options={{
+                    headerShown: false
+                }} />
+        </ProfileStack.Navigator>
     );
 }
-
-// importar telas que o usuário poderá acessar depois de login
 
 
 const Tab = createBottomTabNavigator();
@@ -93,35 +84,35 @@ export default function AppRoutes() {
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="home" size={24} color={focused ? 'green' : 'black'} />
+                            <Feather name="home" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Nova Reserva" component={PageNovaReserva}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="plus-square" size={24} color={focused ? 'green' : 'black'} />
+                            <Feather name="plus-square" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
                         )
                     }} />
-                <Tab.Screen name="Tab3" component={Tab3Screen}
+                <Tab.Screen name="Locais Esportivos" component={PageLocaisEsportivos}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="map-pin" size={24} color={focused ? 'green' : 'black'} />
+                            <Feather name="map-pin" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
                         )
                     }} />
-                <Tab.Screen name="Historico" component={Tab4Screen}
+                <Tab.Screen name="Historico" component={PageHistorico}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="clock" size={24} color={focused ? 'green' : 'black'} />
+                            <Feather name="clock" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
                         )
                     }} />
-                <Tab.Screen name="Meu Perfil" component={PageMeuPerfil}
+                <Tab.Screen name="Meu Perfil" component={MeuPerfilStack}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="user" size={24} color={focused ? 'green' : 'black'} />
+                            <Feather name="user" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
                         )
                     }} />
             </Tab.Navigator>
