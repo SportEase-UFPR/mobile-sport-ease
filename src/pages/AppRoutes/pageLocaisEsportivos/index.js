@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { Center, Box, Stack, VStack, Heading, Text, Button, Skeleton, CheckIcon, CloseIcon, ScrollView, Flex, Badge, Image, WarningOutlineIcon, ArrowForwardIcon } from 'native-base';
+import { Center, Box, Stack, VStack, Heading, Text, Button, Skeleton, Divider, ScrollView, Flex, Badge, Image, WarningOutlineIcon, ArrowForwardIcon, Input, Icon, SearchIcon } from 'native-base';
 import LocacaoService from '../../../api/LocacaoService';
 import { Feather } from '@expo/vector-icons';
 
 
 export default function PageLocaisEsportivos({ navigation }) {
     const [espacosEsportivos, setEspacosEsportivos] = useState(['local']);
+    const [espacosEsportivosFiltrado, setEspacosEsportivosFiltrado] = useState(['']);
     const [isLoading, setIsLoading] = useState(true);
+
+    const handleFiltroLocais = () => {
+
+    }
 
     const carregarEspacosEsportivos = () => {
         setIsLoading(true);
@@ -35,6 +40,17 @@ export default function PageLocaisEsportivos({ navigation }) {
                     Conheça os espaços esportivos
                 </Heading>
             </Box>
+            <Box mb="10" paddingX={'30px'}>
+                <Heading fontSize="lg" >
+                    Pesquise um espaço:
+                </Heading>
+                <Input
+                    placeholder="nome ou esporte..."
+                    variant="underlined" width="100%" fontSize="md" py="1" px="2" InputLeftElement={<SearchIcon />}
+                    onChangeText={handleFiltroLocais()}
+                />
+            </Box>
+
             {espacosEsportivos.map((card, index) => (
                 <Box key={index} mb='5' mx='5' rounded="lg" overflow="hidden" borderColor="coolGray.200" borderWidth="1" borderRadius={'21'}
                     _dark={{
@@ -113,7 +129,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                                     isDisabled={!card.disponivel}
                                     size='lg'
                                     borderRadius='2xl'
-                                    width="150px"
+                                    width="180px"
                                     backgroundColor={card.disponivel ? 'success.500' : 'danger.500'}
                                     leftIcon={card.disponivel ? <ArrowForwardIcon /> : <WarningOutlineIcon />}
                                     onPress={() => navigation.navigate('Nova Reserva')}
