@@ -131,6 +131,10 @@ export default function PageLogin() {
       {/* INPUTS PARA LOGIN */}
       <View style={styles.inputContainer}>
         <Input
+          inputType={'email'}
+          keyboardType={'email-address'}
+          autoCapitalize={'none'}
+          autoComplete={'email'}
           onChangeText={text => handleOnchange(text, 'email')}
           onFocus={() => handleError(null, 'email')}
           iconName="email-outline"
@@ -138,6 +142,7 @@ export default function PageLogin() {
           error={errors.email}
         />
         <Input
+          autoCapitalize={'none'}
           onChangeText={text => handleOnchange(text, 'senha')}
           onFocus={() => handleError(null, 'senha')}
           iconName="email-outline"
@@ -151,30 +156,30 @@ export default function PageLogin() {
         <Text style={[styles.simpleText, { marginBottom: 20 }]}>Esqueci a senha</Text>
       </TouchableOpacity>
 
-      
-        <Pressable
-          w={'4/5'}
-          maxH={60}
-          flex={1}
-          paddingY={5}
-          borderRadius='full'
-          backgroundColor={"success.500"}
-          onPress={handleLogin}
-          mb={10}
+
+      <Pressable
+        w={'4/5'}
+        maxH={60}
+        flex={1}
+        paddingY={5}
+        borderRadius='full'
+        backgroundColor={"success.500"}
+        onPress={handleLogin}
+        mb={10}
+      >
+        <VStack
+          alignItems="center"
+          justifyContent="center"
+          flexDirection={'row'}
+          space={2}
         >
-          <VStack
-            alignItems="center"
-            justifyContent="center"
-            flexDirection={'row'}
-            space={2}
-          >
-            {loading ? <Spinner accessibilityLabel="Entrando..." size={'sm'} color="white"  /> : null}
-            <Heading color="white" fontSize="md">
-              {loading ? ' Entrando...' : 'Entrar'}
-            </Heading>
-          </VStack>
-        </Pressable>
-      
+          {loading ? <Spinner accessibilityLabel="Entrando..." size={'sm'} color="white" /> : null}
+          <Heading color="white" fontSize="md">
+            {loading ? ' Entrando...' : 'Entrar'}
+          </Heading>
+        </VStack>
+      </Pressable>
+
 
       <TouchableOpacity onPress={() => navigation.navigate('Autocadastro')}>
         <Text style={styles.simpleText}> Quero me cadastrar </Text>

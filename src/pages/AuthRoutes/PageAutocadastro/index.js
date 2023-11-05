@@ -5,17 +5,14 @@ import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import styles from './styles';
 import { useAuth } from '../../../contexts/AuthContext';
+import { VStack, Pressable, Spinner, Heading } from 'native-base';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/BasicTextInput';
-import BasicButton from '../../../components/BasicButton';
 
 export default function PageAutocadastro() {
-
   const { onCadastrar } = useAuth();
-
   const navigation = useNavigation();
-
   const [inputs, setInputs] = React.useState({
     nomeCompleto: '',
     email: '',
@@ -26,6 +23,7 @@ export default function PageAutocadastro() {
   });
   const [errors, setErrors] = React.useState({});
   const [isStudent, setIsStudent] = React.useState(false);
+  const [isSending, setIsSending] = React.useState(false);
 
   const validate = async () => {
     Keyboard.dismiss();
@@ -68,14 +66,15 @@ export default function PageAutocadastro() {
         email: inputs.email,
         cpf: inputs.cpf,
         alunoUFPR: isStudent,
-        grr: isStudent ? inputs.grr : null,
+        grr: isStudent ? inputs.grr.toUpperCase : null,
         senha: inputs.senha
       });
 
       if (response.data && response.data.id) {
-        Alert.alert('Sucesso', 'Autocadastro realizado com sucesso!');
+        Alert.alert('Sucesso', 'Um e-mail com o link de ativação foi enviado para você!');
+        navigation.navigate('Login');
       } else {
-        Alert.alert('Atenção', response.msg);
+        Alert.alert('Erro', response.msg);
       }
     } catch (error) {
       Alert.alert('Erro', 'Houve um erro ao realizar o autocadastro. Verifique seus dados e tente novamente.');
@@ -121,6 +120,10 @@ export default function PageAutocadastro() {
           />
 
           <Input
+            inputType={'email'}
+            keyboardType={'email-address'}
+            autoCapitalize={'none'}
+            autoComplete={'email'}
             onChangeText={text => handleOnchange(text, 'email')}
             onFocus={() => handleError(null, 'email')}
             iconName="email-outline"
@@ -148,7 +151,7 @@ export default function PageAutocadastro() {
               onChangeText={text => handleOnchange(text, 'grr')}
               onFocus={() => handleError(null, 'grr')}
               iconName="account-card-details-outline"
-              placeholder="GRR..."
+              placeholder="Ex.: GRR00010002"
               error={errors.grr}
             />
           )}
@@ -171,11 +174,28 @@ export default function PageAutocadastro() {
             error={errors.confirmacaoSenha}
           />
         </View>
-
-        <BasicButton
-          title={'Cadastrar'}
+        <Pressable
+          w={'4/5'}
+          maxH={60}
+          flex={1}
+          paddingY={5}
+          borderRadius='full'
+          backgroundColor={"success.500"}
           onPress={validate}
-        />
+          mb={10}
+        >
+          <VStack
+            alignItems="center"
+            justifyContent="center"
+            flexDirection={'row'}
+            space={2}
+          >
+            {isSending ? <Spinner accessibilityLabel="Entrando..." size={'sm'} color="white" /> : null}
+            <Heading color="white" fontSize="md">
+              {isSending ? ' Enviando...' : 'Cadastrar'}
+            </Heading>
+          </VStack>
+        </Pressable>
 
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={[styles.simpleText, { marginBottom: 80 }]}>Cancelar</Text>

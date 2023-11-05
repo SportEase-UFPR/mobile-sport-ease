@@ -82,7 +82,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                     ) : (
                         <Stack p="4">
                             <Image
-                                source={{ uri: `data:image/jpeg;base64,${card.imagemBase64}` }}
+                                source={{ uri: `data:image/png;base64,${card.imagemBase64}` }}
                                 alt="Imagem do espaço esportivo"
                                 size="xl"
                                 width="100%"
@@ -134,6 +134,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                             </Flex>
                             <Flex direction="row-reverse" >
                                 <Button
+                                    mt={'5'}
                                     isDisabled={!card.disponivel}
                                     size='lg'
                                     borderRadius='2xl'

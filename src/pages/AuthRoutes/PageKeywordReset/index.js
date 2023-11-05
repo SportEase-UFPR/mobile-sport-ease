@@ -64,6 +64,10 @@ export default function PageKeywordReset() {
       <Text style={{ textAlign: 'center', marginHorizontal: 10 }}> Informe o seu e-mail cadastrado na plataforma para receber as instruções e recuperar sua senha. </Text>
       <View style={styles.inputContainer}>
         <Input
+          inputType={'email'}
+          keyboardType={'email-address'}
+          autoCapitalize={'none'}
+          autoComplete={'email'}
           onChangeText={text => handleOnchange(text, 'email')}
           onFocus={() => handleError(null, 'email')}
           placeholder="E-mail da conta..."
