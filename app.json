@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sportease.mobile"
     },
     "android": {
       "package": "com.sportease.mobile",
@@ -26,6 +27,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6b009946-1b37-47c8-ad73-e560fa08b0bf"
+      }
     }
   }
 }

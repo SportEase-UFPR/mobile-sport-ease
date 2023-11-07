@@ -4,6 +4,8 @@ import * as SecureStore from 'expo-secure-store';
 import jwtDecode from 'jwt-decode';
 import AuthService from '../api/AuthService';
 import ApiClient from '../api/ApiClient';
+import { registerIndieID, unregisterIndieDevice } from 'native-notify';
+
 
 interface UserData {
     nome: string;
@@ -64,7 +66,7 @@ export const AuthProvider = ({ children }: any) => {
                         });
                     } else {
                         // O token ainda é válido
-                        console.log('O token ainda é válido', );
+                        console.log('O token ainda é válido',);
                         ApiClient.defaults.headers.common['Authorization'] = `${token}`;
                         setAuthState({
                             token: token,
@@ -103,6 +105,9 @@ export const AuthProvider = ({ children }: any) => {
             });
             ApiClient.defaults.headers.common['Authorization'] = `${result.data.token}`;
             await SecureStore.setItemAsync(TOKEN_KEY, result.data.token);
+            // Native Notify Indie Push Registration Code
+            registerIndieID(`${id}`, 14520, 'vdk0Ur8ZprhkWw4MiubMKt');
+            // End of Native Notify Code
             return result;
         } catch (e) {
             return { error: true, msg: (e as any).response.data.msg };
@@ -112,6 +117,9 @@ export const AuthProvider = ({ children }: any) => {
     const logout = async () => {
         try {
             await SecureStore.deleteItemAsync(TOKEN_KEY);
+            // Native Notify Indie Push Registration Code
+            unregisterIndieDevice(`${authState.id}`, 14520, 'vdk0Ur8ZprhkWw4MiubMKt');
+            // End of Native Notify Code
             ApiClient.defaults.headers.common['Authorization'] = null;
             setAuthState({
                 token: null,

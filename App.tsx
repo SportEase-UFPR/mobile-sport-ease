@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import registerNNPushToken from 'native-notify';
 
 import AuthRoutes from './src/routes/auth.routes';
 import AppRoutes from './src/routes/app.routes';
@@ -11,6 +12,7 @@ import { NativeBaseProvider, Text, Box } from "native-base";
 const Stack = createStackNavigator();
 
 export default function App() {
+  registerNNPushToken(14520, 'vdk0Ur8ZprhkWw4MiubMKt');
   return (
     <AuthProvider>
       <NativeBaseProvider>
