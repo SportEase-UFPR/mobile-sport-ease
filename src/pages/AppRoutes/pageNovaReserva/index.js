@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { listarHorariosDisponiveis, solicitarLocacao } from '../../../services/locacaoService';
-import LocacaoService from '../../../api/LocacaoService';
+import LocacaoService, { getHorariosDisponiveis, getInformacoesEspacoEsportivo } from '../../../api/LocacaoService';
 import { Box, TextArea, Heading, Text, Pressable, ScrollView, FormControl, Input, WarningOutlineIcon, Select, VStack, Skeleton, Spinner, NativeBaseProvider } from 'native-base';
 
 import temaGeralFormulario from './nativeBaseTheme';
@@ -19,13 +19,15 @@ const PageNovaReserva = () => {
     const [dataReserva, setDataReserva] = useState(new Date());
     const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
     const [espacosEsportivos, setEspacosEsportivos] = useState([]);
+    const [informacoesEspacoEscolhido, setInformacoesEspacoEscolhido] = useState([]);
+
     const [isLoading, setIsLoading] = useState(true);
     const [isSending, setIsSending] = useState(true);
-
     const [inputErrors, setInputErrors] = useState({})
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
 
+    // UseEffect para carregar a listagem inicial dos espaços esportivos
     useEffect(() => {
         setIsLoading(true);
         const carregarEspacosEsportivos = async () => {
@@ -42,7 +44,12 @@ const PageNovaReserva = () => {
         carregarEspacosEsportivos();
     }, []);
 
+    //UseEffect para carregar os horários disponíveis de reserva
     useEffect(() => {
+        if (inputLocalReserva) {
+            console.log(inputLocalReserva);
+            carregarInformacoesEspacoEscolhido(inputLocalReserva);
+        }
         if (inputLocalReserva && dataReserva) {
             carregarHorariosDisponiveis(dataReserva, inputLocalReserva);
         }
@@ -58,11 +65,20 @@ const PageNovaReserva = () => {
                 data: dataReserva.toISOString(),
                 idEspacoEsportivo: idEspacoEsportivo,
             };
-
-            const result = await listarHorariosDisponiveis(requestData);
+            const result = await getHorariosDisponiveis(requestData);
             setHorariosDisponiveis(result);
         } catch (error) {
             console.error('Erro ao carregar horários disponíveis:', error);
+        }
+    };
+
+    const carregarInformacoesEspacoEscolhido = async (idEspacoEsportivo) => {
+        try {
+            const result = await getInformacoesEspacoEsportivo(idEspacoEsportivo);
+            setInformacoesEspacoEscolhido(result);
+            
+        } catch (error) {
+            console.error('Erro ao carregar informações do local:', error);
         }
     };
 
@@ -192,20 +208,6 @@ const PageNovaReserva = () => {
                             </Box>
                             <Box mb={10}>
                                 <Text fontSize={'2xl'} color="green.800" fontWeight={'semibold'}>Dados da reserva</Text>
-                                <FormControl isRequired isInvalid={inputErrors.qntParticipantesInvalid} marginBottom={3}>
-                                    <FormControl.Label>Quantidade de participantes</FormControl.Label>
-                                    <Input
-                                        placeholder="Selecionar quantidade de pessoas..."
-                                        keyboardType="numeric"
-                                        onChangeText={(text) => {
-                                            setInputErrors(prevErrors => ({ ...prevErrors, qntParticipantesInvalid: false }));
-                                            setQntParticipantesReserva(text)
-                                        }}
-                                    />
-                                    <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
-                                        Indique a quantidade de participantes
-                                    </FormControl.ErrorMessage>
-                                </FormControl>
 
                                 <FormControl isRequired isInvalid={inputErrors.dataReservaInvalid} marginBottom={3}>
                                     <FormControl.Label>Selecione o dia da reserva </FormControl.Label>
@@ -249,8 +251,8 @@ const PageNovaReserva = () => {
                                         }}
                                     >
                                         {
-                                            horarioDisponivelData && horarioDisponivelData.horaInteira ?
-                                                horarioDisponivelData.horaInteira.map((horario, index) => (
+                                            horarioDisponivelData && horarioDisponivelData.horariosDisponiveis ?
+                                                horarioDisponivelData.horariosDisponiveis.map((horario, index) => (
                                                     <Select.Item key={index} label={horario.toString()} value={horario.toString()} />
                                                 )) : []
 
@@ -260,6 +262,7 @@ const PageNovaReserva = () => {
                                         Indique o horário de início da reserva
                                     </FormControl.ErrorMessage>
                                 </FormControl>
+
                                 <FormControl isRequired isInvalid={inputErrors.qntHorasInvalid}>
                                     <FormControl.Label>Selecione a quantidade de horas a serem reservadas </FormControl.Label>
                                     <Input
@@ -272,6 +275,21 @@ const PageNovaReserva = () => {
                                     />
                                     <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
                                         Indique por quantas horas o local será reservado
+                                    </FormControl.ErrorMessage>
+                                </FormControl>
+
+                                <FormControl isRequired isInvalid={inputErrors.qntParticipantesInvalid} marginBottom={3}>
+                                    <FormControl.Label>Quantidade de participantes</FormControl.Label>
+                                    <Input
+                                        placeholder="Selecionar quantidade de pessoas..."
+                                        keyboardType="numeric"
+                                        onChangeText={(text) => {
+                                            setInputErrors(prevErrors => ({ ...prevErrors, qntParticipantesInvalid: false }));
+                                            setQntParticipantesReserva(text)
+                                        }}
+                                    />
+                                    <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                                        Indique a quantidade de participantes
                                     </FormControl.ErrorMessage>
                                 </FormControl>
                             </Box>
