@@ -1,6 +1,6 @@
 import ApiClient from './ApiClient';
 
-const getEspacosEsportivos = async () => {
+export const getEspacosEsportivos = async () => {
     try {
         const response = await ApiClient.get('/espacos-esportivos');
         return response.data;
@@ -10,7 +10,7 @@ const getEspacosEsportivos = async () => {
     }
 };
 
-const getEspacosEsportivosDisponiveis = async () => {
+export const getEspacosEsportivosDisponiveis = async () => {
     try {
         const response = await ApiClient.get('/espacos-esportivos/disponiveis');
         return response.data;
@@ -23,7 +23,6 @@ const getEspacosEsportivosDisponiveis = async () => {
 export const getHorariosDisponiveis = async (requestData) => {
     try {
         const response = await ApiClient.post('/locacoes/horarios-disponiveis', requestData);
-        console.log('Dados da resposta da requisição: ', response.data);
         return response.data;
     } catch (error) {
         throw error;
@@ -33,7 +32,25 @@ export const getHorariosDisponiveis = async (requestData) => {
 export const getInformacoesEspacoEsportivo = async (requestData) => {
     try {
         const response = await ApiClient.get(`/espacos-esportivos/${requestData}`);
-        console.log('Dados da resposta da requisição: ', response.data);
+        console.log('Dados da resposta da requisição: ', response.data.maxLocacaoDia);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createSolicitacaoLocacao = async (requestData) => {
+    try {
+        const response = await ApiClient.post('/locacoes/solicitar-locacao', requestData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getSolicitacoesEmAndamento = async () => {
+    try {
+        const response = await ApiClient.get('/locacoes/listar-reservas-em-andamento');
         return response.data;
     } catch (error) {
         throw error;
@@ -43,5 +60,7 @@ export const getInformacoesEspacoEsportivo = async (requestData) => {
 export default {
     getEspacosEsportivos,
     getEspacosEsportivosDisponiveis,
-    getHorariosDisponiveis
+    getHorariosDisponiveis,
+    createSolicitacaoLocacao,
+    getSolicitacoesEmAndamento
 };
