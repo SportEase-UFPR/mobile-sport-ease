@@ -49,7 +49,7 @@ function NotificationButton() {
 
     return (
         <IconButton
-            icon={<Icon as={MaterialCommunityIcons} name={useNotifications. ? 'bell-badge' : 'bell'} />}
+            icon={<Icon as={MaterialCommunityIcons} name={isNotification ? 'bell-badge' : 'bell'} />}
             borderRadius="full"
             mr="4"
             _icon={{
