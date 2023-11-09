@@ -1,7 +1,6 @@
-// implementar requisições de solicitação de dados de requisição
 import ApiClient from './ApiClient';
 
-const getInformacoesUsuario = async () => {
+export const getInformacoesUsuario = async () => {
     try {
         const response = await ApiClient.get('/clientes/cliente-logado');
         return response.data;
@@ -11,6 +10,17 @@ const getInformacoesUsuario = async () => {
     }
 };
 
+export const getNotificacoes = async () => {
+    try {
+        const response = await ApiClient.get('/notificacoes');
+        return response.data;
+    } catch (error) {
+        console.error('Erro na requisição getNotificacores:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
 export default {
     getInformacoesUsuario,
+    getNotificacoes
 };

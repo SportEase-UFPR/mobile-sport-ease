@@ -406,7 +406,7 @@ const PageNovaReserva = ({ navigation }) => {
 
                                         <FormControl isRequired isInvalid={inputErrors.qntHorasInvalid}>
                                             <FormControl.Label>Por quanto tempo você deseja reservar o espaço? </FormControl.Label>
-                                            <Slider defaultValue={1} size="lg" colorScheme="green" w="90%" mx="auto" minValue={1} maxValue={sliderMax}
+                                            <Slider defaultValue={1} size="md" colorScheme="green" w="90%" mx="auto" minValue={1} maxValue={sliderMax} 
                                                 onChange={v => {
                                                     v && setQntHoras(v);
                                                 }}>

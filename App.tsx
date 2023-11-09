@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import registerNNPushToken from 'native-notify';
 
+
 import AuthRoutes from './src/routes/auth.routes';
 import AppRoutes from './src/routes/app.routes';
 
