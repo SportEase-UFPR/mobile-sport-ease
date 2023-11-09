@@ -9,6 +9,7 @@ import AuthRoutes from './src/routes/auth.routes';
 import AppRoutes from './src/routes/app.routes';
 
 import { NativeBaseProvider, Text, Box } from "native-base";
+import { NotificationProvider } from './src/contexts/NotificationContext';
 
 const Stack = createStackNavigator();
 
@@ -29,7 +30,9 @@ function InnerApp() {
   return (
     <NavigationContainer>
       {authState?.authenticated ? (
-        <AppRoutes />
+        <NotificationProvider>
+          <AppRoutes />
+        </NotificationProvider>
       ) : (
         <AuthRoutes />
       )}

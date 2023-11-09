@@ -18,6 +18,8 @@ import { useNavigation } from '@react-navigation/native';
 import { getNotificacoes } from '../api/ClienteService';
 import PageNotificacoes from '../pages/AppRoutes/pageNotificacoes';
 
+import { useNotifications } from '../contexts/NotificationContext';
+
 function LogoTitle() {
     return (
         <Image
@@ -31,23 +33,23 @@ function NotificationButton() {
     const navigation = useNavigation();
     const [isNotification, setIsNotification] = useState(false);
 
-    useEffect(() => {
-        const carregarNotificacoes = async () => {
-            const response = await getNotificacoes()
-            const hasUnreadNotification = response.some(notificacao => notificacao.lida === false); // Verifica se há alguma notificação não lida
-            if (response! && hasUnreadNotification) {
-                setIsNotification(true);
-            } else {
-                setIsNotification(false);
-            }
-        }
+    // useEffect(() => {
+    //     const carregarNotificacoes = async () => {
+    //         const response = await getNotificacoes()
+    //         const hasUnreadNotification = response.some(notificacao => notificacao.lida === false); // Verifica se há alguma notificação não lida
+    //         if (response! && hasUnreadNotification) {
+    //             setIsNotification(true);
+    //         } else {
+    //             setIsNotification(false);
+    //         }
+    //     }
 
-        carregarNotificacoes();
-    }, [])
+    //     carregarNotificacoes();
+    // }, [])
 
     return (
         <IconButton
-            icon={<Icon as={MaterialCommunityIcons} name={isNotification ? 'bell-badge' : 'bell'} />}
+            icon={<Icon as={MaterialCommunityIcons} name={useNotifications. ? 'bell-badge' : 'bell'} />}
             borderRadius="full"
             mr="4"
             _icon={{
