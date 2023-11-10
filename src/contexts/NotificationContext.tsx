@@ -23,7 +23,7 @@ const NotificationContext = createContext<NotificationContextType>({
     setNotifications: () => { },
     newNotifications: false,
     setNewNotifications: () => { },
-    markNotificationsAsRead: () => { } 
+    markNotificationsAsRead: () => { },
 });
 
 const NotificationProvider = ({ children }) => {
