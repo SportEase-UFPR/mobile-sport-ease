@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { ActivityIndicator, Text as RNText } from 'react-native';
-import { View, FlatList, Text, Heading, Box, HStack, VStack, Spacer, Badge } from 'native-base';
+import { View, FlatList, Text, Heading, Box, HStack, VStack, Divider, Badge } from 'native-base';
 import { useNotifications } from '../../../contexts/NotificationContext'; // Ajuste para importar o hook de contexto
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { readNotifications } from '../../../api/ClienteService';
@@ -10,6 +10,7 @@ import { readNotifications } from '../../../api/ClienteService';
 function NotificationItem({ item }) {
     return (
         <Box
+            backgroundColor={'white'}
             borderWidth="2"
             borderColor={item.lida ? "coolGray.400" : "yellow.600"}
             borderRadius={'lg'}
@@ -18,8 +19,7 @@ function NotificationItem({ item }) {
             mb="3">
             <HStack
                 justifyContent="space-between"
-                alignItems="center"
-            >
+                alignItems="center">
                 <VStack flex={1}>
                     <Text
                         fontSize={'lg'}
@@ -27,7 +27,9 @@ function NotificationItem({ item }) {
                         bold>
                         {item.titulo}
                     </Text>
-                    <Text color={item.lida ? "coolGray.600" : "yellow.600"}>
+                    <Text
+                        fontSize={'xs'}
+                        color={item.lida ? "coolGray.600" : "yellow.600"}>
                         {item.conteudo}
                     </Text>
                 </VStack>
@@ -83,7 +85,7 @@ export default function PageNotificacoes() {
             <Heading fontSize="4xl" pb="3" textAlign={'right'}>
                 <MaterialCommunityIcons name="message-text" size={30} color="black" /> Notificações
             </Heading>
-            <Spacer> </Spacer>
+            <Divider mb="5" mt="5"></Divider>
             <FlatList
                 data={notifications}
                 renderItem={({ item }) => <NotificationItem item={item} />}
