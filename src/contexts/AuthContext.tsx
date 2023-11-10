@@ -6,7 +6,6 @@ import AuthService from '../api/AuthService';
 import ApiClient from '../api/ApiClient';
 import { registerIndieID, unregisterIndieDevice } from 'native-notify';
 
-
 interface UserData {
     nome: string;
     email: string;

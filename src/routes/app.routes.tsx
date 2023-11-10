@@ -15,9 +15,7 @@ import PageEditarPerfil from '../pages/AppRoutes/pageEditarPerfil';
 import PageLocaisEsportivos from '../pages/AppRoutes/pageLocaisEsportivos';
 import { IconButton, Icon } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
-import { getNotificacoes } from '../api/ClienteService';
 import PageNotificacoes from '../pages/AppRoutes/pageNotificacoes';
-
 import { useNotifications } from '../contexts/NotificationContext';
 
 function LogoTitle() {
@@ -33,19 +31,14 @@ function NotificationButton() {
     const navigation = useNavigation();
     const [isNotification, setIsNotification] = useState(false);
 
-    // useEffect(() => {
-    //     const carregarNotificacoes = async () => {
-    //         const response = await getNotificacoes()
-    //         const hasUnreadNotification = response.some(notificacao => notificacao.lida === false); // Verifica se há alguma notificação não lida
-    //         if (response! && hasUnreadNotification) {
-    //             setIsNotification(true);
-    //         } else {
-    //             setIsNotification(false);
-    //         }
-    //     }
+    // useNotifications é um hook e deve ser chamado diretamente no corpo do componente
+    const { notifications } = useNotifications();
 
-    //     carregarNotificacoes();
-    // }, [])
+    useEffect(() => {
+        // Não precisa de uma função assíncrona aqui, pois os dados já estão no contexto
+        const hasUnreadNotification = notifications.some(notificacao => !notificacao.lida);
+        setIsNotification(hasUnreadNotification);
+    }, [notifications])
 
     return (
         <IconButton
@@ -80,8 +73,6 @@ function NotificationButton() {
     );
 }
 
-
-
 const ProfileStack = createStackNavigator();
 function MeuPerfilStack() {
     return (
@@ -95,19 +86,6 @@ function MeuPerfilStack() {
                     headerShown: false
                 }} />
         </ProfileStack.Navigator>
-    );
-}
-
-const NotificationStack = createStackNavigator();
-function NotificationStackScreen() {
-    return (
-        <NotificationStack.Navigator>
-            <NotificationStack.Screen
-                name="pNotificacoes"
-                component={PageNotificacoes}
-                options={{ headerShown: false }}
-            />
-        </NotificationStack.Navigator>
     );
 }
 
@@ -177,8 +155,7 @@ export default function AppRoutes() {
                     }} />
                 <Tab.Screen name="Notificacoes" component={PageNotificacoes}
                     options={{
-                        tabBarButton: () => null, // Isso tornará a aba invisível
-                        // outras opções para esta aba específica
+                        tabBarButton: () => null, 
                     }} />
             </Tab.Navigator>
         </NavigationContainer>

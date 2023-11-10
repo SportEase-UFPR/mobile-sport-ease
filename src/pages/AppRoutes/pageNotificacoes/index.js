@@ -1,57 +1,94 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { FlatList, Text, Heading, Box, HStack, VStack, Spacer } from 'native-base';
-import { getNotificacoes } from '../../../api/ClienteService';
+import React, { useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
+import { ActivityIndicator, Text as RNText } from 'react-native';
+import { View, FlatList, Text, Heading, Box, HStack, VStack, Spacer, Badge } from 'native-base';
+import { useNotifications } from '../../../contexts/NotificationContext'; // Ajuste para importar o hook de contexto
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { readNotifications } from '../../../api/ClienteService';
+
+function NotificationItem({ item }) {
+    return (
+        <Box
+            borderWidth="2"
+            borderColor={item.lida ? "coolGray.400" : "yellow.600"}
+            borderRadius={'lg'}
+            py="2"
+            px="4"
+            mb="3">
+            <HStack
+                justifyContent="space-between"
+                alignItems="center"
+            >
+                <VStack flex={1}>
+                    <Text
+                        fontSize={'lg'}
+                        color={item.lida ? "coolGray.600" : "yellow.600"}
+                        bold>
+                        {item.titulo}
+                    </Text>
+                    <Text color={item.lida ? "coolGray.600" : "yellow.600"}>
+                        {item.conteudo}
+                    </Text>
+                </VStack>
+                {!item.lida && (
+                    <View style={{
+                        width: 15,
+                        height: 15,
+                    }}
+                        bgColor={"yellow.600"}
+                        borderRadius={'full'}
+                    />
+                )}
+            </HStack>
+        </Box>
+    );
+}
 
 export default function PageNotificacoes() {
-    const [notificacoes, setNotificacoes] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { notifications, newNotifications, markNotificationsAsRead } = useNotifications();
 
-    useEffect(() => {
-        setIsLoading(true)
-        const carregarNotificacoes = async () => {
-            const response = await getNotificacoes();
-            if (response) {
-                setNotificacoes(response);
-                setIsLoading(false);
-            } else {
-                setIsLoading(false);
-            }
-        }
-        carregarNotificacoes();
-    }, [])
+    useFocusEffect(
+        React.useCallback(() => {
+            return () => {
+                if (notifications.some(notificacao => !notificacao.lida)) {
+                    readNotifications().then(() => {
+                        markNotificationsAsRead();
+                    }).catch(error => {
+                        console.log("Um erro ocorreu ao ler as notificações");
+                    });
+                }
+            };
+        }, [notifications])
+    );
+
+    if (newNotifications === null) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
+
+    if (notifications.length === 0) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <RNText>Não há novas notificações.</RNText>
+            </View>
+        );
+    }
 
     return (
-        <View>
-            <Heading fontSize="xl" p="4" pb="3">
-                Notificações
+        <View mx={'4'} mt={'5'}>
+            <Heading fontSize="4xl" pb="3" textAlign={'right'}>
+                <MaterialCommunityIcons name="message-text" size={30} color="black" /> Notificações
             </Heading>
-            <FlatList data={notificacoes} renderItem={({
-                item
-            }) => <Box borderBottomWidth="1" _dark={{
-                borderColor: "muted.50"
-            }} borderColor="muted.800" pl={["0", "4"]} pr={["0", "5"]} py="2">
-                    <HStack space={[2, 3]} justifyContent="space-between">
-                        <VStack>
-                            <Text _dark={{
-                                color: "warmGray.50"
-                            }} color="coolGray.800" bold>
-                                {item.titulo}
-                            </Text>
-                            <Text color="coolGray.600" _dark={{
-                                color: "warmGray.200"
-                            }}>
-                                {item.conteudo}
-                            </Text>
-                        </VStack>
-                        <Spacer />
-                        <Text fontSize="xs" _dark={{
-                            color: "warmGray.50"
-                        }} color="coolGray.800" alignSelf="flex-start">
-                            {item.timeStamp}
-                        </Text>
-                    </HStack>
-                </Box>} keyExtractor={item => item.id} />
-        </View >
+            <Spacer> </Spacer>
+            <FlatList
+                data={notifications}
+                renderItem={({ item }) => <NotificationItem item={item} />}
+                keyExtractor={item => item.id.toString()}
+            />
+        </View>
     );
 }
