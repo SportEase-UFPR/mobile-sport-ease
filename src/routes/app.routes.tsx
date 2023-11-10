@@ -17,6 +17,7 @@ import { IconButton, Icon } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import PageNotificacoes from '../pages/AppRoutes/pageNotificacoes';
 import { useNotifications } from '../contexts/NotificationContext';
+import COLORS from '../colors/colors';
 
 function LogoTitle() {
     return (
@@ -122,35 +123,35 @@ export default function AppRoutes() {
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="home" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
+                            <Feather name="home" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Nova Reserva" component={PageNovaReserva}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="plus-square" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
+                            <Feather name="plus-square" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Locais Esportivos" component={PageLocaisEsportivos}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="map-pin" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
+                            <Feather name="map-pin" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Historico" component={PageHistorico}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="clock" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
+                            <Feather name="clock" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Meu Perfil" component={MeuPerfilStack}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="user" size={focused ? 32 : 24} color={focused ? 'green' : 'black'} />
+                            <Feather name="user" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Notificacoes" component={PageNotificacoes}
