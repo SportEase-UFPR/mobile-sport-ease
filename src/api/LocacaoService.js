@@ -57,10 +57,20 @@ export const getSolicitacoesEmAndamento = async () => {
     }
 };
 
+export const getAllSolicitacoes = async () => {
+    try {
+        const response = await ApiClient.get('/locacoes/listar-historico-reservas');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export default {
     getEspacosEsportivos,
     getEspacosEsportivosDisponiveis,
     getHorariosDisponiveis,
     createSolicitacaoLocacao,
-    getSolicitacoesEmAndamento
+    getSolicitacoesEmAndamento,
+    getAllSolicitacoes
 };

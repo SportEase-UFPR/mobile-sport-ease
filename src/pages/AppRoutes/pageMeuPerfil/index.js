@@ -6,6 +6,7 @@ import { Box, Flex, Heading, Text, Pressable, Container, Center } from 'native-b
 
 import { useAuth } from '../../../contexts/AuthContext';
 import ClienteService from '../../../api/ClienteService';
+import COLORS from '../../../colors/colors';
 
 const PageMeuPerfil = ({ navigation }) => {
     const { onLogout } = useAuth();
@@ -29,7 +30,7 @@ const PageMeuPerfil = ({ navigation }) => {
     return (
         <Box mt={25} mb={25} paddingX={5}>
 
-            <Heading borderColor={'green.500'} borderLeftWidth={20} color="green.500" fontSize={'3xl'} marginBottom={10} paddingLeft={'30px'}>
+            <Heading borderColor={COLORS.green} borderLeftWidth={20} color={COLORS.green} fontSize={'3xl'} marginBottom={10} paddingLeft={'30px'}>
                 {headerText}
             </Heading>
 
