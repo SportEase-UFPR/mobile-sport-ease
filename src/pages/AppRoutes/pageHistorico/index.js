@@ -19,7 +19,7 @@ import {
   InfoOutlineIcon,
   Modal,
   NativeBaseProvider,
-  Input
+  Input, Divider, DeleteIcon
 } from "native-base";
 import temaGeralFormulario from "./nativeBaseTheme";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -31,9 +31,9 @@ import { TouchableOpacity } from "react-native";
 
 export default function PageHistorico() {
   const [isLoading, setIsLoading] = useState(true);
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [cardData, setCardData] = useState([""]);
-  const [endDate, setEndDate] = useState(new Date());
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [status, setStatus] = useState(null);
@@ -42,25 +42,46 @@ export default function PageHistorico() {
   const [modalDados, setModalDados] = useState(null);
   const [statusOptions, setStatusOptions] = useState([]);
   const [espacoOptions, setEspacoOptions] = useState([]);
-  const reservasFiltradas = cardData.filter((card) => {
-    const filtroStatus = status === null || card.status === status;
-    const filtroLocal = local === null || card.nomeEspacoEsportivo === local;
-    const filtroDataInicio = !startDate || moment(card.dataHoraInicioReserva).isSameOrAfter(startDate, 'day');
-    const filtroDataFim = !endDate || moment(card.dataHoraFimReserva).isSameOrBefore(endDate, 'day');
 
+  const reservasFiltradas = cardData.filter((card) => {
+    const filtroStatus = !status || card.status === status;
+    const filtroLocal = !local || card.nomeEspacoEsportivo === local;
+    const filtroDataInicio = !startDate || moment(card.dataHoraInicioReserva).isSameOrAfter(moment(startDate, 'DD/MM/YYYY'), 'day');
+    const filtroDataFim = !endDate || moment(card.dataHoraFimReserva).isSameOrBefore(moment(endDate, 'DD/MM/YYYY'), 'day');
     return filtroStatus && filtroLocal && filtroDataInicio && filtroDataFim;
   });
 
+  const limparFiltros = () => {
+    setStartDate('');
+    setEndDate('');
+    setStatus('');
+    setLocal('');
+    setShowStartPicker(false);
+    setShowEndPicker(false);
+  };
+
   const onChangeStartDate = (event, selectedDate) => {
-    const currentDate = selectedDate || startDate;
     setShowStartPicker(Platform.OS === 'ios');
-    setStartDate(currentDate);
+    if (selectedDate) {
+      // Formatar a data para um formato reconhecido antes de usar com moment
+      const formattedDate = moment(selectedDate, 'DD/MM/YYYY');
+      setStartDate(formattedDate);
+    } else {
+      // Se não houver data selecionada, podemos manter a string vazia ou null
+      setStartDate('');
+    }
   };
 
   const onChangeEndDate = (event, selectedDate) => {
-    const currentDate = selectedDate || endDate;
     setShowEndPicker(Platform.OS === 'ios');
-    setEndDate(currentDate);
+    if (selectedDate) {
+      // Formatar a data para um formato reconhecido antes de usar com moment
+      const formattedDate = moment(selectedDate, 'DD/MM/YYYY');
+      setEndDate(formattedDate);
+    } else {
+      // Se não houver data selecionada, podemos manter a string vazia ou null
+      setEndDate('');
+    }
   };
 
   const showConfirmacaoReserva = (horario) => {
@@ -135,32 +156,33 @@ export default function PageHistorico() {
           >
             Histórico de solicitações
           </Heading>
-          <Box marginBottom={30}>
-            <Text> Filtros...</Text>
+          <Box>
             <VStack space={4} direction={{ base: "column", md: "row" }}>
-              {/* Filtro de Data Início */}
-              <FormControl minWidth="1/3" flex={1}>
-                <FormControl.Label>Data início</FormControl.Label>
-                <TouchableOpacity onPress={() => setShowStartPicker(true)}>
-                  <Input
-                    isReadOnly
-                    placeholder="Data início"
-                    value={moment(startDate).format('DD/MM/YYYY')}
-                  />
-                </TouchableOpacity>
-              </FormControl>
+              <HStack space={2} alignItems="center" flex={1}>
+                {/* Filtro de Data Início */}
+                <FormControl minWidth="1/3" flex={1}>
+                  <FormControl.Label>Data Início</FormControl.Label>
+                  <TouchableOpacity onPress={() => setShowStartPicker(true)}>
+                    <Input
+                      isReadOnly
+                      placeholder="Data início..."
+                      value={startDate ? moment(startDate).format('DD/MM/YYYY') : ''}
+                    />
+                  </TouchableOpacity>
+                </FormControl>
 
-              {/* Filtro de Data Fim */}
-              <FormControl minWidth="1/3" flex={1}>
-                <FormControl.Label>Data Fim</FormControl.Label>
-                <TouchableOpacity onPress={() => setShowEndPicker(true)}>
-                  <Input
-                    isReadOnly
-                    placeholder="Data fim"
-                    value={moment(endDate).format('DD/MM/YYYY')}
-                  />
-                </TouchableOpacity>
-              </FormControl>
+                {/* Filtro de Data Fim */}
+                <FormControl minWidth="1/3" flex={1}>
+                  <FormControl.Label>Data Fim</FormControl.Label>
+                  <TouchableOpacity onPress={() => setShowEndPicker(true)}>
+                    <Input
+                      isReadOnly
+                      placeholder="Data fim..."
+                      value={endDate ? moment(endDate).format('DD/MM/YYYY') : ''}
+                    />
+                  </TouchableOpacity>
+                </FormControl>
+              </HStack>
               <HStack space={2} alignItems="center" flex={1}>
                 <FormControl minWidth="1/3" flex={1}>
                   <FormControl.Label>Status</FormControl.Label>
@@ -193,26 +215,40 @@ export default function PageHistorico() {
                   </Select>
                 </FormControl>
               </HStack>
-
+              <Button
+                alignSelf={'flex-end'}
+                maxWidth={'1/3'}
+                leftIcon={<DeleteIcon></DeleteIcon>}
+                rounded={'full'}
+                size="sm"
+                variant="subtle"
+                colorScheme="secondary"
+                onPress={limparFiltros}>
+                Limpar Filtros
+              </Button>
             </VStack>
           </Box>
+          <Divider mb="5" mt="5"></Divider>
+
+          {/* Modais de datepicker */}
           {showStartPicker && (
             <DateTimePicker
-              value={startDate}
+              value={startDate ? moment(startDate, 'YYYY-MM-DD').toDate() : new Date()}
               mode="date"
               display="default"
               onChange={onChangeStartDate}
             />
           )}
-
           {showEndPicker && (
             <DateTimePicker
-              value={endDate}
+              value={endDate ? moment(endDate, 'YYYY-MM-DD').toDate() : new Date()}
               mode="date"
               display="default"
               onChange={onChangeEndDate}
             />
           )}
+
+          {/* Geração dos cards contendo o histórico de locações */}
           {reservasFiltradas.map((card, index) => (
             <Box
               key={index}
@@ -249,15 +285,6 @@ export default function PageHistorico() {
                 </VStack>
               ) : (
                 <Stack p="4" space={3}>
-                  {/* <Badge
-                  colorScheme="success"
-                  maxW="1/2"
-                  _text={{ fontSize: 20, fontWeight: 400 }}
-                  rounded="50"
-                >
-                  Locação Ativa
-                </Badge> */}
-
                   <Stack
                     space={1}
                     direction="row"

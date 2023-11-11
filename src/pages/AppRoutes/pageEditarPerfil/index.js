@@ -3,7 +3,6 @@ import { View, Text, Image, Keyboard, Alert, TouchableOpacity, ScrollView } from
 import { CheckBox } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
