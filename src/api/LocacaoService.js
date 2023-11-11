@@ -1,4 +1,5 @@
 import ApiClient from './ApiClient';
+import axios from 'axios';
 
 export const getEspacosEsportivos = async () => {
     try {
@@ -32,7 +33,6 @@ export const getHorariosDisponiveis = async (requestData) => {
 export const getInformacoesEspacoEsportivo = async (requestData) => {
     try {
         const response = await ApiClient.get(`/espacos-esportivos/${requestData}`);
-        console.log('Dados da resposta da requisição: ', response.data.maxLocacaoDia);
         return response.data;
     } catch (error) {
         throw error;
@@ -44,7 +44,24 @@ export const createSolicitacaoLocacao = async (requestData) => {
         const response = await ApiClient.post('/locacoes/solicitar-locacao', requestData);
         return response.data;
     } catch (error) {
-        throw error;
+        if (axios.isAxiosError(error)) {
+            if (error.response && error.response.status === 412) {
+                return {
+                    isSuccess: false,
+                    message: error.response.data.message || "Erro desconhecido"
+                };
+            } else {
+                return {
+                    isSuccess: false,
+                    message: error.response ? error.response.data.message : error.message
+                };
+            }
+        } else {
+            return {
+                isSuccess: false,
+                message: error.message || "Erro desconhecido"
+            };
+        }
     }
 };
 
@@ -53,7 +70,12 @@ export const getSolicitacoesEmAndamento = async () => {
         const response = await ApiClient.get('/locacoes/listar-reservas-em-andamento');
         return response.data;
     } catch (error) {
-        throw error;
+        if (axios.isAxiosError(error)) {
+            const serverResponse = error.response;
+            throw new Error(`Request failed with status code ${serverResponse?.status}: ${serverResponse?.data.message}`);
+        } else {
+            throw new Error(error.message);
+        }
     }
 };
 

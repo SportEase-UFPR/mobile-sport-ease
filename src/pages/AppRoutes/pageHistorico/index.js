@@ -139,6 +139,7 @@ export default function PageHistorico() {
                 <FormControl.Label>Status</FormControl.Label>
                 <Select
                   isReadOnly
+                  variant="filled"
                   selectedValue={status}
                   accessibilityLabel="Selecione o status"
                   placeholder="Todos"
@@ -153,6 +154,7 @@ export default function PageHistorico() {
               <FormControl minWidth="1/3" flex={1}>
                 <FormControl.Label>Local</FormControl.Label>
                 <Select
+                  variant="filled"
                   isReadOnly
                   selectedValue={local}
                   accessibilityLabel="Selecione o local"
@@ -265,7 +267,7 @@ export default function PageHistorico() {
                   direction="row"
                   justifyContent={
                     showCancelarReserva(card.dataHoraInicioReserva) &&
-                    showConfirmacaoReserva(card.dataHoraInicioReserva)
+                      showConfirmacaoReserva(card.dataHoraInicioReserva)
                       ? "space-between"
                       : "center"
                   }

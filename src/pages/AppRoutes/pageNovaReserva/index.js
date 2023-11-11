@@ -91,17 +91,22 @@ const PageNovaReserva = ({ navigation }) => {
     setHorarioDisponivelData(horariosDisponiveis);
   }, [horariosDisponiveis]);
 
+useEffect(() => {
+  setHorarioInicioReserva(null);
+}, [inputLocalReserva]);
+
   useEffect(() => {
-    // certifique-se de que calcularDisponibilidadeHorario é uma função e está disponível neste escopo
-    const max = calcularDisponibilidadeHorario(); // Suponha que esta função retorna um número
-    if (typeof max === "number") {
-      // Confirme que é um número antes de atualizar o estado
-      setSliderMax(max);
-    } else {
-      console.error(
-        "calcularDisponibilidadeHorario did not return a number:",
-        max
-      );
+    if(horarioInicioReserva) {
+      const max = calcularDisponibilidadeHorario(); // Suponha que esta função retorna um número
+      if (typeof max === "number") {
+        // Confirme que é um número antes de atualizar o estado
+        setSliderMax(max);
+      } else {
+        console.error(
+          "calcularDisponibilidadeHorario did not return a number:",
+          max
+        );
+      }
     }
   }, [horarioInicioReserva]);
 
@@ -267,6 +272,7 @@ const PageNovaReserva = ({ navigation }) => {
       isValid = false;
     }
     if (isValid) {
+      console.log(horarioInicioReserva);
       setIsSending(true);
       const novaDataReservaInicio = new Date(dataReserva);
       const [horas, minutos] = horarioInicioReserva.split(":").map(Number);
@@ -289,19 +295,22 @@ const PageNovaReserva = ({ navigation }) => {
           idEspacoEsportivo: inputLocalReserva,
         };
 
-        const response = await createSolicitacaoLocacao(dadosDaLocacao);
-
-        if (response) {
+        const result = await createSolicitacaoLocacao(dadosDaLocacao);
+        if (result && result.isSuccess) {
           setIsSending(false);
           Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
           navigation.navigate("HomeScreen");
+        } else if (result) {
+          setIsSending(false);
+          Alert.alert("Falha na solicitação", result.message);
         }
       } catch (error) {
-        Alert.alert(
-          "Erro!",
-          "Não foi possível seguir com a solicitação. Revise os dados enviados."
-        );
         setIsSending(false);
+        isValid = false;
+        Alert.alert(
+          "Falha na solicitação",
+          "Ocorreu um erro inesperado."
+        );
       }
     }
   };
@@ -360,12 +369,12 @@ const PageNovaReserva = ({ navigation }) => {
                   >
                     {espacosEsportivos && espacosEsportivos.length > 0
                       ? espacosEsportivos.map((espaco, index) => (
-                          <Select.Item
-                            key={index}
-                            label={espaco.nome}
-                            value={espaco.id}
-                          />
-                        ))
+                        <Select.Item
+                          key={index}
+                          label={espaco.nome}
+                          value={espaco.id}
+                        />
+                      ))
                       : null}
                   </Select>
                   <FormControl.ErrorMessage
@@ -506,16 +515,16 @@ const PageNovaReserva = ({ navigation }) => {
                         }}
                       >
                         {horarioDisponivelData &&
-                        horarioDisponivelData.horariosDisponiveis
+                          horarioDisponivelData.horariosDisponiveis
                           ? horarioDisponivelData.horariosDisponiveis.map(
-                              (horario, index) => (
-                                <Select.Item
-                                  key={index}
-                                  label={horario.toString()}
-                                  value={horario.toString()}
-                                />
-                              )
+                            (horario, index) => (
+                              <Select.Item
+                                key={index}
+                                label={horario.toString()}
+                                value={horario.toString()}
+                              />
                             )
+                          )
                           : []}
                       </Select>
                       <FormControl.ErrorMessage

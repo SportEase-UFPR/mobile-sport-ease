@@ -11,7 +11,7 @@ function NotificationItem({ item }) {
     return (
         <Box
             backgroundColor={'white'}
-            borderWidth="2"
+            borderWidth="1"
             borderColor={item.lida ? "coolGray.400" : "yellow.600"}
             borderRadius={'lg'}
             py="2"
@@ -22,7 +22,7 @@ function NotificationItem({ item }) {
                 alignItems="center">
                 <VStack flex={1}>
                     <Text
-                        fontSize={'lg'}
+                        fontSize={'md'}
                         color={item.lida ? "coolGray.600" : "yellow.600"}
                         bold>
                         {item.titulo}

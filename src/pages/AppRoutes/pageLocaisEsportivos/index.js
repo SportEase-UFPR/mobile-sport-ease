@@ -158,7 +158,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                 </Flex>
                 <Box my="5">
                   <Text fontSize="lg" fontWeight="semibold">
-                    Descrição do espaço:colorSc
+                    Descrição do espaço:
                   </Text>
                   <Text fontSize="md">{card.descricao}</Text>
                   <Text fontSize="md">Tipo do piso: {card.piso}</Text>
