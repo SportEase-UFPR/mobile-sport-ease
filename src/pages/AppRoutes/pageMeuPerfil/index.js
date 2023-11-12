@@ -11,11 +11,29 @@ import COLORS from '../../../colors/colors';
 const PageMeuPerfil = ({ navigation }) => {
     const { onLogout } = useAuth();
     const [headerText, setHeaderText] = useState('');
+    const [user, setUser] = useState({
+        nome: '',
+        email: '',
+        grr: '',
+        cpf: '',
+        novaSenha: '',
+        confirmacaoNovaSenha: '',
+        isStudent: false,
+    });
 
-
-    const carregarNomeUsuario = async () => {
+    const carregarUsuario = async () => {
         const result = await ClienteService.getInformacoesUsuario();
         if (result.nome) {
+            setUser(prevUser => ({
+                ...prevUser,
+                nome: result.nome,
+                email: result.email,
+                cpf: result.cpf,
+                grr: result.grr,
+                novaSenha: '',
+                confirmacaoNovaSenha: '',
+                isStudent: result.grr ? true : false
+            }));
             const primeiroNome = result.nome.split(' ')[0];
             setHeaderText('Olá, ' + primeiroNome + '!');
         } else {
@@ -24,7 +42,7 @@ const PageMeuPerfil = ({ navigation }) => {
     }
 
     useEffect(() => {
-        carregarNomeUsuario();
+        carregarUsuario();
     }, [])
 
     return (
@@ -35,7 +53,7 @@ const PageMeuPerfil = ({ navigation }) => {
             </Heading>
 
             <Pressable
-                onPress={() => navigation.navigate('PageEditarPerfil')}
+                onPress={() => navigation.navigate('PageEditarPerfil', user)}
                 overflow="hidden"
                 display="flex"
                 style={{ flexDirection: 'row', justifyContent: 'space-between' }}

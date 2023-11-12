@@ -5,6 +5,7 @@ import jwtDecode from 'jwt-decode';
 import AuthService from '../api/AuthService';
 import ApiClient from '../api/ApiClient';
 import { registerIndieID, unregisterIndieDevice } from 'native-notify';
+import ClienteService from '../api/ClienteService';
 
 interface UserData {
     nome: string;
@@ -16,7 +17,7 @@ interface UserData {
 }
 
 interface AuthProps {
-    authState?: { token: string | null; authenticated: boolean | null; userId: number | null; };
+    authState?: { token: string | null; authenticated: boolean | null; id: number | null; nomeCompleto: string | null; email: string | null; grr: "string" | null};
     onCadastrar?: (userData: UserData) => Promise<any>;
     onLogin?: (email: string, password: string) => Promise<any>;
     onLogout?: () => Promise<any>;
@@ -107,6 +108,8 @@ export const AuthProvider = ({ children }: any) => {
             // Native Notify Indie Push Registration Code
             registerIndieID(`${id}`, 14520, 'vdk0Ur8ZprhkWw4MiubMKt');
             // End of Native Notify Code
+
+
             return result;
         } catch (e) {
             return { error: true, msg: (e as any).response.data.msg };
@@ -129,7 +132,6 @@ export const AuthProvider = ({ children }: any) => {
             console.error("Erro durante o logout:", e);
         }
     };
-
 
     const value = {
         onCadastrar: cadastrar,

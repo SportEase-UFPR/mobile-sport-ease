@@ -91,12 +91,12 @@ const PageNovaReserva = ({ navigation }) => {
     setHorarioDisponivelData(horariosDisponiveis);
   }, [horariosDisponiveis]);
 
-useEffect(() => {
-  setHorarioInicioReserva(null);
-}, [inputLocalReserva]);
+  useEffect(() => {
+    setHorarioInicioReserva(null);
+  }, [inputLocalReserva]);
 
   useEffect(() => {
-    if(horarioInicioReserva) {
+    if (horarioInicioReserva) {
       const max = calcularDisponibilidadeHorario(); // Suponha que esta função retorna um número
       if (typeof max === "number") {
         // Confirme que é um número antes de atualizar o estado
@@ -314,6 +314,11 @@ useEffect(() => {
       }
     }
   };
+
+
+
+
+
 
   return (
     <NativeBaseProvider theme={temaGeralFormulario}>

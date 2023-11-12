@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { View, Text, Image, Keyboard, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Image, Keyboard, Alert, TouchableOpacity, ScrollView, Text } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import styles from './styles';
 import { useAuth } from '../../../contexts/AuthContext';
-import { VStack, Pressable, Spinner, Heading } from 'native-base';
+import { VStack, HStack, Pressable, Spinner, Heading, Switch } from 'native-base';
+//import { Switch } from 'react-native-elements';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/BasicTextInput';
@@ -24,6 +25,9 @@ export default function PageAutocadastro() {
   const [errors, setErrors] = React.useState({});
   const [isStudent, setIsStudent] = React.useState(false);
   const [isSending, setIsSending] = React.useState(false);
+
+  const toggleIsStudent = () => setIsStudent(!isStudent);
+
 
   const validate = async () => {
     Keyboard.dismiss();
@@ -139,19 +143,17 @@ export default function PageAutocadastro() {
             error={errors.cpf}
           />
 
-          <CheckBox
-            containerStyle={styles.checkboxInput}
-            title="Sou aluno(a) da UFPR"
-            checked={isStudent}
-            onPress={() => setIsStudent(!isStudent)}
-          />
+          <HStack mt="4" alignItems="center" space={2}>
+            <Switch isChecked={isStudent} onToggle={toggleIsStudent} />
+            <Text fontSize={15}>Sou estudante UFPR</Text>
+          </HStack>
 
           {isStudent && (
             <Input
               onChangeText={text => handleOnchange(text, 'grr')}
               onFocus={() => handleError(null, 'grr')}
               iconName="account-card-details-outline"
-              placeholder="Ex.: GRR00010002"
+              placeholder="GRR completo. Ex.: GRR00010002"
               error={errors.grr}
             />
           )}

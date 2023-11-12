@@ -36,8 +36,22 @@ export const readNotifications = async () => {
     }
 }
 
+export const setDadosCliente = async (requestData) => {
+    try {
+        const response = await ApiClient.put('/clientes', requestData);
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            return [];
+        } else {
+            console.error('Erro na requisição setDadosCliente:', error.response ? error.response.data : error.message);
+        }
+    }
+}
+
 export default {
     getInformacoesUsuario,
     getNotificacoes,
-    readNotifications
+    readNotifications,
+    setDadosCliente
 };
