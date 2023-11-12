@@ -144,7 +144,8 @@ export default function PageAutocadastro() {
           />
 
           <HStack mt="4" alignItems="center" space={2}>
-            <Switch isChecked={isStudent} onToggle={toggleIsStudent} />
+            <Switch isChecked={isStudent} onToggle={toggleIsStudent}
+              offTrackColor="gray.200" onTrackColor="emerald.200" onThumbColor="green.500" offThumbColor="green.50" />
             <Text fontSize={15}>Sou estudante UFPR</Text>
           </HStack>
 

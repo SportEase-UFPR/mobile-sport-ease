@@ -6,43 +6,52 @@ import { View, FlatList, Text, Heading, Box, HStack, VStack, Divider, Badge } fr
 import { useNotifications } from '../../../contexts/NotificationContext'; // Ajuste para importar o hook de contexto
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { readNotifications } from '../../../api/ClienteService';
+import { formatDistanceToNow, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 function NotificationItem({ item }) {
+    const dataHoraFormatada = formatDistanceToNow(parseISO(item.dataHora), { addSuffix: true, locale: ptBR });
+
     return (
-        <Box
-            backgroundColor={'white'}
-            borderWidth="1"
-            borderColor={item.lida ? "coolGray.400" : "yellow.600"}
-            borderRadius={'lg'}
-            py="2"
-            px="4"
-            mb="3">
-            <HStack
-                justifyContent="space-between"
-                alignItems="center">
-                <VStack flex={1}>
-                    <Text
-                        fontSize={'md'}
-                        color={item.lida ? "coolGray.600" : "yellow.600"}
-                        bold>
-                        {item.titulo}
-                    </Text>
-                    <Text
-                        fontSize={'xs'}
-                        color={item.lida ? "coolGray.600" : "yellow.600"}>
-                        {item.conteudo}
-                    </Text>
-                </VStack>
-                {!item.lida && (
-                    <View style={{
-                        width: 15,
-                        height: 15,
-                    }}
-                        bgColor={"yellow.600"}
-                        borderRadius={'full'}
-                    />
-                )}
-            </HStack>
+        <Box mb={5}>
+            <Text ml="1" fontSize={'sm'} color={'gray.700'}>
+                Recebida {dataHoraFormatada}
+            </Text>
+            <Box
+                backgroundColor={'white'}
+                borderWidth={item.lida ? '1' : '1'}
+                borderColor={item.lida ? "coolGray.200" : "yellow.600"}
+                borderRadius={'lg'}
+                py="2"
+                px="4"
+                mb="3">
+                <HStack
+                    justifyContent="space-between"
+                    alignItems="center">
+                    <VStack flex={1}>
+                        <Text
+                            fontSize={'md'}
+                            color={item.lida ? "coolGray.600" : "yellow.600"}
+                            bold>
+                            {item.titulo}
+                        </Text>
+                        <Text
+                            fontSize={'xs'}
+                            color={item.lida ? "coolGray.600" : "yellow.600"}>
+                            {item.conteudo}
+                        </Text>
+                    </VStack>
+                    {!item.lida && (
+                        <View style={{
+                            width: 15,
+                            height: 15,
+                        }}
+                            bgColor={"yellow.600"}
+                            borderRadius={'full'}
+                        />
+                    )}
+                </HStack>
+            </Box>
         </Box>
     );
 }

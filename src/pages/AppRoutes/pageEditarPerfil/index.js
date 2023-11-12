@@ -10,7 +10,8 @@ import {
   NativeBaseProvider,
   Spinner,
   WarningOutlineIcon,
-  Pressable
+  Button,
+  Text
 } from 'native-base';
 import COLORS from '../../../colors/colors';
 import temaGeralFormulario from './nativeBaseTheme';
@@ -81,7 +82,7 @@ export default function PageEditarPerfil({ route }) {
       "email": user.email
     }
     if (user.senha) {
-      requestData.senha = user.senha;
+      requestData.senha = user.novaSenha;
     }
     if (user.grr) {
       requestData.grr = user.grr;
@@ -89,6 +90,7 @@ export default function PageEditarPerfil({ route }) {
     if (!user.isStudent) {
       requestData.grr = '';
     }
+    setIsLoading(true);
 
     try {
       const response = await ClienteService.setDadosCliente(requestData)
@@ -98,6 +100,7 @@ export default function PageEditarPerfil({ route }) {
     } catch (error) {
       Alert.alert('Erro', error.message)
     }
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -190,7 +193,9 @@ export default function PageEditarPerfil({ route }) {
             <FormControl>
 
               <FormControl.Label _style={{ flex: 1 }} alignItems={'center'}>
-                <Switch ml={-1} mr={2} isChecked={user.isStudent} onToggle={toggleIsStudent} />
+                <Switch ml={-1} mr={1}
+                  offTrackColor="gray.200" onTrackColor="emerald.200" onThumbColor="green.500" offThumbColor="green.50"
+                  isChecked={user.isStudent} onToggle={toggleIsStudent} />
                 Sou aluno da UFPR
               </FormControl.Label>
 
@@ -198,12 +203,7 @@ export default function PageEditarPerfil({ route }) {
 
             {user.isStudent && (
               <FormControl isDisabled={user.grr}>
-                <FormControl.Label _disabled={{
-                  _text: {
-                    color: "gray.400",
-                    fontWeight: "bold"
-                  }
-                }}>GRR</FormControl.Label>
+                <FormControl.Label>GRR</FormControl.Label>
                 <Input
                   isReadOnly={!!user.grr}
                   value={user.grr}
@@ -212,33 +212,48 @@ export default function PageEditarPerfil({ route }) {
               </FormControl>
             )}
 
-            <Pressable
-              w={"full"}
+            <Button
+              w="full"
+              mt={5}
               flex={1}
-              paddingY={5}
+              py={5}
               borderRadius="full"
-              backgroundColor={"success.500"}
+              backgroundColor="success.500"
               onPress={() => validateAndSubmit()}
               mb={10}
+              isDisabled={isLoading}
+              isLoading={isLoading}
+              _loading={{
+                bg: "success.500",
+                _text: {
+                  color: "white",
+                },
+              }}
+              _text={{
+                color: "white",
+                fontSize: "md",
+              }}
             >
-              <VStack
-                alignItems="center"
-                justifyContent="center"
-                flexDirection={"row"}
-                space={2}
-              >
-                {isLoading ? (
+              {isLoading ? (
+                <Text>
                   <Spinner
-                    accessibilityLabel="Enviando..."
-                    size={"sm"}
+                    mr={2}
+                    accessibilityLabel="Enviando solicitação..."
+                    size={"md"}
                     color="white"
                   />
-                ) : null}
-                <Heading color="white" fontSize="md">
-                  {isLoading ? " Enviando solicitação..." : "Editar"}
-                </Heading>
-              </VStack>
-            </Pressable>
+                </Text>
+              ) : (
+                <Text
+                  accessibilityLabel="Enviando solicitação..."
+                  color="white"
+                  fontSize={'md'}
+                >
+                  Editar
+                </Text>
+              )}
+            </Button>
+
           </VStack>
         </Box>
       </ScrollView>
