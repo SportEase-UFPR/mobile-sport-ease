@@ -88,16 +88,15 @@ export default function PageEditarPerfil({ route }) {
     }
     if (!user.isStudent) {
       requestData.grr = '';
-    } 
+    }
 
     try {
       const response = await ClienteService.setDadosCliente(requestData)
       if (response) {
-        console.log('deu certo');
-      } 
-    } catch(error) {
-      console.log('deu errado');
-      console.log(error)
+        Alert.alert('Sucesso', 'A edição ocorreu conforme esperado!')
+      }
+    } catch (error) {
+      Alert.alert('Erro', error.message)
     }
   }
 
