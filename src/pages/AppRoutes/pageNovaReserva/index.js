@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { solicitarLocacao } from "../../../services/locacaoService";
+import DatePicker from "../../../components/DatePicker";
 import LocacaoService, {
   createSolicitacaoLocacao,
   getHorariosDisponiveis,
@@ -26,8 +26,9 @@ import {
   Divider,
   Badge,
   Slider,
+  Modal
 } from "native-base";
-
+import moment from "moment";
 import temaGeralFormulario from "./nativeBaseTheme";
 import COLORS from "../../../colors/colors";
 
@@ -38,21 +39,19 @@ const PageNovaReserva = ({ navigation }) => {
   const [qntParticipantesReserva, setQntParticipantesReserva] = useState(null);
   const [qntHoras, setQntHoras] = useState(1);
   const [motivoSolicitacao, setMotivoSolicitacao] = useState("");
-  const [dataReserva, setDataReserva] = useState(new Date());
+  const [dataReserva, setDataReserva] = useState('');
   const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
   const [espacosEsportivos, setEspacosEsportivos] = useState([]);
   const [informacoesEspacoEscolhido, setInformacoesEspacoEscolhido] = useState(
     []
   );
-  const [somaHorario, setSomaHorario] = useState(horarioInicioReserva);
   const [sliderMax, setSliderMax] = useState(0);
 
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [inputErrors, setInputErrors] = useState({});
-  const [mode, setMode] = useState("date");
-  const [show, setShow] = useState(false);
 
   // UseEffect para carregar a listagem inicial dos espaços esportivos
   useEffect(() => {
@@ -97,9 +96,8 @@ const PageNovaReserva = ({ navigation }) => {
 
   useEffect(() => {
     if (horarioInicioReserva) {
-      const max = calcularDisponibilidadeHorario(); // Suponha que esta função retorna um número
+      const max = calcularDisponibilidadeHorario();
       if (typeof max === "number") {
-        // Confirme que é um número antes de atualizar o estado
         setSliderMax(max);
       } else {
         console.error(
@@ -120,6 +118,7 @@ const PageNovaReserva = ({ navigation }) => {
         idEspacoEsportivo: idEspacoEsportivo,
       };
       const result = await getHorariosDisponiveis(requestData);
+      console.log(result)
       setHorariosDisponiveis(result);
     } catch (error) {
       console.error("Erro ao carregar horários disponíveis:", error);
@@ -215,21 +214,6 @@ const PageNovaReserva = ({ navigation }) => {
     return date;
   }
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
-    setShow(false);
-    setDataReserva(currentDate);
-  };
-
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
-  const showDatepicker = () => {
-    showMode("date");
-  };
-
   const handleSubmit = async (formData) => {
     let isValid = true;
     if (!inputLocalReserva) {
@@ -317,12 +301,23 @@ const PageNovaReserva = ({ navigation }) => {
 
 
 
-
-
-
   return (
     <NativeBaseProvider theme={temaGeralFormulario}>
       <ScrollView>
+        {/* Modal com DatePicker */}
+        <Modal isOpen={showCalendarModal} onClose={() => setShowCalendarModal(false)}>
+          <Modal.Content maxWidth="400px">
+            <Modal.CloseButton />
+            <Modal.Body>
+              <DatePicker
+                date={dataReserva}
+                setDate={setDataReserva}
+                availableDays={informacoesEspacoEscolhido.diasFuncionamento}
+                setShowCalendarModal={setShowCalendarModal}
+              />
+            </Modal.Body>
+          </Modal.Content>
+        </Modal>
         <Box mt={25} mb={25} paddingX={5}>
           <Heading
             borderColor={COLORS.green}
@@ -466,31 +461,15 @@ const PageNovaReserva = ({ navigation }) => {
                       marginBottom={3}
                     >
                       <FormControl.Label>
-                        Selecione o dia da reserva{" "}
+                        Selecione o dia da reserva
                       </FormControl.Label>
-                      <Pressable onPress={showDatepicker}>
+                      <Pressable onPress={() => setShowCalendarModal(true)}>
                         <Input
-                          placeholder="Selecione o dia da reserva"
+                          placeholder="Selecione o dia da reserva..."
                           isReadOnly
-                          value={dataReserva.toLocaleDateString()}
+                          value={dataReserva ? moment(dataReserva).format('DD/MM/YYYY') : ''}
                         />
                       </Pressable>
-                      {show && (
-                        <DateTimePicker
-                          testID="dateTimePicker"
-                          value={dataReserva}
-                          mode={mode}
-                          is24Hour={false}
-                          onChange={(event, selectedDate) => {
-                            onChange(event, selectedDate);
-                            setInputErrors((prevErrors) => ({
-                              ...prevErrors,
-                              dataReservaInvalid: false,
-                            }));
-                          }}
-                          minimumDate={new Date()}
-                        />
-                      )}
                       <FormControl.ErrorMessage
                         leftIcon={<WarningOutlineIcon size="xs" />}
                       >

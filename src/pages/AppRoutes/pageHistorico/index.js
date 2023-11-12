@@ -19,6 +19,7 @@ import {
   InfoOutlineIcon,
   Modal,
   NativeBaseProvider,
+  Spacer,
   Input, Divider, DeleteIcon
 } from "native-base";
 import temaGeralFormulario from "./nativeBaseTheme";
@@ -42,14 +43,22 @@ export default function PageHistorico() {
   const [modalDados, setModalDados] = useState(null);
   const [statusOptions, setStatusOptions] = useState([]);
   const [espacoOptions, setEspacoOptions] = useState([]);
+  const [legendaStatus] = useState({ 'CANCELADA': 'error.500', 'NEGADA': 'error.500', 'FINALIZADA': 'emerald.500', 'ENCERRADA': 'gray.500', 'SOLICITADA': 'yellow.500' });
 
-  const reservasFiltradas = cardData.filter((card) => {
-    const filtroStatus = !status || card.status === status;
-    const filtroLocal = !local || card.nomeEspacoEsportivo === local;
-    const filtroDataInicio = !startDate || moment(card.dataHoraInicioReserva).isSameOrAfter(moment(startDate, 'DD/MM/YYYY'), 'day');
-    const filtroDataFim = !endDate || moment(card.dataHoraFimReserva).isSameOrBefore(moment(endDate, 'DD/MM/YYYY'), 'day');
-    return filtroStatus && filtroLocal && filtroDataInicio && filtroDataFim;
-  });
+
+  const reservasFiltradas = cardData
+    .filter((card) => {
+      const filtroStatus = !status || card.status === status;
+      const filtroLocal = !local || card.nomeEspacoEsportivo === local;
+      const filtroDataInicio = !startDate || moment(card.dataHoraInicioReserva).isSameOrAfter(moment(startDate, 'DD/MM/YYYY'), 'day');
+      const filtroDataFim = !endDate || moment(card.dataHoraFimReserva).isSameOrBefore(moment(endDate, 'DD/MM/YYYY'), 'day');
+      return filtroStatus && filtroLocal && filtroDataInicio && filtroDataFim;
+    })
+    .sort((a, b) => {
+      const dataA = moment(a.dataHoraInicioReserva);
+      const dataB = moment(b.dataHoraInicioReserva);
+      return dataA.diff(dataB)
+    });
 
   const limparFiltros = () => {
     setStartDate('');
@@ -121,19 +130,6 @@ export default function PageHistorico() {
     setModalDados(dados);
     setShowModal(true);
   };
-
-  const sleep = (milliseconds) => {
-    return new Promise((resolve) => setTimeout(resolve, milliseconds));
-  };
-
-  useEffect(() => {
-    const loadData = async () => {
-      await sleep(1000);
-      setIsLoading(false);
-    };
-
-    loadData();
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -289,22 +285,30 @@ export default function PageHistorico() {
                     space={1}
                     direction="row"
                     alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Heading size="md">
-                      <Text color={COLORS.darkBlueText}>
-                        {card.nomeEspacoEsportivo}
+                    justifyContent="flex-start">
+                    <Box alignSelf={'flex-start'} w={'1/3'}>
+                      <Heading size="lg">
+                        <Text color={COLORS.darkBlueText}>
+                          {card.nomeEspacoEsportivo}
+                        </Text>
+                      </Heading>
+                      <Text mt='-1' fontSize={'lg'} fontWeight={'bold'} color={COLORS.darkBlueText}>
+                        {moment(card.dataHoraInicioReserva).format("DD/MM/YYYY")}
                       </Text>
-                    </Heading>
-
+                    </Box>
+                    <Spacer />
+                    <Badge mt='-5' borderWidth={'2'} variant={'outline'} borderRadius={'full'} colorScheme={legendaStatus[card.status].split('.')[0]}>
+                      {card.status}
+                    </Badge>
                     <Button
-                      size="md"
-                      borderRadius="md"
-                      width="35px"
-                      backgroundColor={COLORS.blue}
-                      startIcon={<InfoOutlineIcon />}
-                      onPress={() => abrirModalDetalhes(card)}
-                    ></Button>
+                      size="lg"
+                      mt='-5'
+                      padding={'0'}
+                      borderRadius='full'
+                      backgroundColor='blue.500'
+                      startIcon={<InfoOutlineIcon size={'xl'} />}
+                      onPress={() => abrirModalDetalhes(card)}>
+                    </Button>
                   </Stack>
 
                   <Text color={COLORS.darkBlueText}>

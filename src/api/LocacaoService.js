@@ -88,11 +88,21 @@ export const getAllSolicitacoes = async () => {
     }
 };
 
+export const confirmarUsoLocacao = async () => {
+    try {
+        const response = await ApiClient.put('/locacoes/solicitar-locacao');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export default {
     getEspacosEsportivos,
     getEspacosEsportivosDisponiveis,
     getHorariosDisponiveis,
     createSolicitacaoLocacao,
     getSolicitacoesEmAndamento,
-    getAllSolicitacoes
+    getAllSolicitacoes,
+    confirmarUsoLocacao
 };

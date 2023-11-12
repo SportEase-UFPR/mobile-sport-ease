@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Image, StyleSheet, View } from 'react-native';
+import { Text, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -156,7 +156,7 @@ export default function AppRoutes() {
                     }} />
                 <Tab.Screen name="Notificacoes" component={PageNotificacoes}
                     options={{
-                        tabBarButton: () => null, 
+                        tabBarButton: () => null,
                     }} />
             </Tab.Navigator>
         </NavigationContainer>
