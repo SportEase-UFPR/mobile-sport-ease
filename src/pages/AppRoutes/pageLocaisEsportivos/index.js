@@ -233,7 +233,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                 <Flex direction="row" align="center">
                   <Feather name="users" size={15} color="black" />
                   <Text ml="1" fontSize="md">
-                    Capacidade para {card.capacidade} pessoa(s)
+                    Capacidade entre {card.capacidadeMin} a {card.capacidadeMax} pessoa(s)
                   </Text>
                 </Flex>
                 <Box my="5">
