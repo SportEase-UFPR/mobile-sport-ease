@@ -7,6 +7,7 @@ interface NotificationData {
     titulo: string;
     conteudo: string;
     lida: boolean;
+    dataHora: Date;
 }
 
 interface NotificationContextType {
@@ -14,7 +15,7 @@ interface NotificationContextType {
     setNotifications: Dispatch<SetStateAction<NotificationData[]>>;
     newNotifications: boolean;
     setNewNotifications: Dispatch<SetStateAction<boolean>>;
-    markNotificationsAsRead: () => void; 
+    markNotificationsAsRead: () => void;
 }
 
 // Ajuste aqui: defina o valor inicial do contexto com a tipagem correta    
@@ -35,14 +36,15 @@ const NotificationProvider = ({ children }) => {
         setNotifications(updatedNotifications);
         setNewNotifications(false); // Atualizar o estado para não haver novas notificações
     };
-    
+
     useEffect(() => {
         const carregarNotificacoes = async () => {
             try {
                 const response = await getNotificacoes();
                 if (response) {
-                    const hasUnreadNotification = response.some(notificacao => !notificacao.lida);
-                    setNotifications(response);
+                    const sortedNotifications = response.sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
+                    const hasUnreadNotification = sortedNotifications.some(notificacao => !notificacao.lida);
+                    setNotifications(sortedNotifications);
                     setNewNotifications(hasUnreadNotification);
                 } else {
                     setNotifications([]);

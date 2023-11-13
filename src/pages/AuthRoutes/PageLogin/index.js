@@ -18,7 +18,6 @@ export default function PageLogin() {
     const checkAuthentication = async () => {
       if (authState.authenticated === null) {
         setIsOpenTop(true);
-        await sleep(4000);
         setIsOpenTop(false);
       }
     };
@@ -123,10 +122,6 @@ export default function PageLogin() {
         <Image source={LogoSportEase} style={{ width: 55.5, height: 55.5 }}></Image>
         <Text style={styles.headerText}> SportEase </Text>
       </View>
-
-      {/* <Button onPress={() => setIsOpenTop(!isOpenTop)} variant="unstyled" bg="coolGray.700:alpha.30">
-        {str}
-      </Button> */}
 
       {/* INPUTS PARA LOGIN */}
       <View style={styles.inputContainer}>

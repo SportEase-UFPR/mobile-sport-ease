@@ -43,7 +43,7 @@ export default function PageHistorico() {
   const [modalDados, setModalDados] = useState(null);
   const [statusOptions, setStatusOptions] = useState([]);
   const [espacoOptions, setEspacoOptions] = useState([]);
-  const [legendaStatus] = useState({ 'CANCELADA': 'error.500', 'NEGADA': 'error.500', 'FINALIZADA': 'emerald.500', 'ENCERRADA': 'gray.500', 'SOLICITADA': 'yellow.500' });
+  const [legendaStatus] = useState({ 'CANCELADA': 'error.500', 'NEGADA': 'error.500', 'FINALIZADA': 'emerald.500', 'ENCERRADA': 'gray.500', 'SOLICITADA': 'yellow.500', 'APROVADA': 'green.500' });
 
 
   const reservasFiltradas = cardData

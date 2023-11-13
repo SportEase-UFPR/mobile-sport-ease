@@ -81,7 +81,7 @@ export default function PageEditarPerfil({ route }) {
       "nome": user.nome,
       "email": user.email
     }
-    if (user.senha) {
+    if (user.novaSenha) {
       requestData.senha = user.novaSenha;
     }
     if (user.grr) {

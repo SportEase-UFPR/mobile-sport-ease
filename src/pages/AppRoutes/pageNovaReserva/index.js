@@ -280,13 +280,15 @@ const PageNovaReserva = ({ navigation }) => {
         };
 
         const result = await createSolicitacaoLocacao(dadosDaLocacao);
-        if (result && result.isSuccess) {
+        if (result.isSuccess == false) {
+          console.log(result)
+          setIsSending(false);
+          Alert.alert("Falha na solicitação", result.message);
+        } else {
+          console.log(result)
           setIsSending(false);
           Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
           navigation.navigate("HomeScreen");
-        } else if (result) {
-          setIsSending(false);
-          Alert.alert("Falha na solicitação", result.message);
         }
       } catch (error) {
         setIsSending(false);

@@ -13,7 +13,7 @@ function NotificationItem({ item }) {
     const dataHoraFormatada = formatDistanceToNow(parseISO(item.dataHora), { addSuffix: true, locale: ptBR });
 
     return (
-        <Box mb={5}>
+        <Box>
             <Text ml="1" fontSize={'sm'} color={'gray.700'}>
                 Recebida {dataHoraFormatada}
             </Text>
