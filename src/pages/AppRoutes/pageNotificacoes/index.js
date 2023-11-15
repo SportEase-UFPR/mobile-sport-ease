@@ -90,7 +90,7 @@ export default function PageNotificacoes() {
     }
 
     return (
-        <View mx={'4'} mt={'5'}>
+        <View style={{ flex: 1 }} mx={'4'} mt={'5'}>
             <Heading fontSize="4xl" pb="3" textAlign={'right'}>
                 <MaterialCommunityIcons name="message-text" size={30} color="black" /> Notificações
             </Heading>

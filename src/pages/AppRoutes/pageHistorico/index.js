@@ -20,15 +20,32 @@ import {
   Modal,
   NativeBaseProvider,
   Spacer,
-  Input, Divider, DeleteIcon
+  Input, Divider, DeleteIcon,
+  Alert,
+  useToast
 } from "native-base";
 import temaGeralFormulario from "./nativeBaseTheme";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { getAllSolicitacoes } from "../../../api/LocacaoService";
+import { cancelarUsoLocacao, confirmarUsoLocacao, getAllSolicitacoes } from "../../../api/LocacaoService";
 import { useFocusEffect } from "@react-navigation/native";
 import COLORS from "../../../colors/colors";
 import moment from "moment";
 import { TouchableOpacity } from "react-native";
+//const toast = useToast();
+const ToastDetails = [
+  {
+    title: "Reserva cancelada",
+    variant: "solid",
+    description: "Solicitação cancelada com sucesso.",
+    isClosable: true
+  },
+  {
+    title: "Uso confirmado",
+    variant: "solid",
+    description: "Uso confirmado com sucesso.",
+    isClosable: true
+  },
+]
 
 export default function PageHistorico() {
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +60,29 @@ export default function PageHistorico() {
   const [modalDados, setModalDados] = useState(null);
   const [statusOptions, setStatusOptions] = useState([]);
   const [espacoOptions, setEspacoOptions] = useState([]);
-  const [legendaStatus] = useState({ 'CANCELADA': 'error.500', 'NEGADA': 'error.500', 'FINALIZADA': 'emerald.500', 'ENCERRADA': 'gray.500', 'SOLICITADA': 'yellow.500', 'APROVADA': 'green.500' });
+  const [legendaStatus] = useState({
+    'CANCELADA': 'error.500',
+    'NEGADA': 'error.500',
+    'FINALIZADA': 'emerald.500',
+    'ENCERRADA': 'gray.500',
+    'SOLICITADA': 'yellow.500',
+    'APROVADA': 'green.500'
+  });
+  const toast = useToast();
+  const ToastDetails = [
+    {
+      title: "Reserva cancelada",
+      variant: "solid",
+      description: "Solicitação cancelada com sucesso.",
+      isClosable: true
+    },
+    {
+      title: "Uso confirmado",
+      variant: "solid",
+      description: "Uso confirmado com sucesso.",
+      isClosable: true
+    },
+  ]
 
   const reservasFiltradas = cardData
     .filter((card) => {
@@ -129,6 +168,45 @@ export default function PageHistorico() {
     setModalDados(dados);
     setShowModal(true);
   };
+
+  const handleCancelarUso = async (idLocacao) => {
+    console.log(`cancelando uso... id ${idLocacao}`)
+    try {
+      const result = await cancelarUsoLocacao(idLocacao);
+
+      const toastConfig = ToastDetails[0];
+      toast.show(toastConfig);
+
+
+      // Atualizar a lista removendo o item cancelado
+      const updatedCardData = cardData.filter(card => card.id !== idLocacao);
+      setCardData(updatedCardData);
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        `Não foi possível seguir com o cancelamento da locação. ${error.message}`
+      )
+    }
+  }
+
+  const handleConfirmarUso = async (idLocacao) => {
+    try {
+      const result = await confirmarUsoLocacao(idLocacao)
+      const toastConfig = ToastDetails[1];
+      toast.show(toastConfig);
+
+      // Atualizar a lista removendo o item confirmado
+      const updatedCardData = cardData.filter(card => card.id !== idLocacao);
+      setCardData(updatedCardData);
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        `Não foi possível seguir com a confirmação de uso da locação. ${error.message}`
+      )
+    }
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -244,9 +322,8 @@ export default function PageHistorico() {
           )}
 
           {/* Geração dos cards contendo o histórico de locações */}
-          {reservasFiltradas.map((card, index) => (
+          {isLoading ? (
             <Box
-              key={index}
               mb="5"
               rounded="lg"
               overflow="hidden"
@@ -265,20 +342,40 @@ export default function PageHistorico() {
                 backgroundColor: "gray.50",
               }}
             >
-              {isLoading ? (
-                // Renderize o Skeleton se estiver carregando
-                <VStack space={8} overflow="hidden" rounded="20">
-                  <Skeleton.Text py="6" px="4" />
-                  <Center>
-                    <Skeleton
-                      mb="3"
-                      w="90%"
-                      rounded="20"
-                      startColor={"green.100"}
-                    />
-                  </Center>
-                </VStack>
-              ) : (
+              <VStack space={8} overflow="hidden" rounded="20">
+                <Skeleton.Text py="6" px="4" />
+                <Center>
+                  <Skeleton
+                    mb="3"
+                    w="90%"
+                    rounded="20"
+                    startColor={"green.100"}
+                  />
+                </Center>
+              </VStack>
+            </Box>
+          ) : reservasFiltradas.length > 0 ? (
+            reservasFiltradas.map((card, index) => (
+              <Box
+                key={index}
+                mb="5"
+                rounded="lg"
+                overflow="hidden"
+                borderColor="coolGray.200"
+                borderWidth="1"
+                borderRadius={"21"}
+                _dark={{
+                  borderColor: "coolGray.600",
+                  backgroundColor: "gray.700",
+                }}
+                _web={{
+                  shadow: 2,
+                  borderWidth: 0,
+                }}
+                _light={{
+                  backgroundColor: "gray.50",
+                }}
+              >
                 <Stack p="4" space={3}>
                   <Stack
                     space={1}
@@ -345,34 +442,40 @@ export default function PageHistorico() {
                         : "center"
                     }
                   >
-                    {showConfirmacaoReserva(card.dataHoraInicioReserva) ? (
+                    {showConfirmacaoReserva(card.dataHoraInicioReserva) && (card.status == 'SOLICITADA' || card.status == 'APROVADA') ? (
                       <Button
                         size="lg"
-                        borderRadius="md"
-                        width="140px"
-                        backgroundColor={COLORS.green}
+                        borderRadius="lg"
+                        backgroundColor={'success.500'}
                         leftIcon={<CheckIcon />}
+                        onPress={() => { handleConfirmarUso(card.id) }}
                       >
                         Confirmar uso
                       </Button>
                     ) : null}
 
-                    {showCancelarReserva(card.dataHoraInicioReserva) ? (
+                    {showCancelarReserva(card.dataHoraInicioReserva) && (card.status == 'SOLICITADA' || card.status == 'APROVADA') ? (
                       <Button
                         size="lg"
-                        borderRadius="md"
-                        width="140px"
-                        backgroundColor={COLORS.red}
+                        borderRadius="lg"
+                        backgroundColor={'danger.500'}
                         leftIcon={<CloseIcon />}
+                        onPress={() => { handleCancelarUso(card.id) }}
                       >
                         Cancelar uso
                       </Button>
                     ) : null}
                   </Flex>
                 </Stack>
-              )}
-            </Box>
-          ))}
+              </Box>
+            ))
+          ) : (
+            <Center>
+              <Text fontSize="md" color={COLORS.darkGrayText}>
+                Não existem reservas em andamento.
+              </Text>
+            </Center>
+          )}
         </Box>
 
         {/* Modal com detalhes da reserva */}
