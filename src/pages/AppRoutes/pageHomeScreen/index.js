@@ -14,23 +14,70 @@ import {
   ScrollView,
   Flex,
   Divider,
-  Badge
+  Badge,
+  AlertDialog,
+  useToast
 } from "native-base";
 import { cancelarUsoLocacao, confirmarUsoLocacao, getSolicitacoesEmAndamento } from "../../../api/LocacaoService";
 import moment from "moment";
 import COLORS from "../../../colors/colors";
 import { Alert } from "react-native";
 
+
 export default function PageHomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [cardData, setCardData] = useState([]);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const onClose = () => setIsOpen(false);
+  const cancelRef = React.useRef(null);
+  const toast = useToast();
+  const ToastDetails = [
+    {
+      title: "Reserva cancelada",
+      variant: "solid",
+      description: "Solicitação cancelada com sucesso.",
+      isClosable: true
+    },
+    {
+      title: "Uso confirmado",
+      variant: "solid",
+      description: "Uso confirmado com sucesso.",
+      isClosable: true
+    },
+  ]
+
+  const ToastAlert = ({
+    id,
+    status,
+    variant,
+    title,
+    description,
+    isClosable,
+    ...rest
+  }) => <Alert maxWidth="100%" alignSelf="center" flexDirection="row" status={status ? status : "info"} variant={variant} {...rest}>
+      <VStack space={1} flexShrink={1} w="100%">
+        <HStack flexShrink={1} alignItems="center" justifyContent="space-between">
+          <HStack space={2} flexShrink={1} alignItems="center">
+            <Alert.Icon />
+            <Text fontSize="md" fontWeight="medium" flexShrink={1} color={variant === "solid" ? "lightText" : variant !== "outline" ? "darkText" : null}>
+              {title}
+            </Text>
+          </HStack>
+          {isClosable ? <IconButton variant="unstyled" icon={<CloseIcon size="3" />} _icon={{
+            color: variant === "solid" ? "lightText" : "darkText"
+          }} onPress={() => toast.close(id)} /> : null}
+        </HStack>
+        <Text px="6" color={variant === "solid" ? "lightText" : variant !== "outline" ? "darkText" : null}>
+          {description}
+        </Text>
+      </VStack>
+    </Alert>;
 
 
   const showConfirmacaoReserva = (horario) => {
     if (moment().diff(moment(horario), "minutes") >= 5) {
       return true;
     }
-
     return false;
   };
 
@@ -38,7 +85,6 @@ export default function PageHomeScreen() {
     if (moment(horario).diff(moment(), "minutes") >= 15) {
       return true;
     }
-
     return false;
   };
 
@@ -65,7 +111,9 @@ export default function PageHomeScreen() {
     try {
       const result = await cancelarUsoLocacao(idLocacao);
 
-      Alert.alert("Sucesso", "Locação cancelada com sucesso");
+      const toastConfig = ToastDetails[0];
+      toast.show(toastConfig);
+      
 
       // Atualizar a lista removendo o item cancelado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
@@ -82,8 +130,8 @@ export default function PageHomeScreen() {
   const handleConfirmarUso = async (idLocacao) => {
     try {
       const result = await confirmarUsoLocacaoUsoLocacao(idLocacao)
-
-      Alert.alert("Sucesso", "O uso do espaço foi confirmado e a locação encerrada!");
+      const toastConfig = ToastDetails[1];
+      toast.show(toastConfig);
 
       // Atualizar a lista removendo o item confirmado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
@@ -146,7 +194,7 @@ export default function PageHomeScreen() {
         ) : cardData.length > 0 ? (
           cardData.map((card, index) => (
             <Box
-              key={index}
+              key={'alert_dialog-' + index}
               mb="5"
               rounded="lg"
               overflow="hidden"
@@ -165,6 +213,25 @@ export default function PageHomeScreen() {
                 backgroundColor: "gray.50",
               }}
             >
+              <AlertDialog key={'alert_dialog-' + index} leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
+                <AlertDialog.Content>
+                  <AlertDialog.CloseButton />
+                  <AlertDialog.Header>Cancelar Reserva</AlertDialog.Header>
+                  <AlertDialog.Body>
+                    Realmente deseja cancelar a reserva?
+                  </AlertDialog.Body>
+                  <AlertDialog.Footer>
+                    <Button.Group space={2}>
+                      <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
+                        Voltar
+                      </Button>
+                      <Button colorScheme="danger" onPress={() => handleCancelarUso(card.id)}>
+                        Sim, cancelar
+                      </Button>
+                    </Button.Group>
+                  </AlertDialog.Footer>
+                </AlertDialog.Content>
+              </AlertDialog>
               <Stack p="4" space={3}>
                 <Stack space={2}>
                   <Heading size="sm" ml="-1" textAlign="center">
@@ -233,7 +300,7 @@ export default function PageHomeScreen() {
                       borderRadius="lg"
                       backgroundColor={'danger.500'}
                       leftIcon={<CloseIcon />}
-                      onPress={() => handleCancelarUso(card.id)}
+                      onPress={() => setIsOpen(!isOpen)}
                     >
                       Cancelar uso
                     </Button>
