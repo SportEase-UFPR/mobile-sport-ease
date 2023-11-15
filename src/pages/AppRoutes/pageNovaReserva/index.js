@@ -28,7 +28,7 @@ import {
   Slider,
   Modal
 } from "native-base";
-import moment from "moment";
+import moment from "moment-timezone";
 import temaGeralFormulario from "./nativeBaseTheme";
 import COLORS from "../../../colors/colors";
 
@@ -258,12 +258,10 @@ const PageNovaReserva = ({ navigation }) => {
     if (isValid) {
       console.log(horarioInicioReserva);
       setIsSending(true);
-      const novaDataReservaInicio = new Date(dataReserva);
+      const novaDataReservaInicio = moment.tz(dataReserva, "America/Sao_Paulo");
       const [horas, minutos] = horarioInicioReserva.split(":").map(Number);
-      novaDataReservaInicio.setHours(horas);
-      novaDataReservaInicio.setMinutes(minutos);
-      novaDataReservaInicio.setSeconds(0);
-      novaDataReservaInicio.setMilliseconds(0);
+      novaDataReservaInicio.hours(horas - 3).minutes(minutos).seconds(0).milliseconds(0);
+
       const novaDataReservaFim = new Date(novaDataReservaInicio);
       addPeriodToDate(
         novaDataReservaFim,
@@ -527,23 +525,31 @@ const PageNovaReserva = ({ navigation }) => {
                       <FormControl.Label>
                         Por quanto tempo você deseja reservar o espaço?{" "}
                       </FormControl.Label>
-                      <Slider
-                        defaultValue={1}
-                        size="md"
-                        colorScheme="green"
-                        w="90%"
-                        mx="auto"
-                        minValue={1}
-                        maxValue={sliderMax}
-                        onChange={(v) => {
-                          v && setQntHoras(v);
-                        }}
-                      >
-                        <Slider.Track>
-                          <Slider.FilledTrack />
-                        </Slider.Track>
-                        <Slider.Thumb />
-                      </Slider>
+                      {horarioInicioReserva ? (
+                        <Slider
+                          defaultValue={0}
+                          size="lg"
+                          colorScheme="green"
+                          w="80%"
+                          mx="auto"
+                          minValue={0}
+                          maxValue={sliderMax}
+                          onChange={(v) => {
+                            v && setQntHoras(v);
+                          }}
+                        >
+                          <Slider.Track>
+                            <Slider.FilledTrack />
+                          </Slider.Track>
+                          <Slider.Thumb />
+                        </Slider>
+                      ) : (
+                        null
+                      )
+
+                      }
+
+
                       {horarioInicioReserva ? (
                         <>
                           <Text>

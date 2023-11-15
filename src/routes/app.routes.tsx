@@ -126,18 +126,18 @@ export default function AppRoutes() {
                             <Feather name="home" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
-                <Tab.Screen name="Nova Reserva" component={PageNovaReserva}
-                    options={{
-                        tabBarLabel: () => null,
-                        tabBarIcon: ({ focused, size }) => (
-                            <Feather name="plus-square" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
-                        )
-                    }} />
                 <Tab.Screen name="Locais Esportivos" component={PageLocaisEsportivos}
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
                             <Feather name="map-pin" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
+                        )
+                    }} />
+                <Tab.Screen name="Nova Reserva" component={PageNovaReserva}
+                    options={{
+                        tabBarLabel: () => null,
+                        tabBarIcon: ({ focused, size }) => (
+                            <Feather name="plus-square" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Historico" component={PageHistorico}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Calendar } from "react-native-calendars";
 import moment from "moment";
 
-export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = new Date(), minimumDate = new Date(), availableDays = [0,1,2,3,4,5,6] }) => {
+export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = new Date(), minimumDate = new Date(), availableDays = [0, 1, 2, 3, 4, 5, 6] }) => {
     const [markedDates, setMarkedDates] = useState({});
 
     useEffect(() => {
@@ -39,7 +39,10 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
             current={initDate.toISOString()}
             minDate={minimumDate.toISOString()}
             onDayPress={(day) => {
-                setDate(moment(day.dateString, "YYYY-MM-DD").toDate());
+                const selectedDate = moment(day.dateString, "YYYY-MM-DD");
+                selectedDate.hour(0).minute(0).second(0);
+                console.log(`data formatada: ${selectedDate.toDate()}`); // Para ver a data e hora ajustadas
+                setDate(selectedDate.toDate());
                 setShowCalendarModal(false);
             }}
             firstDay={0}
