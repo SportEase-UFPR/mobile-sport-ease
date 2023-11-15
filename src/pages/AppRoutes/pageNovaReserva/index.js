@@ -546,11 +546,9 @@ const PageNovaReserva = ({ navigation }) => {
                       ) : (
                         null
                       )
-
                       }
-
-
                       {horarioInicioReserva ? (
+                        
                         <>
                           <Text>
                             Período: {horarioInicioReserva} até{" "}
