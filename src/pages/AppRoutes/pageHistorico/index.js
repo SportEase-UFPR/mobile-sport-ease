@@ -22,8 +22,11 @@ import {
   Spacer,
   Input, Divider, DeleteIcon,
   Alert,
-  useToast
+  useToast,
+  AlertDialog,
+  TextArea,
 } from "native-base";
+import { AntDesign } from '@expo/vector-icons';
 import temaGeralFormulario from "./nativeBaseTheme";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { cancelarUsoLocacao, confirmarUsoLocacao, getAllSolicitacoes } from "../../../api/LocacaoService";
@@ -31,7 +34,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import COLORS from "../../../colors/colors";
 import moment from "moment";
 import { TouchableOpacity } from "react-native";
-//const toast = useToast();
+import { AirbnbRating } from "react-native-elements";
 const ToastDetails = [
   {
     title: "Reserva cancelada",
@@ -60,6 +63,10 @@ export default function PageHistorico() {
   const [modalDados, setModalDados] = useState(null);
   const [statusOptions, setStatusOptions] = useState([]);
   const [espacoOptions, setEspacoOptions] = useState([]);
+  const cancelRef = React.useRef(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const onClose = () => setIsOpen(false);
   const [legendaStatus] = useState({
     'CANCELADA': 'error.500',
     'NEGADA': 'error.500',
@@ -147,10 +154,16 @@ export default function PageHistorico() {
     return false;
   };
 
+  const showAvaliarReserva = (avaliacao) => {
+    if (!avaliacao) {
+      return true;
+    }
+    return false;
+  };
+
   const carregarReservas = async () => {
     const result = await getAllSolicitacoes();
     if (result) {
-      console.log(result);
       setCardData(result);
       setIsLoading(false);
 
@@ -170,7 +183,6 @@ export default function PageHistorico() {
   };
 
   const handleCancelarUso = async (idLocacao) => {
-    console.log(`cancelando uso... id ${idLocacao}`)
     try {
       const result = await cancelarUsoLocacao(idLocacao);
 
@@ -376,13 +388,38 @@ export default function PageHistorico() {
                   backgroundColor: "gray.50",
                 }}
               >
+                <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)} size="lg">
+                  <Modal.Content>
+                    <Modal.CloseButton />
+                    <Modal.Header>Avalie a sua reserva!</Modal.Header>
+                    <Modal.Body>
+                      <AirbnbRating
+                        defaultRating={5}
+                        size={20}
+                        showRating={false}
+
+                      />
+                      <FormControl mt="3">
+                        <FormControl.Label>Adicione um comentário abaixo</FormControl.Label>
+                        <TextArea placeholder="Inclua aqui o seu comentário" />
+                      </FormControl>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button flex="1" onPress={() => {
+                        setModalVisible(false);
+                      }}>
+                        Proceed
+                      </Button>
+                    </Modal.Footer>
+                  </Modal.Content>
+                </Modal>
                 <Stack p="4" space={3}>
                   <Stack
                     space={1}
                     direction="row"
                     alignItems="center"
                     justifyContent="flex-start">
-                    <Box alignSelf={'flex-start'} w={'1/3'}>
+                    <Box alignSelf={'flex-start'}>
                       <Heading size="lg">
                         <Text color={COLORS.darkBlueText}>
                           {card.nomeEspacoEsportivo}
@@ -436,16 +473,17 @@ export default function PageHistorico() {
                   <Flex
                     direction="row"
                     justifyContent={
-                      showCancelarReserva(card.dataHoraInicioReserva) &&
-                        showConfirmacaoReserva(card.dataHoraInicioReserva)
-                        ? "space-between"
-                        : "center"
+                      "flex-end"
+                      // showCancelarReserva(card.dataHoraInicioReserva) &&
+                      //   showConfirmacaoReserva(card.dataHoraInicioReserva)
+                      //   ? "space-between"
+                      //   : "center"
                     }
                   >
                     {showConfirmacaoReserva(card.dataHoraInicioReserva) && (card.status == 'SOLICITADA' || card.status == 'APROVADA') ? (
                       <Button
                         size="lg"
-                        borderRadius="lg"
+                        borderRadius="full"
                         backgroundColor={'success.500'}
                         leftIcon={<CheckIcon />}
                         onPress={() => { handleConfirmarUso(card.id) }}
@@ -457,12 +495,26 @@ export default function PageHistorico() {
                     {showCancelarReserva(card.dataHoraInicioReserva) && (card.status == 'SOLICITADA' || card.status == 'APROVADA') ? (
                       <Button
                         size="lg"
-                        borderRadius="lg"
+                        borderRadius="full"
                         backgroundColor={'danger.500'}
                         leftIcon={<CloseIcon />}
                         onPress={() => { handleCancelarUso(card.id) }}
                       >
                         Cancelar uso
+                      </Button>
+                    ) : null}
+
+                    {showAvaliarReserva(card.comentario) &&
+                      card.status == 'FINALIZADA' ? (
+                      <Button
+                        variant={'solid'}
+                        size="lg"
+                        borderRadius="full"
+                        colorScheme="info"
+                        leftIcon={<AntDesign name="staro" size={24} color="white" />}
+                        onPress={() => setModalVisible(!modalVisible)}
+                      >
+                        Avaliar
                       </Button>
                     ) : null}
                   </Flex>
