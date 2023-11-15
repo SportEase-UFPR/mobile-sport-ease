@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { FontAwesome } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 import DatePicker from "../../../components/DatePicker";
 import LocacaoService, {
   createSolicitacaoLocacao,
@@ -25,8 +26,10 @@ import {
   NativeBaseProvider,
   Divider,
   Badge,
-  Slider,
-  Modal
+  IconButton,
+  Modal,
+  HStack,
+  Center
 } from "native-base";
 import moment from "moment-timezone";
 import temaGeralFormulario from "./nativeBaseTheme";
@@ -35,6 +38,7 @@ import COLORS from "../../../colors/colors";
 const PageNovaReserva = ({ navigation }) => {
   const [inputLocalReserva, setInputLocalReserva] = useState(null);
   const [horarioInicioReserva, setHorarioInicioReserva] = useState(null);
+  const [horarioFimReserva, setHorarioFimReserva] = useState(null);
   const [horarioDisponivelData, setHorarioDisponivelData] = useState(null);
   const [qntParticipantesReserva, setQntParticipantesReserva] = useState(null);
   const [qntHoras, setQntHoras] = useState(1);
@@ -45,13 +49,44 @@ const PageNovaReserva = ({ navigation }) => {
   const [informacoesEspacoEscolhido, setInformacoesEspacoEscolhido] = useState(
     []
   );
-  const [sliderMax, setSliderMax] = useState(0);
+  const [botaoMax, setBotaoMax] = useState(0);
+  const [botaoCount, setBotaoCount] = useState(0)
+  const [botaoAumentarHorarioCount, setBotaoAumentarHorarioCount] = useState()
 
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [inputErrors, setInputErrors] = useState({});
+
+  useEffect(() => {
+    if (horarioInicioReserva) {
+      const max = calcularDisponibilidadeHorario();
+      setBotaoMax(max);
+      console.log(`o novo valor do botao max é ${botaoMax}`)
+      atualizarHorarioFim();
+    }
+  }, [horarioInicioReserva, botaoCount]);
+
+  const atualizarHorarioFim = () => {
+    console.log(`o valor do botãoCount + 1 é ${(botaoCount+1)}`)
+    const novoFim = addTimes(horarioInicioReserva, multTime(informacoesEspacoEscolhido.periodoLocacao, (botaoCount+1)));
+    setHorarioFimReserva(novoFim);
+    console.log(`o novo horario fim é é ${horarioFimReserva}`)
+  };
+
+  const aumentarHorario = () => {
+    if (botaoCount < botaoMax) {
+      setBotaoCount(botaoCount + 1);
+    }
+  };
+
+  const diminuirHorario = () => {
+    if (botaoCount > 0) {
+      setBotaoCount(botaoCount - 1);
+    }
+  };
+
 
   // UseEffect para carregar a listagem inicial dos espaços esportivos
   useEffect(() => {
@@ -73,14 +108,14 @@ const PageNovaReserva = ({ navigation }) => {
   //UseEffect para carregar os horários disponíveis de reserva
   useEffect(() => {
     if (inputLocalReserva && dataReserva) {
-      setSliderMax(1);
+      // setSliderMax(1);
       carregarHorariosDisponiveis(dataReserva, inputLocalReserva);
     }
   }, [inputLocalReserva, dataReserva]);
 
   useEffect(() => {
     if (inputLocalReserva) {
-      setSliderMax(1);
+      // setSliderMax(1);
       setIsLoadingForm(true);
       carregarInformacoesEspacoEscolhido(inputLocalReserva);
     }
@@ -92,13 +127,28 @@ const PageNovaReserva = ({ navigation }) => {
 
   useEffect(() => {
     setHorarioInicioReserva(null);
+    setHorarioFimReserva(null);
   }, [inputLocalReserva]);
+
+
 
   useEffect(() => {
     if (horarioInicioReserva) {
       const max = calcularDisponibilidadeHorario();
+      console.log(max)
       if (typeof max === "number") {
-        setSliderMax(max);
+        setHorarioFimReserva(
+          addTimes(
+            horarioInicioReserva,
+            multTime(
+              informacoesEspacoEscolhido.periodoLocacao,
+              botaoCount + 1
+            )
+          )
+        )
+        setBotaoMax(max)
+        setBotaoCount(0)
+        console.log(`O máximo de vezes a serem contadas é: ${botaoMax}`)
       } else {
         console.error(
           "calcularDisponibilidadeHorario did not return a number:",
@@ -143,13 +193,16 @@ const PageNovaReserva = ({ navigation }) => {
 
     for (let indexMax = 1; indexMax <= maxLocacaoDia; indexMax++) {
       const novoHorario = addTimes(horarioAtual, periodoLocacao);
+      console.log(`horario ${novoHorario} sendo testado`)
       if (horariosDisponiveis.horariosDisponiveis.includes(novoHorario)) {
+        console.log(`horario ${novoHorario} passou no teste`)
         horarioAtual = novoHorario;
         horariosEncontrados++;
       } else {
         break;
       }
     }
+    console.log(`foram encontrados ${horariosEncontrados} horarios`)
     return horariosEncontrados;
   };
 
@@ -241,13 +294,13 @@ const PageNovaReserva = ({ navigation }) => {
       }));
       isValid = false;
     }
-    if (!qntHoras) {
-      setInputErrors((prevErrors) => ({
-        ...prevErrors,
-        qntHorasInvalid: true,
-      }));
-      isValid = false;
-    }
+    // if (!qntHoras) {
+    //   setInputErrors((prevErrors) => ({
+    //     ...prevErrors,
+    //     qntHorasInvalid: true,
+    //   }));
+    //   isValid = false;
+    // }
     if (!motivoSolicitacao) {
       setInputErrors((prevErrors) => ({
         ...prevErrors,
@@ -266,7 +319,7 @@ const PageNovaReserva = ({ navigation }) => {
       addPeriodToDate(
         novaDataReservaFim,
         informacoesEspacoEscolhido.periodoLocacao,
-        qntHoras
+        botaoCount + 1
       );
       try {
         const dadosDaLocacao = {
@@ -520,47 +573,41 @@ const PageNovaReserva = ({ navigation }) => {
 
                     <FormControl
                       isRequired
-                      isInvalid={inputErrors.qntHorasInvalid}
+                    // isInvalid={inputErrors.qntHorasInvalid}
                     >
                       <FormControl.Label>
                         Por quanto tempo você deseja reservar o espaço?{" "}
                       </FormControl.Label>
                       {horarioInicioReserva ? (
-                        <Slider
-                          defaultValue={0}
-                          size="lg"
-                          colorScheme="green"
-                          w="80%"
-                          mx="auto"
-                          minValue={0}
-                          maxValue={sliderMax}
-                          onChange={(v) => {
-                            v && setQntHoras(v);
-                          }}
-                        >
-                          <Slider.Track>
-                            <Slider.FilledTrack />
-                          </Slider.Track>
-                          <Slider.Thumb />
-                        </Slider>
-                      ) : (
-                        null
-                      )
-                      }
-                      {horarioInicioReserva ? (
-                        
-                        <>
-                          <Text>
-                            Período: {horarioInicioReserva} até{" "}
-                            {addTimes(
-                              horarioInicioReserva,
-                              multTime(
-                                informacoesEspacoEscolhido.periodoLocacao,
-                                qntHoras
-                              )
-                            )}
+                        <HStack alignItems="center" justifyContent="space-around">
+                          <IconButton
+                            isDisabled={botaoCount === 0}
+                            size={'sm'}
+                            colorScheme="success"
+                            variant="outline"
+                            _icon={{
+                              as: Entypo,
+                              name: "minus",
+                            }}
+                            onPress={diminuirHorario}
+                          />
+                          <Text fontSize={'md'}>
+                            {horarioInicioReserva} até{" "}
+                            {horarioFimReserva}
                           </Text>
-                        </>
+                          <IconButton
+                            isDisabled={botaoCount === (botaoMax-1)}
+                            size={'sm'}
+                            colorScheme="success"
+                            variant="outline"
+                            _icon={{
+                              as: Entypo,
+                              name: "plus",
+                            }}
+                            onPress={aumentarHorario}
+                          />
+                        </HStack>
+
                       ) : (
                         <>
                           <FormControl.HelperText>
