@@ -114,29 +114,25 @@ export default function PageHistorico() {
     setShowEndPicker(false);
   };
 
-  const onChangeStartDate = (event, selectedDate) => {
+  const onChangeStartDate = useCallback((event, selectedDate) => {
     setShowStartPicker(Platform.OS === 'ios');
     if (selectedDate) {
-      // Formatar a data para um formato reconhecido antes de usar com moment
       const formattedDate = moment(selectedDate, 'DD/MM/YYYY');
       setStartDate(formattedDate);
     } else {
-      // Se não houver data selecionada, podemos manter a string vazia ou null
       setStartDate('');
     }
-  };
+  }, []);
 
-  const onChangeEndDate = (event, selectedDate) => {
+  const onChangeEndDate = useCallback((event, selectedDate) => {
     setShowEndPicker(Platform.OS === 'ios');
     if (selectedDate) {
-      // Formatar a data para um formato reconhecido antes de usar com moment
       const formattedDate = moment(selectedDate, 'DD/MM/YYYY');
       setEndDate(formattedDate);
     } else {
-      // Se não houver data selecionada, podemos manter a string vazia ou null
       setEndDate('');
     }
-  };
+  }, []);
 
   const showConfirmacaoReserva = (horario) => {
     if (moment().diff(moment(horario), "minutes") >= 5) {
@@ -229,6 +225,31 @@ export default function PageHistorico() {
 
   return (
     <NativeBaseProvider theme={temaGeralFormulario}>
+      {/* Modal de avaliação de reserva */}
+      <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)} size="xl">
+        <Modal.Content>
+          <Modal.CloseButton />
+          <Modal.Header>Avalie a sua reserva!</Modal.Header>
+          <Modal.Body>
+            <AirbnbRating
+              defaultRating={5}
+              size={30}
+              showRating={false}
+            />
+            <FormControl mt="3">
+              <FormControl.Label>Nos conte o que você achou sobre o local!</FormControl.Label>
+              <TextArea placeholder="Inclua aqui o seu comentário" />
+            </FormControl>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button flex="1" colorScheme={"info"} onPress={() => {
+              setModalVisible(false);
+            }}>
+              Enviar avaliação
+            </Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
       <ScrollView>
         <Box mt={25} mb={25} paddingX={5}>
           <Heading
@@ -308,7 +329,8 @@ export default function PageHistorico() {
                 size="sm"
                 variant="subtle"
                 colorScheme="secondary"
-                onPress={limparFiltros}>
+                onPress={limparFiltros}
+                px={'5'}>
                 Limpar Filtros
               </Button>
             </VStack>
@@ -388,31 +410,6 @@ export default function PageHistorico() {
                   backgroundColor: "gray.50",
                 }}
               >
-                <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)} size="lg">
-                  <Modal.Content>
-                    <Modal.CloseButton />
-                    <Modal.Header>Avalie a sua reserva!</Modal.Header>
-                    <Modal.Body>
-                      <AirbnbRating
-                        defaultRating={5}
-                        size={20}
-                        showRating={false}
-
-                      />
-                      <FormControl mt="3">
-                        <FormControl.Label>Adicione um comentário abaixo</FormControl.Label>
-                        <TextArea placeholder="Inclua aqui o seu comentário" />
-                      </FormControl>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <Button flex="1" onPress={() => {
-                        setModalVisible(false);
-                      }}>
-                        Proceed
-                      </Button>
-                    </Modal.Footer>
-                  </Modal.Content>
-                </Modal>
                 <Stack p="4" space={3}>
                   <Stack
                     space={1}
