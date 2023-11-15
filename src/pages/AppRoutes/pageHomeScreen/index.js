@@ -13,15 +13,18 @@ import {
   CloseIcon,
   ScrollView,
   Flex,
+  Divider,
+  Badge
 } from "native-base";
-import { getSolicitacoesEmAndamento } from "../../../api/LocacaoService";
+import { cancelarUsoLocacao, confirmarUsoLocacao, getSolicitacoesEmAndamento } from "../../../api/LocacaoService";
 import moment from "moment";
 import COLORS from "../../../colors/colors";
+import { Alert } from "react-native";
 
 export default function PageHomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
-  const [informacoesEspacos, setInformacoesEspacos] = useState([]);
-  const [cardData, setCardData] = useState([""]);
+  const [cardData, setCardData] = useState([]);
+
 
   const showConfirmacaoReserva = (horario) => {
     if (moment().diff(moment(horario), "minutes") >= 5) {
@@ -53,8 +56,46 @@ export default function PageHomeScreen() {
     useCallback(() => {
       setIsLoading(true);
       carregarReservas();
+      console.log(cardData);
     }, [])
   );
+
+  const handleCancelarUso = async (idLocacao) => {
+    console.log(`cancelando uso... id ${idLocacao}`)
+    try {
+      const result = await cancelarUsoLocacao(idLocacao);
+
+      Alert.alert("Sucesso", "Locação cancelada com sucesso");
+
+      // Atualizar a lista removendo o item cancelado
+      const updatedCardData = cardData.filter(card => card.id !== idLocacao);
+      setCardData(updatedCardData);
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        `Não foi possível seguir com o cancelamento da locação. ${error.message}`
+      )
+    }
+  }
+
+  const handleConfirmarUso = async (idLocacao) => {
+    try {
+      const result = await confirmarUsoLocacaoUsoLocacao(idLocacao)
+
+      Alert.alert("Sucesso", "O uso do espaço foi confirmado e a locação encerrada!");
+
+      // Atualizar a lista removendo o item confirmado
+      const updatedCardData = cardData.filter(card => card.id !== idLocacao);
+      setCardData(updatedCardData);
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        `Não foi possível seguir com a confirmação de uso da locação. ${error.message}`
+      )
+    }
+  }
 
   return (
     <ScrollView>
@@ -69,10 +110,9 @@ export default function PageHomeScreen() {
         >
           Suas reservas em andamento
         </Heading>
-
-        {cardData.map((card, index) => (
+        <Divider mb="5" />
+        {isLoading ? (
           <Box
-            key={index}
             mb="5"
             rounded="lg"
             overflow="hidden"
@@ -91,24 +131,44 @@ export default function PageHomeScreen() {
               backgroundColor: "gray.50",
             }}
           >
-            {isLoading ? (
-              // Renderize o Skeleton se estiver carregando
-              <VStack space={8} overflow="hidden" rounded="20">
-                <Skeleton.Text py="6" px="4" />
-                <Center>
-                  <Skeleton
-                    mb="3"
-                    w="90%"
-                    rounded="20"
-                    startColor={"green.100"}
-                  />
-                </Center>
-              </VStack>
-            ) : (
+            <VStack space={8} overflow="hidden" rounded="20">
+              <Skeleton.Text py="6" px="4" />
+              <Center>
+                <Skeleton
+                  mb="3"
+                  w="90%"
+                  rounded="20"
+                  startColor={"green.100"}
+                />
+              </Center>
+            </VStack>
+          </Box>
+        ) : cardData.length > 0 ? (
+          cardData.map((card, index) => (
+            <Box
+              key={index}
+              mb="5"
+              rounded="lg"
+              overflow="hidden"
+              borderColor="coolGray.200"
+              borderWidth="1"
+              borderRadius={"21"}
+              _dark={{
+                borderColor: "coolGray.600",
+                backgroundColor: "gray.700",
+              }}
+              _web={{
+                shadow: 2,
+                borderWidth: 0,
+              }}
+              _light={{
+                backgroundColor: "gray.50",
+              }}
+            >
               <Stack p="4" space={3}>
                 <Stack space={2}>
                   <Heading size="sm" ml="-1" textAlign="center">
-                    <Text
+                    <Badge
                       style={{
                         color:
                           card.status === "SOLICITADA"
@@ -120,7 +180,7 @@ export default function PageHomeScreen() {
                       {" " +
                         card.status?.charAt(0).toUpperCase() +
                         card.status?.slice(1).toLowerCase()}
-                    </Text>
+                    </Badge>
                   </Heading>
 
                   <Heading size="lg" ml="-1" textAlign="center">
@@ -149,7 +209,7 @@ export default function PageHomeScreen() {
                   direction="row"
                   justifyContent={
                     showCancelarReserva(card.dataHoraInicioReserva) &&
-                    showConfirmacaoReserva(card.dataHoraInicioReserva)
+                      showConfirmacaoReserva(card.dataHoraInicioReserva)
                       ? "space-between"
                       : "center"
                   }
@@ -157,10 +217,11 @@ export default function PageHomeScreen() {
                   {showConfirmacaoReserva(card.dataHoraInicioReserva) ? (
                     <Button
                       size="lg"
-                      borderRadius="md"
-                      width="140px"
-                      backgroundColor={COLORS.green}
+
+                      borderRadius="lg"
+                      backgroundColor={'success.500'}
                       leftIcon={<CheckIcon />}
+                      onPress={() => handleConfirmarUso(card.id)}
                     >
                       Confirmar uso
                     </Button>
@@ -169,19 +230,25 @@ export default function PageHomeScreen() {
                   {showCancelarReserva(card.dataHoraInicioReserva) ? (
                     <Button
                       size="lg"
-                      borderRadius="md"
-                      width="140px"
-                      backgroundColor={COLORS.red}
+                      borderRadius="lg"
+                      backgroundColor={'danger.500'}
                       leftIcon={<CloseIcon />}
+                      onPress={() => handleCancelarUso(card.id)}
                     >
                       Cancelar uso
                     </Button>
                   ) : null}
                 </Flex>
               </Stack>
-            )}
-          </Box>
-        ))}
+            </Box>
+          ))
+        ) : (
+          <Center>
+            <Text fontSize="md" color={COLORS.darkGrayText}>
+              Não existem reservas em andamento.
+            </Text>
+          </Center>
+        )}
       </Box>
     </ScrollView>
   );

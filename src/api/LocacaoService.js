@@ -90,7 +90,16 @@ export const getAllSolicitacoes = async () => {
 
 export const confirmarUsoLocacao = async () => {
     try {
-        const response = await ApiClient.put('/locacoes/solicitar-locacao');
+        const response = await ApiClient.put(`/locacoes/confirmar-uso/${idLocacao}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const cancelarUsoLocacao = async (idLocacao) => {
+    try {
+        const response = await ApiClient.put(`/locacoes/cancelar-reserva/${idLocacao}`);
         return response.data;
     } catch (error) {
         throw error;
@@ -104,5 +113,6 @@ export default {
     createSolicitacaoLocacao,
     getSolicitacoesEmAndamento,
     getAllSolicitacoes,
-    confirmarUsoLocacao
+    confirmarUsoLocacao,
+    cancelarUsoLocacao
 };

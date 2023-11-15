@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import PageMeuPerfil from '../pages/AppRoutes/pageMeuPerfil';
 import styles from '../../styles';
 import { useFonts } from 'expo-font';
@@ -137,7 +137,7 @@ export default function AppRoutes() {
                     options={{
                         tabBarLabel: () => null,
                         tabBarIcon: ({ focused, size }) => (
-                            <Feather name="plus-square" size={focused ? 32 : 24} color={focused ? COLORS.green : 'black'} />
+                            <AntDesign name="pluscircleo" size={focused ? 37 : 32} color={focused ? COLORS.green : 'black'} />
                         )
                     }} />
                 <Tab.Screen name="Historico" component={PageHistorico}
