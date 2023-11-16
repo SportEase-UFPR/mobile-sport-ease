@@ -323,7 +323,7 @@ export default function PageHistorico() {
               </HStack>
               <Button
                 alignSelf={'flex-end'}
-                maxWidth={'1/3'}
+                maxWidth={'2/3'}
                 leftIcon={<DeleteIcon></DeleteIcon>}
                 rounded={'full'}
                 size="sm"
@@ -457,7 +457,7 @@ export default function PageHistorico() {
 
                   <Text color={COLORS.darkBlueText}>
                     <Text fontWeight="semibold">
-                      Quantidade de participantes:{" "}
+                      Quantidade de participantes:
                     </Text>
                     {card.qtdParticipantes}
                   </Text>

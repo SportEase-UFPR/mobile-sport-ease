@@ -491,7 +491,7 @@ const PageNovaReserva = ({ navigation }) => {
                       </FormControl.Label>
                       <Input
                         placeholder="Selecionar quantidade de pessoas..."
-                        keyboardType="numeric"
+                        keyboardType="number-pad"
                         onChangeText={(text) => {
                           setInputErrors((prevErrors) => ({
                             ...prevErrors,
