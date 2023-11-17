@@ -24,6 +24,7 @@ import COLORS from "../../../colors/colors";
 import { Alert } from "react-native";
 
 
+
 export default function PageHomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [cardData, setCardData] = useState([]);
@@ -45,6 +46,14 @@ export default function PageHomeScreen() {
       isClosable: true
     },
   ]
+  const [legendaStatus] = useState({
+    'CANCELADA': 'error.500',
+    'NEGADA': 'error.500',
+    'FINALIZADA': 'emerald.500',
+    'ENCERRADA': 'gray.500',
+    'SOLICITADA': 'yellow.500',
+    'APROVADA': 'green.500'
+  });
 
   const ToastAlert = ({
     id,
@@ -113,7 +122,7 @@ export default function PageHomeScreen() {
 
       const toastConfig = ToastDetails[0];
       toast.show(toastConfig);
-      
+
 
       // Atualizar a lista removendo o item cancelado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
@@ -144,6 +153,8 @@ export default function PageHomeScreen() {
       )
     }
   }
+
+  
 
   return (
     <ScrollView>
@@ -234,38 +245,27 @@ export default function PageHomeScreen() {
               </AlertDialog>
               <Stack p="4" space={3}>
                 <Stack space={2}>
-                  <Heading size="sm" ml="-1" textAlign="center">
-                    <Badge
-                      style={{
-                        color:
-                          card.status === "SOLICITADA"
-                            ? COLORS.yellow
-                            : COLORS.green,
-                      }}
-                    >
-                      Reserva
-                      {" " +
-                        card.status?.charAt(0).toUpperCase() +
-                        card.status?.slice(1).toLowerCase()}
+                  <Heading size="sm" ml="-1" >
+                    <Badge variant={'outline'} borderRadius={'full'} colorScheme={legendaStatus[card.status].split('.')[0]}>
+                      {card.status}
                     </Badge>
                   </Heading>
-
-                  <Heading size="lg" ml="-1" textAlign="center">
+                  <Heading size="lg" ml="-1" textAlign="left">
                     <Text color={COLORS.darkBlueText}>Reserva #{card.id}</Text>
                   </Heading>
                 </Stack>
 
-                <Text color={COLORS.darkGrayText} textAlign="center">
+                <Text color={COLORS.darkGrayText} textAlign="left">
                   <Text fontWeight="semibold">Período:</Text>{" "}
                   {moment(card.dataHoraInicioReserva).format("HH:mm")} até{" "}
                   {moment(card.dataHoraFimReserva).format("HH:mm - DD/MM/YYYY")}{" "}
                 </Text>
 
-                <Text color={COLORS.darkGrayText} textAlign="center">
+                <Text color={COLORS.darkGrayText} textAlign="left">
                   <Text fontWeight="semibold">Espaço esportivo:</Text>{" "}
                   {card.nomeEspacoEsportivo + " - " + card.localidade}
                 </Text>
-                <Text color={COLORS.darkGrayText} textAlign="center">
+                <Text color={COLORS.darkGrayText} textAlign="left">
                   <Text fontWeight="semibold">
                     Quantidade de participantes:
                   </Text>{" "}
@@ -278,14 +278,14 @@ export default function PageHomeScreen() {
                     showCancelarReserva(card.dataHoraInicioReserva) &&
                       showConfirmacaoReserva(card.dataHoraInicioReserva)
                       ? "space-between"
-                      : "center"
+                      : "flex-start"
                   }
                 >
                   {showConfirmacaoReserva(card.dataHoraInicioReserva) ? (
                     <Button
                       size="lg"
-
-                      borderRadius="lg"
+                      width={'full'}
+                      borderRadius="full"
                       backgroundColor={'success.500'}
                       leftIcon={<CheckIcon />}
                       onPress={() => handleConfirmarUso(card.id)}
@@ -297,7 +297,8 @@ export default function PageHomeScreen() {
                   {showCancelarReserva(card.dataHoraInicioReserva) ? (
                     <Button
                       size="lg"
-                      borderRadius="lg"
+                      width={'full'}
+                      borderRadius="full"
                       backgroundColor={'danger.500'}
                       leftIcon={<CloseIcon />}
                       onPress={() => setIsOpen(!isOpen)}

@@ -106,6 +106,15 @@ export const cancelarUsoLocacao = async (idLocacao) => {
     }
 }
 
+export const avaliarLocacao = async (idLocacao, requestData) => {
+    try {
+        const response = await ApiClient.post(`/locacoes/avaliar-reserva/${idLocacao}`, requestData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export default {
     getEspacosEsportivos,
     getEspacosEsportivosDisponiveis,
@@ -114,5 +123,6 @@ export default {
     getSolicitacoesEmAndamento,
     getAllSolicitacoes,
     confirmarUsoLocacao,
-    cancelarUsoLocacao
+    cancelarUsoLocacao,
+    avaliarLocacao
 };

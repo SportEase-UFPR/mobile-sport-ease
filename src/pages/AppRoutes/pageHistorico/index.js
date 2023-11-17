@@ -29,7 +29,7 @@ import {
 import { AntDesign } from '@expo/vector-icons';
 import temaGeralFormulario from "./nativeBaseTheme";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { cancelarUsoLocacao, confirmarUsoLocacao, getAllSolicitacoes } from "../../../api/LocacaoService";
+import { avaliarLocacao, cancelarUsoLocacao, confirmarUsoLocacao, getAllSolicitacoes } from "../../../api/LocacaoService";
 import { useFocusEffect } from "@react-navigation/native";
 import COLORS from "../../../colors/colors";
 import moment from "moment";
@@ -89,7 +89,16 @@ export default function PageHistorico() {
       description: "Uso confirmado com sucesso.",
       isClosable: true
     },
+    {
+      title: "Avaliação enviada!",
+      variant: "solid",
+      description: "Obrigado por avaliar o local!",
+      isClosable: true
+    },
   ]
+  const [idReservaAvaliacao, setIdReservaAvaliacao] = useState();
+  const [ratingReservaAvaliacao, setRatingReservaAvaliacao] = useState(5);
+  const [comentarioReservaAvaliacao, setComentarioReservaAvaliacao] = useState();
 
   const reservasFiltradas = cardData
     .filter((card) => {
@@ -181,10 +190,8 @@ export default function PageHistorico() {
   const handleCancelarUso = async (idLocacao) => {
     try {
       const result = await cancelarUsoLocacao(idLocacao);
-
       const toastConfig = ToastDetails[0];
       toast.show(toastConfig);
-
 
       // Atualizar a lista removendo o item cancelado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
@@ -207,11 +214,28 @@ export default function PageHistorico() {
       // Atualizar a lista removendo o item confirmado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
       setCardData(updatedCardData);
-
     } catch (error) {
       Alert.alert(
         "Erro",
         `Não foi possível seguir com a confirmação de uso da locação. ${error.message}`
+      )
+    }
+  }
+
+  const handleAvaliarReserva = async (idLocacao, avaliacao, comentario) => {
+    let requestData = {
+      avaliacao: avaliacao,
+      comentario: comentario
+    }
+    try {
+      const result = await avaliarLocacao(idLocacao, requestData)
+      const toastConfig = ToastDetails[2];
+      toast.show(toastConfig);
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        `Não foi possível seguir com a avaliação do local. ${error.message}`
       )
     }
   }
@@ -235,15 +259,21 @@ export default function PageHistorico() {
               defaultRating={5}
               size={30}
               showRating={false}
+              onFinishRating={(number) => {
+                setRatingReservaAvaliacao(number)
+              }}
             />
             <FormControl mt="3">
               <FormControl.Label>Nos conte o que você achou sobre o local!</FormControl.Label>
-              <TextArea placeholder="Inclua aqui o seu comentário" />
+              <TextArea placeholder="Inclua aqui o seu comentário..." onChangeText={(text) => {
+                setComentarioReservaAvaliacao(text)
+              }} />
             </FormControl>
           </Modal.Body>
           <Modal.Footer>
             <Button flex="1" colorScheme={"info"} onPress={() => {
               setModalVisible(false);
+              handleAvaliarReserva(idReservaAvaliacao, ratingReservaAvaliacao, comentarioReservaAvaliacao);
             }}>
               Enviar avaliação
             </Button>
@@ -509,7 +539,10 @@ export default function PageHistorico() {
                         borderRadius="full"
                         colorScheme="info"
                         leftIcon={<AntDesign name="staro" size={24} color="white" />}
-                        onPress={() => setModalVisible(!modalVisible)}
+                        onPress={() => {
+                          setIdReservaAvaliacao(card.id)
+                          setModalVisible(!modalVisible)
+                        }}
                       >
                         Avaliar
                       </Button>
