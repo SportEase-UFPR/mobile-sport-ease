@@ -4,12 +4,15 @@
     "slug": "mobile-sport-ease",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo-sport-ease.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
+    },
+    "notification": {
+      "icon": "./assets/logo-sport-ease.png"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -21,7 +24,7 @@
     "android": {
       "package": "com.sportease.mobile",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logo-sport-ease.png",
         "backgroundColor": "#ffffff"
       }
     },
