@@ -119,14 +119,13 @@ export default function PageHomeScreen() {
     console.log(`cancelando uso... id ${idLocacao}`)
     try {
       const result = await cancelarUsoLocacao(idLocacao);
-
       const toastConfig = ToastDetails[0];
       toast.show(toastConfig);
-
 
       // Atualizar a lista removendo o item cancelado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
       setCardData(updatedCardData);
+      onClose;
 
     } catch (error) {
       Alert.alert(

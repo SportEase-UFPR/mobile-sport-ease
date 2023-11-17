@@ -6,20 +6,22 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
     const [markedDates, setMarkedDates] = useState({});
 
     useEffect(() => {
+        console.log(initDate.getMonth());
+        console.log(initDate.getMonth());
         getDisabledDays(
-            initDate.getMonth(),
+            initDate.getMonth()+1,
             initDate.getFullYear(),
             availableDays
         );
     }, []);
 
     const getDisabledDays = (month, year, availableDays) => {
-        let pivot = moment().month(month).year(year).startOf('month');
-        const end = moment().month(month).year(year).endOf('month');
+        let pivot = moment().month(month - 1).year(year).startOf('month');
+        const end = moment().month(month - 1).year(year).endOf('month');
         let dates = {};
         const disabled = { disabled: true, disableTouchEvent: true };
 
-        while (pivot.isBefore(end)) {
+        while (pivot.isSameOrBefore(end)) {
             if (!availableDays.includes(pivot.day())) {
                 const dateString = pivot.format('YYYY-MM-DD');
                 dates[dateString] = disabled;
@@ -27,7 +29,6 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
             pivot.add(1, 'day');
         }
         setMarkedDates(dates);
-        return dates;
     };
 
     return (
@@ -41,7 +42,7 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
             onDayPress={(day) => {
                 const selectedDate = moment(day.dateString, "YYYY-MM-DD");
                 selectedDate.hour(0).minute(0).second(0);
-                console.log(`data formatada: ${selectedDate.toDate()}`); // Para ver a data e hora ajustadas
+                console.log(`data formatada: ${selectedDate.toDate()}`);
                 setDate(selectedDate.toDate());
                 setShowCalendarModal(false);
             }}

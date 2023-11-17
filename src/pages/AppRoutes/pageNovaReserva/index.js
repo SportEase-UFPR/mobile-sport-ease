@@ -62,6 +62,7 @@ const PageNovaReserva = ({ navigation }) => {
   useEffect(() => {
     if (horarioInicioReserva) {
       const max = calcularDisponibilidadeHorario();
+      console.log(`o valor máximo é: ${max}`);
       setBotaoMax(max);
       console.log(`o novo valor do botao max é ${botaoMax}`)
       atualizarHorarioFim();
@@ -294,13 +295,6 @@ const PageNovaReserva = ({ navigation }) => {
       }));
       isValid = false;
     }
-    // if (!qntHoras) {
-    //   setInputErrors((prevErrors) => ({
-    //     ...prevErrors,
-    //     qntHorasInvalid: true,
-    //   }));
-    //   isValid = false;
-    // }
     if (!motivoSolicitacao) {
       setInputErrors((prevErrors) => ({
         ...prevErrors,
@@ -310,11 +304,13 @@ const PageNovaReserva = ({ navigation }) => {
     }
     if (isValid) {
       console.log(horarioInicioReserva);
+      console.log(dataReserva);
       setIsSending(true);
-      const novaDataReservaInicio = moment.tz(dataReserva, "America/Sao_Paulo");
+      const novaDataReservaInicio = moment(dataReserva);
       const [horas, minutos] = horarioInicioReserva.split(":").map(Number);
-      novaDataReservaInicio.hours(horas - 3).minutes(minutos).seconds(0).milliseconds(0);
-
+      novaDataReservaInicio.hours(horas).minutes(minutos).seconds(0).milliseconds(0);
+      console.log('novadatareservainicio')
+      console.log(novaDataReservaInicio);
       const novaDataReservaFim = new Date(novaDataReservaInicio);
       addPeriodToDate(
         novaDataReservaFim,
@@ -322,6 +318,11 @@ const PageNovaReserva = ({ navigation }) => {
         botaoCount + 1
       );
       try {
+        console.log(motivoSolicitacao)
+        console.log(parseInt(qntParticipantesReserva))
+        console.log(novaDataReservaInicio.toISOString())
+        console.log(novaDataReservaFim.toISOString())
+        console.log(inputLocalReserva)
         const dadosDaLocacao = {
           motivoSolicitacao: motivoSolicitacao,
           qtdParticipantes: parseInt(qntParticipantesReserva),
@@ -329,7 +330,6 @@ const PageNovaReserva = ({ navigation }) => {
           dataHoraFimReserva: novaDataReservaFim.toISOString(),
           idEspacoEsportivo: inputLocalReserva,
         };
-
         const result = await createSolicitacaoLocacao(dadosDaLocacao);
         if (result.isSuccess == false) {
           console.log(result)
@@ -596,7 +596,7 @@ const PageNovaReserva = ({ navigation }) => {
                             {horarioFimReserva}
                           </Text>
                           <IconButton
-                            isDisabled={botaoCount === (botaoMax-1)}
+                            isDisabled={(botaoCount === (botaoMax-1) && botaoMax!=0)}
                             size={'sm'}
                             colorScheme="success"
                             variant="outline"
