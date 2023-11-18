@@ -79,14 +79,17 @@ export const getSolicitacoesEmAndamento = async () => {
     }
 };
 
-export const getAllSolicitacoes = async () => {
-    try {
-        const response = await ApiClient.get('/locacoes/listar-historico-reservas');
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+export const getAllSolicitacoes = () => {
+    return ApiClient.get('/locacoes/listar-historico-reservas')
+        .then(response => {
+            return response.data;
+        })
+        .catch(error => {
+
+            throw error;
+        });
 };
+
 
 export const confirmarUsoLocacao = async (idLocacao) => {
     try {

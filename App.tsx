@@ -8,7 +8,7 @@ import registerNNPushToken from 'native-notify';
 import AuthRoutes from './src/routes/auth.routes';
 import AppRoutes from './src/routes/app.routes';
 
-import { NativeBaseProvider, Text, Box } from "native-base";
+import { NativeBaseProvider } from "native-base";
 import { NotificationProvider } from './src/contexts/NotificationContext';
 
 const Stack = createStackNavigator();
