@@ -16,8 +16,21 @@ interface UserData {
     senha: string;
 }
 
+interface DecodedToken {
+    exp: number;
+    idPessoa: number;
+    iss: string;
+    sub: string;
+    userProfile: string;
+}
+
 interface AuthProps {
-    authState?: { token: string | null; authenticated: boolean | null; id: number | null; nomeCompleto: string | null; email: string | null; grr: "string" | null};
+    authState: {
+        token: string | null;
+        authenticated: boolean | null;
+        id: number | null;
+        // Inclua outras propriedades aqui se necessário
+    };
     onCadastrar?: (userData: UserData) => Promise<any>;
     onLogin?: (email: string, password: string) => Promise<any>;
     onLogout?: () => Promise<any>;
@@ -25,23 +38,31 @@ interface AuthProps {
 
 const TOKEN_KEY = 'my-jwt';
 
-const AuthContext = createContext<AuthProps>({});
+const AuthContext = createContext<AuthProps>({
+    authState: {
+        token: null,
+        authenticated: null,
+        id: null,
+        // Inicialize outras propriedades aqui se necessário
+    }
+});
 
 export const useAuth = () => {
     return useContext(AuthContext);
 };
 
-export const AuthProvider = ({ children }: any) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [authState, setAuthState] = useState<{
         token: string | null;
         authenticated: boolean | null;
         id: number | null;
+        // Defina outras propriedades aqui se necessário
     }>({
         token: null,
-        authenticated: false,
+        authenticated: null,
         id: null,
+        // Inicialize outras propriedades aqui se necessário
     });
-
 
     useEffect(() => {
         const loadToken = async () => {
@@ -50,7 +71,7 @@ export const AuthProvider = ({ children }: any) => {
 
             if (token) {
                 try {
-                    const decodedToken = jwtDecode(token);
+                    const decodedToken = jwtDecode<DecodedToken>(token);
                     console.log(decodedToken);
                     const expTimestamp = decodedToken.exp;
                     const id = decodedToken.idPessoa;
@@ -96,7 +117,7 @@ export const AuthProvider = ({ children }: any) => {
     const login = async (email: string, password: string) => {
         try {
             const result = await AuthService.login(email, password);
-            const decodedToken = jwtDecode(result.data.token);
+            const decodedToken = jwtDecode<DecodedToken>(result.data.token);
             const id = decodedToken.idPessoa;
             setAuthState({
                 token: result.data.token,
@@ -140,5 +161,3 @@ export const AuthProvider = ({ children }: any) => {
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-
-
