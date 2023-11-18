@@ -64,7 +64,10 @@ export default function PageHistorico() {
   const [statusOptions, setStatusOptions] = useState([]);
   const [espacoOptions, setEspacoOptions] = useState([]);
   const cancelRef = React.useRef(null);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [cancelDialog, setCancelDialog] = useState(false);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
+  const [cardId, setCardId] = useState();
   const [modalVisible, setModalVisible] = React.useState(false);
   const onClose = () => setIsOpen(false);
   const [legendaStatus] = useState({
@@ -102,23 +105,24 @@ export default function PageHistorico() {
 
   const reservasFiltradas = cardData
     .filter((card) => {
-      const filtroStatus = !status || card.status === status;
-      const filtroLocal = !local || card.nomeEspacoEsportivo === local;
+      const filtroStatus = !status || status === "Todos" || card.status === status;
+      const filtroLocal = !local || local === "Todos" || card.nomeEspacoEsportivo === local;
       const filtroDataInicio = !startDate || moment(card.dataHoraInicioReserva).isSameOrAfter(moment(startDate, 'DD/MM/YYYY'), 'day');
       const filtroDataFim = !endDate || moment(card.dataHoraFimReserva).isSameOrBefore(moment(endDate, 'DD/MM/YYYY'), 'day');
       return filtroStatus && filtroLocal && filtroDataInicio && filtroDataFim;
     })
     .sort((a, b) => {
       const dataA = moment(a.dataHoraInicioReserva);
-      const dataB = moment(b.dataHoraInicioReserva);
-      return dataA.diff(dataB)
+      const dataB = moment(b.dataHoraFimReserva);
+      return dataA.diff(dataB);
     });
+
 
   const limparFiltros = () => {
     setStartDate('');
     setEndDate('');
-    setStatus('');
-    setLocal('');
+    setStatus('Todos');
+    setLocal('Todos');
     setShowStartPicker(false);
     setShowEndPicker(false);
   };
@@ -143,11 +147,10 @@ export default function PageHistorico() {
     }
   }, []);
 
-  const showConfirmacaoReserva = (horario) => {
-    if (moment().diff(moment(horario), "minutes") >= 5) {
+  const showConfirmacaoReserva = (horario, status) => {
+    if ((moment().diff(moment(horario), "minutes") >= 5) && status == 'APROVADA') {
       return true;
     }
-
     return false;
   };
 
@@ -155,7 +158,6 @@ export default function PageHistorico() {
     if (moment(horario).diff(moment(), "minutes") >= 15) {
       return true;
     }
-
     return false;
   };
 
@@ -171,10 +173,10 @@ export default function PageHistorico() {
     if (result) {
       setCardData(result);
       setIsLoading(false);
-
       const statusUnicos = [...new Set(result.map(item => item.status))];
       const espacosUnicos = [...new Set(result.map(item => item.nomeEspacoEsportivo))];
-
+      statusUnicos.unshift("Todos");
+      espacosUnicos.unshift("Todos");
       setStatusOptions(statusUnicos);
       setEspacoOptions(espacosUnicos);
     } else {
@@ -188,37 +190,39 @@ export default function PageHistorico() {
   };
 
   const handleCancelarUso = async (idLocacao) => {
+    setIsLoadingModal(true);
     try {
       const result = await cancelarUsoLocacao(idLocacao);
-      const toastConfig = ToastDetails[0];
-      toast.show(toastConfig);
-
-      // Atualizar a lista removendo o item cancelado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
       setCardData(updatedCardData);
-
+      setIsLoadingModal(false);
+      setIsOpen(false);
+      const toastConfig = ToastDetails[0];
+      toast.show(toastConfig);
     } catch (error) {
       Alert.alert(
         "Erro",
         `Não foi possível seguir com o cancelamento da locação. ${error.message}`
       )
+      setIsLoadingModal(false);
     }
   }
 
   const handleConfirmarUso = async (idLocacao) => {
+    setIsLoadingModal(true);
     try {
       const result = await confirmarUsoLocacao(idLocacao)
-      const toastConfig = ToastDetails[1];
-      toast.show(toastConfig);
-
-      // Atualizar a lista removendo o item confirmado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
       setCardData(updatedCardData);
+      setIsLoadingModal(false);
+      const toastConfig = ToastDetails[1];
+      toast.show(toastConfig);
     } catch (error) {
       Alert.alert(
         "Erro",
         `Não foi possível seguir com a confirmação de uso da locação. ${error.message}`
       )
+      setIsLoadingModal(false);
     }
   }
 
@@ -227,18 +231,30 @@ export default function PageHistorico() {
       avaliacao: avaliacao,
       comentario: comentario
     }
+    setIsLoadingModal(true);
     try {
       const result = await avaliarLocacao(idLocacao, requestData)
+      await carregarReservas();
+      setIsLoadingModal(false);
+      setModalVisible(false)
       const toastConfig = ToastDetails[2];
       toast.show(toastConfig);
-
     } catch (error) {
       Alert.alert(
         "Erro",
         `Não foi possível seguir com a avaliação do local. ${error.message}`
       )
+      setModalVisible(false)
+      setIsLoadingModal(false);
     }
   }
+
+  const handleIsOpen = (isCancel, cardId) => {
+    setCancelDialog(isCancel ? true : false);
+    setCardId(cardId);
+    setIsOpen(true);
+  };
+
 
   useFocusEffect(
     useCallback(() => {
@@ -249,6 +265,35 @@ export default function PageHistorico() {
 
   return (
     <NativeBaseProvider theme={temaGeralFormulario}>
+      <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
+        <AlertDialog.Content>
+          <AlertDialog.CloseButton />
+          <AlertDialog.Header>{cancelDialog ? 'Cancelar Reserva' : 'Confirmar Uso'}</AlertDialog.Header>
+          <AlertDialog.Body>
+            {cancelDialog ?
+              'Realmente deseja cancelar a reserva?'
+              :
+              'Realmente deseja confirmar o uso do local?'}
+          </AlertDialog.Body>
+          <AlertDialog.Footer>
+            <Button.Group space={2}>
+              <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
+                Voltar
+              </Button>
+              <Button
+                isLoading={isLoadingModal}
+                isLoadingText={'Carregando...'}
+                isDisabled={isLoadingModal}
+                colorScheme={cancelDialog ? 'danger' : 'success'}
+                onPress={() => {
+                  { cancelDialog ? handleCancelarUso(cardId) : handleConfirmarUso(cardId) }
+                }}>
+                {cancelDialog ? 'Cancelar' : 'Confirmar'}
+              </Button>
+            </Button.Group>
+          </AlertDialog.Footer>
+        </AlertDialog.Content>
+      </AlertDialog>
       {/* Modal de avaliação de reserva */}
       <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)} size="xl">
         <Modal.Content>
@@ -271,10 +316,14 @@ export default function PageHistorico() {
             </FormControl>
           </Modal.Body>
           <Modal.Footer>
-            <Button flex="1" colorScheme={"info"} onPress={() => {
-              setModalVisible(false);
-              handleAvaliarReserva(idReservaAvaliacao, ratingReservaAvaliacao, comentarioReservaAvaliacao);
-            }}>
+            <Button
+              isLoading={isLoadingModal}
+              isLoadingText={'Carregando...'}
+              flex="1"
+              colorScheme={"info"}
+              onPress={() => {
+                handleAvaliarReserva(idReservaAvaliacao, ratingReservaAvaliacao, comentarioReservaAvaliacao);
+              }}>
               Enviar avaliação
             </Button>
           </Modal.Footer>
@@ -324,6 +373,7 @@ export default function PageHistorico() {
                   <FormControl.Label>Status</FormControl.Label>
                   <Select
                     isReadOnly
+                    defaultValue="Todos"
                     selectedValue={status}
                     accessibilityLabel="Selecione o status"
                     placeholder="Todos"
@@ -338,6 +388,7 @@ export default function PageHistorico() {
                 <FormControl minWidth="1/3" flex={1}>
                   <FormControl.Label>Local</FormControl.Label>
                   <Select
+                    defaultValue="Todos"
                     variant="filled"
                     isReadOnly
                     selectedValue={local}
@@ -507,13 +558,13 @@ export default function PageHistorico() {
                       //   : "center"
                     }
                   >
-                    {showConfirmacaoReserva(card.dataHoraInicioReserva) && (card.status == 'SOLICITADA' || card.status == 'APROVADA') ? (
+                    {showConfirmacaoReserva(card.dataHoraInicioReserva, card.status) ? (
                       <Button
                         size="lg"
                         borderRadius="full"
                         backgroundColor={'success.500'}
                         leftIcon={<CheckIcon />}
-                        onPress={() => { handleConfirmarUso(card.id) }}
+                        onPress={() => handleIsOpen(false, card.id)}
                       >
                         Confirmar uso
                       </Button>
@@ -525,7 +576,7 @@ export default function PageHistorico() {
                         borderRadius="full"
                         backgroundColor={'danger.500'}
                         leftIcon={<CloseIcon />}
-                        onPress={() => { handleCancelarUso(card.id) }}
+                        onPress={() => handleIsOpen(true, card.id)}
                       >
                         Cancelar uso
                       </Button>
@@ -554,7 +605,7 @@ export default function PageHistorico() {
           ) : (
             <Center>
               <Text fontSize="md" color={COLORS.darkGrayText}>
-                Não existem reservas em andamento.
+                Não existe histórico de ordens.
               </Text>
             </Center>
           )}
@@ -622,6 +673,13 @@ export default function PageHistorico() {
                 <Text color={COLORS.darkBlueText} marginTop={2}>
                   <Text fontWeight="semibold">Avaliação: </Text>
                   {modalDados?.avaliacao}
+                </Text>
+              ) : null}
+
+              {modalDados?.comentario ? (
+                <Text color={COLORS.darkBlueText} marginTop={2}>
+                  <Text fontWeight="semibold">Comentário: </Text>
+                  {modalDados?.comentario}
                 </Text>
               ) : null}
             </Modal.Body>

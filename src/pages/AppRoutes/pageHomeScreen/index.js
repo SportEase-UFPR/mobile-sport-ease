@@ -264,12 +264,6 @@ export default function PageHomeScreen() {
 
                 <Flex
                   direction="row"
-                // justifyContent={
-                //   showCancelarReserva(card.dataHoraInicioReserva) &&
-                //     showConfirmacaoReserva(card.dataHoraInicioReserva)
-                //     ? "space-between"
-                //     : "flex-start"
-                // }
                 >
                   {showConfirmacaoReserva(card.dataHoraInicioReserva, card.status) ? (
                     <Button
