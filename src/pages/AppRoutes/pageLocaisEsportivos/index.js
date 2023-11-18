@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 import {
   View,
   Center,
@@ -25,7 +25,7 @@ import {
   Spinner
 } from "native-base";
 import LocacaoService from "../../../api/LocacaoService";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import temaGeralFormulario from "./nativeBaseTheme";
 import COLORS from "../../../colors/colors";
 import { AirbnbRating } from "react-native-elements";
@@ -69,10 +69,16 @@ export default function PageLocaisEsportivos({ navigation }) {
     setIsComentariosLoading(true);
     try {
       const response = await EspacoEsportivoService.getComentarios(idEspaco);
+      console.log(response);
       if (response) {
+        response.sort((a, b) => {
+          const dateA = new Date(a.dataHoraComentario);
+          const dateB = new Date(b.dataHoraComentario);
+          return dateB - dateA;
+        });
         setComentarios(response);
       } else {
-        setComentarios([]); // Se não houver comentários, defina como uma lista vazia
+        setComentarios([]);
       }
     } catch (error) {
       console.error("Erro ao carregar comentários:", error);
@@ -80,6 +86,13 @@ export default function PageLocaisEsportivos({ navigation }) {
     }
     setIsComentariosLoading(false);
   };
+
+  function toTitleCase(str) {
+    return str.toLowerCase().split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+  }
+
 
   useEffect(() => {
     carregarEspacosEsportivos();
@@ -165,13 +178,21 @@ export default function PageLocaisEsportivos({ navigation }) {
                   <Heading size="xl">{card.nome}</Heading>
                   <View ml={-1} mb={3} style={{ alignItems: 'flex-start' }}>
                     {card.mediaAvaliacoes > 0 ? (
-                      <AirbnbRating
-                        defaultRating={card.mediaAvaliacoes}
-                        size={20}
-                        isDisabled
-                        showRating={false}
-                        starContainerStyle={{ justifyContent: 'flex-start' }}
-                      />
+                      <>
+                        <AirbnbRating
+                          defaultRating={card.mediaAvaliacoes}
+                          size={20}
+                          isDisabled
+                          showRating={false}
+                          starContainerStyle={{ justifyContent: 'flex-start' }}
+                        />
+                        <Flex ml='1' flexDirection={'row'} alignItems={'center'}>
+                          <Feather name="message-square" size={13} color="black" />
+                          <Text fontSize={'xs'} fontStyle={'italic'} ml={'1'}>
+                            Acessar avaliações...
+                          </Text>
+                        </Flex>
+                      </>
                     ) : (
                       <Text ml='1' color={'gray.500'}>Sem avaliações...</Text>
                     )}
@@ -190,11 +211,12 @@ export default function PageLocaisEsportivos({ navigation }) {
                         <Spinner color="emerald.500" />
                       </Center>
                     ) : (
-                      comentarios.filter(comentario => comentario.comentario).length > 0 ? (
-                        comentarios.filter(comentario => comentario.comentario)
+                      comentarios.filter(comentario => comentario.avaliacao).length > 0 ? (
+                        comentarios.filter(comentario => comentario.avaliacao)
                           .map((comentario, index) => (
-                            <Actionsheet.Item key={index}>
-                              <View style={{ alignItems: 'flex-start' }}>
+                            <Actionsheet.Item key={index} borderBottomColor={'gray.200'} borderBottomWidth={1}>
+                              <View style={{ alignItems: 'flex-start' }} >
+                                <Heading size="sm" ml="1">{comentario.nomeCliente.split(" ")[0].toUpperCase()}</Heading>
                                 <AirbnbRating
                                   defaultRating={comentario.avaliacao}
                                   size={19}
@@ -202,9 +224,8 @@ export default function PageLocaisEsportivos({ navigation }) {
                                   showRating={false}
                                   starContainerStyle={{ justifyContent: 'flex-start' }}
                                 />
-                                <Text italic>"{comentario.comentario}"</Text>
-                                <Text mt='1' fontSize={'xs'} color={'gray.500'}>{moment(comentario.dataHoraComentario).format('DD/MM/YYYY')}</Text>
-                                <Divider mt='2'></Divider>
+                                {comentario.comentario ? <Text ml="1" italic>"{comentario.comentario}"</Text> : null}
+                                <Text ml="1" mt='1' fontSize={'xs'} color={'gray.500'}>{moment(comentario.dataHoraComentario).format('DD/MM/YYYY')}</Text>
                               </View>
                             </Actionsheet.Item>
                           ))
@@ -259,7 +280,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                       variant={"subtle"}
                       rounded="50"
                     >
-                      {esporte.nome}
+                      <Text>{toTitleCase(esporte.nome)}</Text>
                     </Badge>
                   ))}
                 </Flex>

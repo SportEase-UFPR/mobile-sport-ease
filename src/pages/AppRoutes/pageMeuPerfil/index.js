@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import styles from './styles';
-import { Box, Flex, Heading, Text, Pressable, Container, Center } from 'native-base';
-
+import { Box, Flex, Heading, Text, Pressable } from 'native-base';
 import { useAuth } from '../../../contexts/AuthContext';
 import ClienteService from '../../../api/ClienteService';
 import COLORS from '../../../colors/colors';

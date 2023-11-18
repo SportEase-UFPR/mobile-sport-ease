@@ -18,6 +18,7 @@ export default function PageLogin() {
     const checkAuthentication = async () => {
       if (authState.authenticated === null) {
         setIsOpenTop(true);
+        await sleep(3000)
         setIsOpenTop(false);
       }
     };

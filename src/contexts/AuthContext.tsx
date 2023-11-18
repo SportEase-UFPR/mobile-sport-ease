@@ -108,8 +108,6 @@ export const AuthProvider = ({ children }: any) => {
             // Native Notify Indie Push Registration Code
             registerIndieID(`${id}`, 14520, 'vdk0Ur8ZprhkWw4MiubMKt');
             // End of Native Notify Code
-
-
             return result;
         } catch (e) {
             return { error: true, msg: (e as any).response.data.msg };

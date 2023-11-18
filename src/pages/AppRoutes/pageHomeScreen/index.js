@@ -28,7 +28,10 @@ import { Alert } from "react-native";
 export default function PageHomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [cardData, setCardData] = useState([]);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [cancelDialog, setCancelDialog] = useState(false);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
+  const [cardId, setCardId] = useState();
   const onClose = () => setIsOpen(false);
   const cancelRef = React.useRef(null);
   const toast = useToast();
@@ -55,36 +58,8 @@ export default function PageHomeScreen() {
     'APROVADA': 'green.500'
   });
 
-  const ToastAlert = ({
-    id,
-    status,
-    variant,
-    title,
-    description,
-    isClosable,
-    ...rest
-  }) => <Alert maxWidth="100%" alignSelf="center" flexDirection="row" status={status ? status : "info"} variant={variant} {...rest}>
-      <VStack space={1} flexShrink={1} w="100%">
-        <HStack flexShrink={1} alignItems="center" justifyContent="space-between">
-          <HStack space={2} flexShrink={1} alignItems="center">
-            <Alert.Icon />
-            <Text fontSize="md" fontWeight="medium" flexShrink={1} color={variant === "solid" ? "lightText" : variant !== "outline" ? "darkText" : null}>
-              {title}
-            </Text>
-          </HStack>
-          {isClosable ? <IconButton variant="unstyled" icon={<CloseIcon size="3" />} _icon={{
-            color: variant === "solid" ? "lightText" : "darkText"
-          }} onPress={() => toast.close(id)} /> : null}
-        </HStack>
-        <Text px="6" color={variant === "solid" ? "lightText" : variant !== "outline" ? "darkText" : null}>
-          {description}
-        </Text>
-      </VStack>
-    </Alert>;
-
-
-  const showConfirmacaoReserva = (horario) => {
-    if (moment().diff(moment(horario), "minutes") >= 5) {
+  const showConfirmacaoReserva = (horario, status) => {
+    if ((moment().diff(moment(horario), "minutes") >= 5) && status == 'APROVADA') {
       return true;
     }
     return false;
@@ -116,47 +91,81 @@ export default function PageHomeScreen() {
   );
 
   const handleCancelarUso = async (idLocacao) => {
-    console.log(`cancelando uso... id ${idLocacao}`)
+    setIsLoadingModal(true);
     try {
       const result = await cancelarUsoLocacao(idLocacao);
-      const toastConfig = ToastDetails[0];
-      toast.show(toastConfig);
-
-      // Atualizar a lista removendo o item cancelado
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
       setCardData(updatedCardData);
-      onClose;
-
+      setIsLoadingModal(false);
+      setIsOpen(false);
+      const toastConfig = ToastDetails[0];
+      toast.show(toastConfig);
     } catch (error) {
       Alert.alert(
         "Erro",
         `Não foi possível seguir com o cancelamento da locação. ${error.message}`
       )
+      setIsLoadingModal(false);
     }
   }
 
   const handleConfirmarUso = async (idLocacao) => {
+    setIsLoadingModal(true);
     try {
-      const result = await confirmarUsoLocacaoUsoLocacao(idLocacao)
-      const toastConfig = ToastDetails[1];
-      toast.show(toastConfig);
-
-      // Atualizar a lista removendo o item confirmado
+      const result = await confirmarUsoLocacao(idLocacao)
       const updatedCardData = cardData.filter(card => card.id !== idLocacao);
       setCardData(updatedCardData);
-
+      setIsLoadingModal(false);
+      const toastConfig = ToastDetails[1];
+      toast.show(toastConfig);
     } catch (error) {
       Alert.alert(
         "Erro",
         `Não foi possível seguir com a confirmação de uso da locação. ${error.message}`
       )
+      setIsLoadingModal(false);
     }
   }
 
-  
+  const handleIsOpen = (isCancel, cardId) => {
+    setCancelDialog(isCancel ? true : false);
+    setCardId(cardId);
+    setIsOpen(true);
+  };
+
+
 
   return (
     <ScrollView>
+      <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
+        <AlertDialog.Content>
+          <AlertDialog.CloseButton />
+          <AlertDialog.Header>{cancelDialog ? 'Cancelar Reserva' : 'Confirmar Uso'}</AlertDialog.Header>
+          <AlertDialog.Body>
+            {cancelDialog ?
+              'Realmente deseja cancelar a reserva?'
+              :
+              'Realmente deseja confirmar o uso do local?'}
+          </AlertDialog.Body>
+          <AlertDialog.Footer>
+            <Button.Group space={2}>
+              <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
+                Voltar
+              </Button>
+              <Button
+                isLoading={isLoadingModal}
+                isLoadingText={'Carregando...'}
+                isDisabled={isLoadingModal}
+                colorScheme={cancelDialog ? 'danger' : 'success'}
+                onPress={() => {
+                  { cancelDialog ? handleCancelarUso(cardId) : handleConfirmarUso(cardId) }
+                }}>
+                {cancelDialog ? 'Cancelar' : 'Confirmar'}
+              </Button>
+            </Button.Group>
+          </AlertDialog.Footer>
+        </AlertDialog.Content>
+      </AlertDialog>
       <Box mt={25} mb={25} paddingX={5}>
         <Heading
           borderColor={COLORS.green}
@@ -223,25 +232,7 @@ export default function PageHomeScreen() {
                 backgroundColor: "gray.50",
               }}
             >
-              <AlertDialog key={'alert_dialog-' + index} leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
-                <AlertDialog.Content>
-                  <AlertDialog.CloseButton />
-                  <AlertDialog.Header>Cancelar Reserva</AlertDialog.Header>
-                  <AlertDialog.Body>
-                    Realmente deseja cancelar a reserva?
-                  </AlertDialog.Body>
-                  <AlertDialog.Footer>
-                    <Button.Group space={2}>
-                      <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
-                        Voltar
-                      </Button>
-                      <Button colorScheme="danger" onPress={() => handleCancelarUso(card.id)}>
-                        Sim, cancelar
-                      </Button>
-                    </Button.Group>
-                  </AlertDialog.Footer>
-                </AlertDialog.Content>
-              </AlertDialog>
+
               <Stack p="4" space={3}>
                 <Stack space={2}>
                   <Heading size="sm" ml="-1" >
@@ -273,21 +264,21 @@ export default function PageHomeScreen() {
 
                 <Flex
                   direction="row"
-                  justifyContent={
-                    showCancelarReserva(card.dataHoraInicioReserva) &&
-                      showConfirmacaoReserva(card.dataHoraInicioReserva)
-                      ? "space-between"
-                      : "flex-start"
-                  }
+                // justifyContent={
+                //   showCancelarReserva(card.dataHoraInicioReserva) &&
+                //     showConfirmacaoReserva(card.dataHoraInicioReserva)
+                //     ? "space-between"
+                //     : "flex-start"
+                // }
                 >
-                  {showConfirmacaoReserva(card.dataHoraInicioReserva) ? (
+                  {showConfirmacaoReserva(card.dataHoraInicioReserva, card.status) ? (
                     <Button
                       size="lg"
                       width={'full'}
                       borderRadius="full"
                       backgroundColor={'success.500'}
                       leftIcon={<CheckIcon />}
-                      onPress={() => handleConfirmarUso(card.id)}
+                      onPress={() => handleIsOpen(false, card.id)}
                     >
                       Confirmar uso
                     </Button>
@@ -300,7 +291,7 @@ export default function PageHomeScreen() {
                       borderRadius="full"
                       backgroundColor={'danger.500'}
                       leftIcon={<CloseIcon />}
-                      onPress={() => setIsOpen(!isOpen)}
+                      onPress={() => handleIsOpen(true, card.id)}
                     >
                       Cancelar uso
                     </Button>

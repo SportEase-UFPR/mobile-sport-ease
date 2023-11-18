@@ -88,7 +88,7 @@ export const getAllSolicitacoes = async () => {
     }
 };
 
-export const confirmarUsoLocacao = async () => {
+export const confirmarUsoLocacao = async (idLocacao) => {
     try {
         const response = await ApiClient.put(`/locacoes/confirmar-uso/${idLocacao}`);
         return response.data;

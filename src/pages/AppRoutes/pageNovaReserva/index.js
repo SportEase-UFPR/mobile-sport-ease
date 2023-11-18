@@ -308,7 +308,7 @@ const PageNovaReserva = ({ navigation }) => {
       setIsSending(true);
       const novaDataReservaInicio = moment(dataReserva);
       const [horas, minutos] = horarioInicioReserva.split(":").map(Number);
-      novaDataReservaInicio.hours(horas).minutes(minutos).seconds(0).milliseconds(0);
+      novaDataReservaInicio.hours(horas-3).minutes(minutos).seconds(0).milliseconds(0);
       console.log('novadatareservainicio')
       console.log(novaDataReservaInicio);
       const novaDataReservaFim = new Date(novaDataReservaInicio);
