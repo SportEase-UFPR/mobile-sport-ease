@@ -28,9 +28,6 @@ import {
   IconButton,
   Modal,
   HStack,
-  Center,
-  Spacer,
-  View
 } from "native-base";
 import moment from "moment-timezone";
 import temaGeralFormulario from "./nativeBaseTheme";
@@ -344,7 +341,7 @@ const PageNovaReserva = ({ navigation }) => {
           console.log(result)
           setIsSending(false);
           Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
-          navigation.navigate("HomeScreen");
+          navigation.navigate('HomeScreen');
         }
       } catch (error) {
         setIsSending(false);

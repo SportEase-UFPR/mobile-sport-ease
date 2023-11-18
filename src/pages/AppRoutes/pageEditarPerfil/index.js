@@ -11,7 +11,12 @@ import {
   Spinner,
   WarningOutlineIcon,
   Button,
-  Text
+  Text,
+  useToast,
+  Center,
+  HStack,
+  IconButton,
+  CloseIcon,
 } from 'native-base';
 import COLORS from '../../../colors/colors';
 import temaGeralFormulario from './nativeBaseTheme';
@@ -27,6 +32,7 @@ export default function PageEditarPerfil({ route }) {
     confirmacaoNovaSenha: '',
     isStudent: false,
   });
+  const [grr, setGrr] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -89,11 +95,14 @@ export default function PageEditarPerfil({ route }) {
     }
     if (!user.isStudent) {
       requestData.grr = '';
+      requestData.alunoUFPR = 0
+    } else {
+      requestData.alunoUFPR = 1
     }
     setIsLoading(true);
-
+    
     try {
-      const response = await ClienteService.setDadosCliente(requestData)
+      const response = await ClienteService.editarDadosCliente(requestData)
       if (response) {
         Alert.alert('Sucesso', 'A edição ocorreu conforme esperado!')
       }
@@ -116,7 +125,10 @@ export default function PageEditarPerfil({ route }) {
         novaSenha: '',
         confirmacaoNovaSenha: '',
         isStudent: grr ? true : false
-      }));
+      }),
+        setGrr(grr));
+    } else {
+
     }
   }, [route.params?.user]);
 
@@ -202,10 +214,10 @@ export default function PageEditarPerfil({ route }) {
             </FormControl>
 
             {user.isStudent && (
-              <FormControl isDisabled={user.grr}>
+              <FormControl isDisabled={!!grr}>
                 <FormControl.Label>GRR</FormControl.Label>
                 <Input
-                  isReadOnly={!!user.grr}
+                  isReadOnly={!!grr}
                   value={user.grr}
                   onChangeText={(value) => handleInputChange('grr', value)}
                 />

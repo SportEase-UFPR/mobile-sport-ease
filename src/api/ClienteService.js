@@ -36,7 +36,7 @@ export const readNotifications = async () => {
     }
 }
 
-export const setDadosCliente = async (requestData) => {
+export const editarDadosCliente = async (requestData) => {
     try {
         const response = await ApiClient.put('/clientes', requestData);
         return response.data;
@@ -44,7 +44,7 @@ export const setDadosCliente = async (requestData) => {
         if (error.response && error.response.status === 404) {
             return [];
         } else {
-            console.error('Erro na requisição setDadosCliente:', error.response ? error.response.data : error.message);
+            console.error('Erro na requisição editarDadosCliente:', error.response ? error.response.data : error.message);
         }
     }
 }
@@ -53,5 +53,5 @@ export default {
     getInformacoesUsuario,
     getNotificacoes,
     readNotifications,
-    setDadosCliente
+    editarDadosCliente
 };
