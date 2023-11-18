@@ -1,6 +1,59 @@
 import React, { useState, useEffect } from "react";
-import { Calendar } from "react-native-calendars";
+import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
+import COLORS from "../colors/colors";
+
+LocaleConfig.locales['pt-br'] = {
+    monthNames: [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ],
+    monthNamesShort: [
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez'
+    ],
+    dayNames: [
+      'Domingo',
+      'Segunda-feira',
+      'Terça-feira',
+      'Quarta-feira',
+      'Quinta-feira',
+      'Sexta-feira',
+      'Sábado'
+    ],
+    dayNamesShort: [
+      'Dom',
+      'Seg',
+      'Ter',
+      'Qua',
+      'Qui',
+      'Sex',
+      'Sáb'
+    ],
+    today: 'Hoje'
+  };
+  LocaleConfig.defaultLocale = 'pt-br';
+  
 
 export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = new Date(), minimumDate = new Date(), availableDays = [0, 1, 2, 3, 4, 5, 6] }) => {
     const [markedDates, setMarkedDates] = useState({});
@@ -9,7 +62,7 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
         console.log(initDate.getMonth());
         console.log(initDate.getMonth());
         getDisabledDays(
-            initDate.getMonth()+1,
+            initDate.getMonth() + 1,
             initDate.getFullYear(),
             availableDays
         );
@@ -34,8 +87,16 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
     return (
         <Calendar
             theme={{
-                textSectionTitleDisabledColor: '#d9e1e8',
+                backgroundColor: '#ffffff',
+                calendarBackground: '#ffffff',
+                textSectionTitleColor: '#b6c1cd',
+                selectedDayBackgroundColor: '#00adf5',
+                selectedDayTextColor: '#ffffff',
+                todayTextColor: COLORS.green,
+                dayTextColor: '#2d4150',
+                textDisabledColor: '#d9e1e8'
             }}
+
             markedDates={markedDates}
             current={initDate.toISOString()}
             minDate={minimumDate.toISOString()}

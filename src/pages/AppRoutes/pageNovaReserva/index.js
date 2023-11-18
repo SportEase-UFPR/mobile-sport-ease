@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
-import { FontAwesome } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import DatePicker from "../../../components/DatePicker";
 import LocacaoService, {
@@ -29,7 +28,9 @@ import {
   IconButton,
   Modal,
   HStack,
-  Center
+  Center,
+  Spacer,
+  View
 } from "native-base";
 import moment from "moment-timezone";
 import temaGeralFormulario from "./nativeBaseTheme";
@@ -41,7 +42,6 @@ const PageNovaReserva = ({ navigation }) => {
   const [horarioFimReserva, setHorarioFimReserva] = useState(null);
   const [horarioDisponivelData, setHorarioDisponivelData] = useState(null);
   const [qntParticipantesReserva, setQntParticipantesReserva] = useState(null);
-  const [qntHoras, setQntHoras] = useState(1);
   const [motivoSolicitacao, setMotivoSolicitacao] = useState("");
   const [dataReserva, setDataReserva] = useState('');
   const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
@@ -51,7 +51,6 @@ const PageNovaReserva = ({ navigation }) => {
   );
   const [botaoMax, setBotaoMax] = useState(0);
   const [botaoCount, setBotaoCount] = useState(0)
-  const [botaoAumentarHorarioCount, setBotaoAumentarHorarioCount] = useState()
 
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,9 +68,15 @@ const PageNovaReserva = ({ navigation }) => {
     }
   }, [horarioInicioReserva, botaoCount]);
 
+  function toTitleCase(str) {
+    return str.toLowerCase().split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+  }
+
   const atualizarHorarioFim = () => {
-    console.log(`o valor do botãoCount + 1 é ${(botaoCount+1)}`)
-    const novoFim = addTimes(horarioInicioReserva, multTime(informacoesEspacoEscolhido.periodoLocacao, (botaoCount+1)));
+    console.log(`o valor do botãoCount + 1 é ${(botaoCount + 1)}`)
+    const novoFim = addTimes(horarioInicioReserva, multTime(informacoesEspacoEscolhido.periodoLocacao, (botaoCount + 1)));
     setHorarioFimReserva(novoFim);
     console.log(`o novo horario fim é é ${horarioFimReserva}`)
   };
@@ -308,7 +313,7 @@ const PageNovaReserva = ({ navigation }) => {
       setIsSending(true);
       const novaDataReservaInicio = moment(dataReserva);
       const [horas, minutos] = horarioInicioReserva.split(":").map(Number);
-      novaDataReservaInicio.hours(horas-3).minutes(minutos).seconds(0).milliseconds(0);
+      novaDataReservaInicio.hours(horas - 3).minutes(minutos).seconds(0).milliseconds(0);
       console.log('novadatareservainicio')
       console.log(novaDataReservaInicio);
       const novaDataReservaFim = new Date(novaDataReservaInicio);
@@ -359,9 +364,10 @@ const PageNovaReserva = ({ navigation }) => {
       <ScrollView>
         {/* Modal com DatePicker */}
         <Modal isOpen={showCalendarModal} onClose={() => setShowCalendarModal(false)}>
-          <Modal.Content maxWidth="400px">
+          <Modal.Content maxWidth="600px">
             <Modal.CloseButton />
-            <Modal.Body>
+            <Modal.Header>Dia da Reserva</Modal.Header>
+            <Modal.Body >
               <DatePicker
                 date={dataReserva}
                 setDate={setDataReserva}
@@ -452,7 +458,7 @@ const PageNovaReserva = ({ navigation }) => {
                       (esporte, index) => (
                         <Badge
                           key={`badge-${index}`}
-                          _text={{ fontSize: "10px", fontWeight: "400" }}
+                          _text={{ fontSize: "13px", fontWeight: "400" }}
                           py="1.5"
                           mr="1"
                           mb="1"
@@ -460,7 +466,7 @@ const PageNovaReserva = ({ navigation }) => {
                           variant="subtle"
                           rounded="50"
                         >
-                          {esporte?.nome}
+                          {toTitleCase(esporte?.nome)}
                         </Badge>
                       )
                     )
@@ -562,7 +568,13 @@ const PageNovaReserva = ({ navigation }) => {
                               />
                             )
                           )
-                          : []}
+                          :
+                          <Select.Item
+                            isDisabled
+                            label={'Selecione um dia para a reserva...'}
+                            value={'Selecione um dia para a reserva...'}
+                          />
+                        }
                       </Select>
                       <FormControl.ErrorMessage
                         leftIcon={<WarningOutlineIcon size="xs" />}
@@ -596,7 +608,7 @@ const PageNovaReserva = ({ navigation }) => {
                             {horarioFimReserva}
                           </Text>
                           <IconButton
-                            isDisabled={(botaoCount === (botaoMax-1) && botaoMax!=0)}
+                            isDisabled={(botaoCount === (botaoMax - 1) && botaoMax != 0)}
                             size={'sm'}
                             colorScheme="success"
                             variant="outline"
