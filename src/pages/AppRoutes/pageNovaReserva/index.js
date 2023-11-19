@@ -74,11 +74,8 @@ const PageNovaReserva = ({ navigation }) => {
   //UseFocusEffect para limpar a navegação ao sair da pg
   useFocusEffect(
     useCallback(() => {
-      console.log('entrou no callback');
-      console.log(desmontarComponente);
       if (desmontarComponente) {
         setDesmontarComponente(false);
-        console.log('Desmontando o componente');
         setInputLocalReserva('');
         setEspacosEsportivos(null);
         setIsLoading(true);
@@ -365,7 +362,7 @@ const PageNovaReserva = ({ navigation }) => {
           setIsSending(false);
           setDesmontarComponente(true);
           Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
-          navigation.navigate('HomeScreen');
+          navigation.goBack();
         }
       } catch (error) {
         setIsSending(false);
@@ -466,29 +463,32 @@ const PageNovaReserva = ({ navigation }) => {
                     <Skeleton
                       startColor="green.200"
                       width={"50"}
-                      height={"8"}
+                      height={"10"}
                       rounded={"50"}
                       py="1.5"
                       mr="1"
                       mb="1"
                     />
                   ) : (
-                    informacoesEspacoEscolhido.listaEsportes?.map(
-                      (esporte, index) => (
-                        <Badge
-                          key={`badge-${index}`}
-                          _text={{ fontSize: "13px", fontWeight: "400" }}
-                          py="1.5"
-                          mr="1"
-                          mb="1"
-                          colorScheme="success"
-                          variant="subtle"
-                          rounded="50"
-                        >
-                          {toTitleCase(esporte?.nome)}
-                        </Badge>
+                    inputLocalReserva ?
+                      (informacoesEspacoEscolhido.listaEsportes?.map(
+                        (esporte, index) => (
+                          <Badge
+                            key={`badge-${index}`}
+                            _text={{ fontSize: "13px", fontWeight: "400" }}
+                            py="1.5"
+                            mr="1"
+                            mb="1"
+                            colorScheme="success"
+                            variant="subtle"
+                            rounded="50"
+                          >
+                            {toTitleCase(esporte?.nome)}
+                          </Badge>
+                        )
+                      )) : (
+                        null
                       )
-                    )
                   )}
                 </Flex>
               </Box>

@@ -18,7 +18,6 @@ interface NotificationContextType {
     markNotificationsAsRead: () => void;
 }
 
-// Ajuste aqui: defina o valor inicial do contexto com a tipagem correta    
 const NotificationContext = createContext<NotificationContextType>({
     notifications: [],
     setNotifications: () => { },
@@ -37,29 +36,29 @@ const NotificationProvider = ({ children }) => {
         setNewNotifications(false); // Atualizar o estado para não haver novas notificações
     };
 
-    useEffect(() => {
-        const carregarNotificacoes = async () => {
-            try {
-                const response = await getNotificacoes();
-                if (response) {
-                    const sortedNotifications = response.sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
-                    const hasUnreadNotification = sortedNotifications.some(notificacao => !notificacao.lida);
-                    setNotifications(sortedNotifications);
-                    setNewNotifications(hasUnreadNotification);
-                } else {
-                    setNotifications([]);
-                    setNewNotifications(false);
-                }
-            } catch (error) {
-                if (error.response && error.response.status === 404) {
-                    setNotifications([]);
-                    setNewNotifications(false);
-                } else {
-                    console.error("Erro ao carregar notificações:", error);
-                }
+    const carregarNotificacoes = async () => {
+        try {
+            const response = await getNotificacoes();
+            if (response) {
+                const sortedNotifications = response.sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
+                const hasUnreadNotification = sortedNotifications.some(notificacao => !notificacao.lida);
+                setNotifications(sortedNotifications);
+                setNewNotifications(hasUnreadNotification);
+            } else {
+                setNotifications([]);
+                setNewNotifications(false);
             }
-        };
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                setNotifications([]);
+                setNewNotifications(false);
+            } else {
+                console.error("Erro ao carregar notificações:", error);
+            }
+        }
+    };
 
+    useEffect(() => {
         carregarNotificacoes();
     }, []);
 
