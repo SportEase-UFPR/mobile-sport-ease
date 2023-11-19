@@ -86,7 +86,6 @@ export default function PageHomeScreen() {
     useCallback(() => {
       setIsLoading(true);
       carregarReservas();
-      console.log(cardData);
     }, [])
   );
 

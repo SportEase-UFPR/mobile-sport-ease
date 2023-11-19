@@ -26,7 +26,7 @@ import {
   AlertDialog,
   TextArea,
 } from "native-base";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Entypo } from '@expo/vector-icons';
 import temaGeralFormulario from "./nativeBaseTheme";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { avaliarLocacao, cancelarUsoLocacao, confirmarUsoLocacao, getAllSolicitacoes } from "../../../api/LocacaoService";
@@ -445,17 +445,7 @@ export default function PageHistorico() {
               borderColor="coolGray.200"
               borderWidth="1"
               borderRadius={"21"}
-              _dark={{
-                borderColor: "coolGray.600",
-                backgroundColor: "gray.700",
-              }}
-              _web={{
-                shadow: 2,
-                borderWidth: 0,
-              }}
-              _light={{
-                backgroundColor: "gray.50",
-              }}
+              backgroundColor="gray.50"
             >
               <VStack space={8} overflow="hidden" rounded="20">
                 <Skeleton.Text py="6" px="4" />
@@ -479,41 +469,35 @@ export default function PageHistorico() {
                 borderColor="coolGray.200"
                 borderWidth="1"
                 borderRadius={"21"}
-                _dark={{
-                  borderColor: "coolGray.600",
-                  backgroundColor: "gray.700",
-                }}
-                _web={{
-                  shadow: 2,
-                  borderWidth: 0,
-                }}
-                _light={{
-                  backgroundColor: "gray.50",
-                }}
+                backgroundColor="gray.50"
               >
-                <Stack p="4" space={3}>
+                <Stack p="4" space={1}>
                   <Stack
                     space={1}
                     direction="row"
                     alignItems="center"
                     justifyContent="flex-start">
                     <Box alignSelf={'flex-start'}>
-                      <Heading size="lg">
+                      <Heading size="lg" mb={'1.5'}>
                         <Text color={COLORS.darkBlueText}>
                           {card.nomeEspacoEsportivo}
                         </Text>
                       </Heading>
-                      <Text mt='-1' fontSize={'lg'} fontWeight={'bold'} color={COLORS.darkBlueText}>
-                        {moment(card.dataHoraInicioReserva).format("DD/MM/YYYY")}
+                      <Text mt='-1' fontSize={'md'} fontWeight={'medium'} color={COLORS.darkBlueText}>
+                        <Entypo name="calendar" size={15} color={COLORS.darkBlueText} /> {moment(card.dataHoraInicioReserva).format("DD/MM/YYYY")}
+                      </Text>
+                      <Text mt='-1' fontSize={'md'} fontWeight={'medium'} color={COLORS.darkBlueText}>
+                        <Entypo name="clock" size={15} color={COLORS.darkBlueText} /> {moment(card.dataHoraInicioReserva).format("HH:mm")}{" "}
+                        às {moment(card.dataHoraFimReserva).format("HH:mm")}
                       </Text>
                     </Box>
                     <Spacer />
-                    <Badge mt='-5' borderWidth={'2'} variant={'outline'} borderRadius={'full'} colorScheme={legendaStatus[card.status].split('.')[0]}>
+                    <Badge mt='-10' borderWidth={'2'} variant={'outline'} borderRadius={'full'} colorScheme={legendaStatus[card.status].split('.')[0]}>
                       {card.status}
                     </Badge>
                     <Button
                       size="lg"
-                      mt='-5'
+                      mt='-10'
                       padding={'0'}
                       borderRadius='full'
                       backgroundColor='blue.500'
@@ -521,7 +505,7 @@ export default function PageHistorico() {
                       onPress={() => abrirModalDetalhes(card)}>
                     </Button>
                   </Stack>
-
+                  <Divider mb="1.5"></Divider>
                   <Text color={COLORS.darkBlueText}>
                     <Text fontWeight="semibold">Status da reserva: </Text>
                     {card.status?.charAt(0).toUpperCase() +
@@ -529,17 +513,14 @@ export default function PageHistorico() {
                   </Text>
 
                   <Text color={COLORS.darkBlueText}>
-                    <Text fontWeight="semibold">Data e hora: </Text>
-                    {moment(card.dataHoraInicioReserva).format(
+                    <Text fontWeight="semibold">Solicitado em: </Text>
+                    {moment(card.dataHoraSolicitacao).format(
                       "DD/MM/YYYY - HH:mm"
-                    )}{" "}
-                    às {moment(card.dataHoraFimReserva).format("HH:mm")}
+                    )}
                   </Text>
 
                   <Text color={COLORS.darkBlueText}>
-                    <Text fontWeight="semibold">
-                      Quantidade de participantes:
-                    </Text>
+                    <Text fontWeight="semibold">Quantidade de participantes: </Text>
                     {card.qtdParticipantes}
                   </Text>
 
@@ -547,16 +528,11 @@ export default function PageHistorico() {
                     <Text fontWeight="semibold">Local: </Text>
                     {card.localidade}
                   </Text>
+                  <Divider mt="1.5" mb="1.5"></Divider>
 
                   <Flex
                     direction="row"
-                    justifyContent={
-                      "flex-end"
-                      // showCancelarReserva(card.dataHoraInicioReserva) &&
-                      //   showConfirmacaoReserva(card.dataHoraInicioReserva)
-                      //   ? "space-between"
-                      //   : "center"
-                    }
+                    justifyContent={"flex-end"}
                   >
                     {showConfirmacaoReserva(card.dataHoraInicioReserva, card.status) ? (
                       <Button

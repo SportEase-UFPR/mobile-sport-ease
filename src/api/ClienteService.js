@@ -19,6 +19,7 @@ export const getNotificacoes = async () => {
             return [];
         } else {
             console.error('Erro na requisição getNotificacoes:', error.response ? error.response.data : error.message);
+            throw error;
         }
     }
 }
@@ -32,6 +33,7 @@ export const readNotifications = async () => {
             return [];
         } else {
             console.error('Erro na requisição readNotifications:', error.response ? error.response.data : error.message);
+            throw error;
         }
     }
 }
@@ -41,7 +43,6 @@ export const editarDadosCliente = async (requestData) => {
         const response = await ApiClient.put('/clientes', requestData);
         return response.data;
     } catch (error) {
-        console.error('Erro na requisição editarDadosCliente:', error);
         throw error;
     }
 }

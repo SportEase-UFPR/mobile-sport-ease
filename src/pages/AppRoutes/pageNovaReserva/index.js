@@ -33,7 +33,6 @@ import {
 import moment from "moment-timezone";
 import temaGeralFormulario from "./nativeBaseTheme";
 import COLORS from "../../../colors/colors";
-import { set } from "date-fns";
 
 const PageNovaReserva = ({ navigation }) => {
   const [inputLocalReserva, setInputLocalReserva] = useState(null);
@@ -75,38 +74,26 @@ const PageNovaReserva = ({ navigation }) => {
   //UseFocusEffect para limpar a navegação ao sair da pg
   useFocusEffect(
     useCallback(() => {
-      return () => {
-        if (desmontarComponente) {
-          setInputLocalReserva('');
-          setEspacosEsportivos(null);
-          setIsLoading(true);
-          const carregarEspacosEsportivos = async () => {
-            try {
-              const result = await LocacaoService.getEspacosEsportivosDisponiveis();
-              setEspacosEsportivos(result);
-            } catch (error) {
-              console.error("Erro ao carregar espaços esportivos:", error);
-              setIsLoading(false);
-            }
-          };
-          carregarEspacosEsportivos();
-          setDataReserva('')
-          setHorarioDisponivelData(null);
-          setQntParticipantesReserva(null);
-          setMotivoSolicitacao("");
-          setHorariosDisponiveis([]);
-          setEspacosEsportivos([]);
-          setInformacoesEspacoEscolhido([]);
-          setBotaoMax(0);
-          setBotaoCount(0)
-          setShowCalendarModal(false);
-          setIsLoadingForm(false);
-          setIsSending(false);
-          setInputErrors({});
-          setDesmontarComponente(false);
-          setIsLoading(false);
-        }
-      };
+      console.log('entrou no callback');
+      console.log(desmontarComponente);
+      if (desmontarComponente) {
+        setDesmontarComponente(false);
+        console.log('Desmontando o componente');
+        setInputLocalReserva('');
+        setEspacosEsportivos(null);
+        setIsLoading(true);
+        const carregarEspacosEsportivos = async () => {
+          try {
+            const result = await LocacaoService.getEspacosEsportivosDisponiveis();
+            setEspacosEsportivos(result);
+          } catch (error) {
+            console.error("Erro ao carregar espaços esportivos:", error);
+            setIsLoading(false);
+          }
+        };
+        carregarEspacosEsportivos();
+        setIsLoading(false);
+      }
     }, [])
   );
 
@@ -376,8 +363,8 @@ const PageNovaReserva = ({ navigation }) => {
         } else {
           console.log(result)
           setIsSending(false);
-          Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
           setDesmontarComponente(true);
+          Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
           navigation.navigate('HomeScreen');
         }
       } catch (error) {

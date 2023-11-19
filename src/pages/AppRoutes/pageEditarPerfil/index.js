@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Keyboard, Alert, ScrollView } from 'react-native';
+import { Keyboard, Alert, ScrollView, Pressable } from 'react-native';
 import {
   Box,
   VStack,
@@ -12,11 +12,14 @@ import {
   WarningOutlineIcon,
   Button,
   Text,
+  IconButton,
+  Icon,
 } from 'native-base';
 import COLORS from '../../../colors/colors';
 import temaGeralFormulario from './nativeBaseTheme';
 import ClienteService from '../../../api/ClienteService';
 import { validateEmail } from '../../../utils';
+import { Entypo } from '@expo/vector-icons';
 
 export default function PageEditarPerfil({ navigation, route }) {
   const [user, setUser] = useState({
@@ -33,6 +36,9 @@ export default function PageEditarPerfil({ navigation, route }) {
   const [isSending, setIsSending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [customErrorMessage, setCustomErrorMessage] = useState({});
+  const [show, setShow] = React.useState(false);
+
+  const handleClick = () => setShow(!show);
 
   const handleInputChange = (name, value) => {
     setUser({ ...user, [name]: value });
@@ -120,8 +126,7 @@ export default function PageEditarPerfil({ navigation, route }) {
         navigation.navigate('MeuPerfil', { param: 'reload' })
       }
     } catch (error) {
-      // Trata o erro de forma mais específica
-      Alert.alert('Erro', error);
+      Alert.alert('Erro ao realizar edição...', error.response.data.message)
     }
     setIsLoading(false);
   }
@@ -193,7 +198,13 @@ export default function PageEditarPerfil({ navigation, route }) {
               <Input
                 value={user.novaSenha}
                 onChangeText={(value) => handleInputChange('novaSenha', value)}
-                type="password"
+                type={show ? "text" : "password"}
+                InputRightElement={
+                  <Pressable
+                    onPress={handleClick}
+                  >
+                    {show ? <Icon as={Entypo} name="eye-with-line" mr={'5'} size={'5'}/> : <Icon as={Entypo} name="eye" mr={'5'} size={'5'}/>}
+                  </Pressable>}
               />
               <FormControl.ErrorMessage
                 leftIcon={<WarningOutlineIcon size="xs" />}
@@ -205,9 +216,15 @@ export default function PageEditarPerfil({ navigation, route }) {
             <FormControl isInvalid={fieldErrors.confirmacaoNovaSenha}>
               <FormControl.Label>Confirmar Nova Senha</FormControl.Label>
               <Input
+                type={show ? "text" : "password"}
                 value={user.confirmacaoNovaSenha}
                 onChangeText={(value) => handleInputChange('confirmacaoNovaSenha', value)}
-                type="password"
+                InputRightElement={
+                  <Pressable
+                    onPress={handleClick}
+                  >
+                    {show ? <Icon as={Entypo} name="eye-with-line" mr={'5'} size={'5'}/> : <Icon as={Entypo} name="eye" mr={'5'} size={'5'}/>}
+                  </Pressable>}
               />
               <FormControl.ErrorMessage
                 leftIcon={<WarningOutlineIcon size="xs" />}
