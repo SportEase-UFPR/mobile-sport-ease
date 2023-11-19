@@ -12,17 +12,13 @@ import {
   WarningOutlineIcon,
   Button,
   Text,
-  useToast,
-  Center,
-  HStack,
-  IconButton,
-  CloseIcon,
 } from 'native-base';
 import COLORS from '../../../colors/colors';
 import temaGeralFormulario from './nativeBaseTheme';
 import ClienteService from '../../../api/ClienteService';
+import { validateEmail } from '../../../utils';
 
-export default function PageEditarPerfil({ route }) {
+export default function PageEditarPerfil({ navigation, route }) {
   const [user, setUser] = useState({
     nome: '',
     email: '',
@@ -36,40 +32,56 @@ export default function PageEditarPerfil({ route }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [customErrorMessage, setCustomErrorMessage] = useState({});
 
   const handleInputChange = (name, value) => {
     setUser({ ...user, [name]: value });
     setFieldErrors((prevErrors) => ({ ...prevErrors, [name]: false }));
+    setCustomErrorMessage((prevErrors) => ({ ...prevErrors, [name]: false }));
   };
 
   const toggleIsStudent = () => setUser({ ...user, isStudent: !user.isStudent });
 
   const validateAndSubmit = () => {
     Keyboard.dismiss();
-    let isValid = true; // Alterado para 'let'
+    let isValid = true;
 
     // Validando campos obrigatórios
     if (!user.nome) {
       setFieldErrors(prevErrors => ({ ...prevErrors, nome: true }));
-      isValid = false; // Alterado para modificar a variável existente
+      isValid = false;
     }
     if (!user.email) {
       setFieldErrors(prevErrors => ({ ...prevErrors, email: true }));
       isValid = false;
+    } else if (!validateEmail(user.email)) {
+      setCustomErrorMessage(prevErrors => ({ ...prevErrors, email: 'Inclua um endereço de e-mail válido.' }));
+      setFieldErrors(prevErrors => ({ ...prevErrors, email: true }));
+      isValid = false;
     }
+
     if (user.novaSenha || user.confirmacaoNovaSenha) {
       if (user.novaSenha !== user.confirmacaoNovaSenha) {
-        // Senhas não são iguais
+        setFieldErrors(prevErrors => ({ ...prevErrors, novaSenha: true }));
         setFieldErrors(prevErrors => ({ ...prevErrors, confirmacaoNovaSenha: true }));
         isValid = false;
       } else {
-        // Senhas são iguais
+        setFieldErrors(prevErrors => ({ ...prevErrors, novaSenha: false }));
         setFieldErrors(prevErrors => ({ ...prevErrors, confirmacaoNovaSenha: false }));
       }
     } else {
-      // Ambas as senhas estão vazias
+      setFieldErrors(prevErrors => ({ ...prevErrors, novaSenha: false }));
       setFieldErrors(prevErrors => ({ ...prevErrors, confirmacaoNovaSenha: false }));
     }
+
+    if (user.novaSenha) {
+      if (user.novaSenha.length < 6) {
+        setFieldErrors(prevErrors => ({ ...prevErrors, novaSenha: true }));
+        setCustomErrorMessage(prevErrors => ({ ...prevErrors, novaSenha: 'A senha deve possuir 6 ou mais caracteres.' }));
+        isValid = false;
+      }
+    }
+
     if (user.isStudent && !user.grr) {
       setFieldErrors(prevErrors => ({ ...prevErrors, isStudent: true }));
       isValid = false;
@@ -100,14 +112,16 @@ export default function PageEditarPerfil({ route }) {
       requestData.alunoUFPR = 1
     }
     setIsLoading(true);
-    
+
     try {
       const response = await ClienteService.editarDadosCliente(requestData)
       if (response) {
         Alert.alert('Sucesso', 'A edição ocorreu conforme esperado!')
+        navigation.navigate('MeuPerfil', { param: 'reload' })
       }
     } catch (error) {
-      Alert.alert('Erro', error.message)
+      // Trata o erro de forma mais específica
+      Alert.alert('Erro', error);
     }
     setIsLoading(false);
   }
@@ -174,7 +188,7 @@ export default function PageEditarPerfil({ route }) {
               </FormControl.ErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={fieldErrors.confirmacaoNovaSenha}>
+            <FormControl isInvalid={fieldErrors.novaSenha}>
               <FormControl.Label>Nova Senha</FormControl.Label>
               <Input
                 value={user.novaSenha}
@@ -184,7 +198,7 @@ export default function PageEditarPerfil({ route }) {
               <FormControl.ErrorMessage
                 leftIcon={<WarningOutlineIcon size="xs" />}
               >
-                As senhas devem ser iguais.
+                {customErrorMessage.novaSenha ? customErrorMessage.novaSenha : 'As senhas devem ser iguais.'}
               </FormControl.ErrorMessage>
             </FormControl>
 
@@ -198,7 +212,7 @@ export default function PageEditarPerfil({ route }) {
               <FormControl.ErrorMessage
                 leftIcon={<WarningOutlineIcon size="xs" />}
               >
-                As senhas devem ser iguais.
+                {customErrorMessage.confirmacaoNovaSenha ? customErrorMessage.confirmacaoNovaSenha : 'As senhas devem ser iguais.'}
               </FormControl.ErrorMessage>
             </FormControl>
 

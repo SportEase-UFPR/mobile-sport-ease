@@ -1,11 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import jwtDecode from 'jwt-decode';
 import AuthService from '../api/AuthService';
 import ApiClient from '../api/ApiClient';
 import { registerIndieID, unregisterIndieDevice } from 'native-notify';
-import ClienteService from '../api/ClienteService';
 
 interface UserData {
     nome: string;
@@ -43,7 +41,6 @@ const AuthContext = createContext<AuthProps>({
         token: null,
         authenticated: null,
         id: null,
-        // Inicialize outras propriedades aqui se necessário
     }
 });
 
@@ -56,12 +53,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         token: string | null;
         authenticated: boolean | null;
         id: number | null;
-        // Defina outras propriedades aqui se necessário
     }>({
         token: null,
         authenticated: null,
         id: null,
-        // Inicialize outras propriedades aqui se necessário
     });
 
     useEffect(() => {

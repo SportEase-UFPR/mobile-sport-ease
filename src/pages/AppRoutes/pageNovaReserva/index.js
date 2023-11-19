@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import { Alert } from "react-native";
 import { Entypo } from '@expo/vector-icons';
 import DatePicker from "../../../components/DatePicker";
@@ -32,6 +33,7 @@ import {
 import moment from "moment-timezone";
 import temaGeralFormulario from "./nativeBaseTheme";
 import COLORS from "../../../colors/colors";
+import { set } from "date-fns";
 
 const PageNovaReserva = ({ navigation }) => {
   const [inputLocalReserva, setInputLocalReserva] = useState(null);
@@ -43,39 +45,137 @@ const PageNovaReserva = ({ navigation }) => {
   const [dataReserva, setDataReserva] = useState('');
   const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
   const [espacosEsportivos, setEspacosEsportivos] = useState([]);
-  const [informacoesEspacoEscolhido, setInformacoesEspacoEscolhido] = useState(
-    []
-  );
+  const [informacoesEspacoEscolhido, setInformacoesEspacoEscolhido] = useState([]);
   const [botaoMax, setBotaoMax] = useState(0);
   const [botaoCount, setBotaoCount] = useState(0)
-
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [inputErrors, setInputErrors] = useState({});
+  const [desmontarComponente, setDesmontarComponente] = useState(false);
+
+  // USEEFFECTS, --------------------------------
+  // UseEffect para carregar a listagem inicial dos espaços esportivos
+  useEffect(() => {
+    setIsLoading(true);
+    const carregarEspacosEsportivos = async () => {
+      try {
+        const result = await LocacaoService.getEspacosEsportivosDisponiveis();
+        setEspacosEsportivos(result);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Erro ao carregar espaços esportivos:", error);
+        setIsLoading(false);
+      }
+    };
+    carregarEspacosEsportivos();
+  }, []);
+
+  //UseFocusEffect para limpar a navegação ao sair da pg
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        if (desmontarComponente) {
+          setInputLocalReserva('');
+          setEspacosEsportivos(null);
+          setIsLoading(true);
+          const carregarEspacosEsportivos = async () => {
+            try {
+              const result = await LocacaoService.getEspacosEsportivosDisponiveis();
+              setEspacosEsportivos(result);
+            } catch (error) {
+              console.error("Erro ao carregar espaços esportivos:", error);
+              setIsLoading(false);
+            }
+          };
+          carregarEspacosEsportivos();
+          setDataReserva('')
+          setHorarioDisponivelData(null);
+          setQntParticipantesReserva(null);
+          setMotivoSolicitacao("");
+          setHorariosDisponiveis([]);
+          setEspacosEsportivos([]);
+          setInformacoesEspacoEscolhido([]);
+          setBotaoMax(0);
+          setBotaoCount(0)
+          setShowCalendarModal(false);
+          setIsLoadingForm(false);
+          setIsSending(false);
+          setInputErrors({});
+          setDesmontarComponente(false);
+          setIsLoading(false);
+        }
+      };
+    }, [])
+  );
+
+  //UseEffect para carregar os horários disponíveis de reserva
+  useEffect(() => {
+    if (inputLocalReserva && dataReserva) {
+      carregarHorariosDisponiveis(dataReserva, inputLocalReserva);
+    }
+  }, [inputLocalReserva, dataReserva]);
+
+  useEffect(() => {
+    if (inputLocalReserva) {
+      setIsLoadingForm(true);
+      carregarInformacoesEspacoEscolhido(inputLocalReserva);
+    }
+  }, [inputLocalReserva]);
+
 
   useEffect(() => {
     if (horarioInicioReserva) {
       const max = calcularDisponibilidadeHorario();
-      console.log(`o valor máximo é: ${max}`);
       setBotaoMax(max);
-      console.log(`o novo valor do botao max é ${botaoMax}`)
       atualizarHorarioFim();
     }
-  }, [horarioInicioReserva, botaoCount]);
+  }, [botaoCount]);
 
-  function toTitleCase(str) {
-    return str.toLowerCase().split(' ').map(word => {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    }).join(' ');
-  }
+  useEffect(() => {
+    if (horarioInicioReserva) {
+      const max = calcularDisponibilidadeHorario();
+      if (typeof max === "number") {
+        setHorarioFimReserva(
+          addTimes(
+            horarioInicioReserva,
+            multTime(
+              informacoesEspacoEscolhido.periodoLocacao,
+              botaoCount + 1
+            )
+          )
+        )
+        setBotaoMax(max)
+        setBotaoCount(0)
+      } else {
+        console.error(
+          "calcularDisponibilidadeHorario did not return a number:",
+          max
+        );
+      }
+    }
+  }, [horarioInicioReserva]);
 
+
+  useEffect(() => {
+    setHorarioDisponivelData(horariosDisponiveis);
+  }, [horariosDisponiveis]);
+
+  useEffect(() => {
+    setHorarioInicioReserva(null);
+    setHorarioFimReserva(null);
+  }, [inputLocalReserva]);
+
+
+
+
+  // FUNÇÕES PARA TRATAR HORÁRIOS E DATAS ------------------------------------ 
   const atualizarHorarioFim = () => {
-    console.log(`o valor do botãoCount + 1 é ${(botaoCount + 1)}`)
+
     const novoFim = addTimes(horarioInicioReserva, multTime(informacoesEspacoEscolhido.periodoLocacao, (botaoCount + 1)));
     setHorarioFimReserva(novoFim);
-    console.log(`o novo horario fim é é ${horarioFimReserva}`)
+
   };
 
   const aumentarHorario = () => {
@@ -90,89 +190,18 @@ const PageNovaReserva = ({ navigation }) => {
     }
   };
 
-
-  // UseEffect para carregar a listagem inicial dos espaços esportivos
-  useEffect(() => {
-    setIsLoading(true);
-    const carregarEspacosEsportivos = async () => {
-      try {
-        const result = await LocacaoService.getEspacosEsportivosDisponiveis();
-        setEspacosEsportivos(result);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Erro ao carregar espaços esportivos:", error);
-        setIsLoading(false);
-      }
-    };
-
-    carregarEspacosEsportivos();
-  }, []);
-
-  //UseEffect para carregar os horários disponíveis de reserva
-  useEffect(() => {
-    if (inputLocalReserva && dataReserva) {
-      // setSliderMax(1);
-      carregarHorariosDisponiveis(dataReserva, inputLocalReserva);
-    }
-  }, [inputLocalReserva, dataReserva]);
-
-  useEffect(() => {
-    if (inputLocalReserva) {
-      // setSliderMax(1);
-      setIsLoadingForm(true);
-      carregarInformacoesEspacoEscolhido(inputLocalReserva);
-    }
-  }, [inputLocalReserva]);
-
-  useEffect(() => {
-    setHorarioDisponivelData(horariosDisponiveis);
-  }, [horariosDisponiveis]);
-
-  useEffect(() => {
-    setHorarioInicioReserva(null);
-    setHorarioFimReserva(null);
-  }, [inputLocalReserva]);
-
-
-
-  useEffect(() => {
-    if (horarioInicioReserva) {
-      const max = calcularDisponibilidadeHorario();
-      console.log(max)
-      if (typeof max === "number") {
-        setHorarioFimReserva(
-          addTimes(
-            horarioInicioReserva,
-            multTime(
-              informacoesEspacoEscolhido.periodoLocacao,
-              botaoCount + 1
-            )
-          )
-        )
-        setBotaoMax(max)
-        setBotaoCount(0)
-        console.log(`O máximo de vezes a serem contadas é: ${botaoMax}`)
-      } else {
-        console.error(
-          "calcularDisponibilidadeHorario did not return a number:",
-          max
-        );
-      }
-    }
-  }, [horarioInicioReserva]);
-
   const carregarHorariosDisponiveis = async (
     dataReserva,
     idEspacoEsportivo
   ) => {
+    const dataReservaLocalDate = moment(dataReserva).format('YYYY-MM-DD')
     try {
       const requestData = {
-        data: dataReserva.toISOString(),
+        data: dataReservaLocalDate,
         idEspacoEsportivo: idEspacoEsportivo,
       };
       const result = await getHorariosDisponiveis(requestData);
-      console.log(result)
-      setHorariosDisponiveis(result);
+      setHorariosDisponiveis(result.horariosDisponiveis);
     } catch (error) {
       console.error("Erro ao carregar horários disponíveis:", error);
     }
@@ -190,23 +219,33 @@ const PageNovaReserva = ({ navigation }) => {
 
   const calcularDisponibilidadeHorario = () => {
     const maxLocacaoDia = informacoesEspacoEscolhido.maxLocacaoDia;
-    const periodoLocacao = informacoesEspacoEscolhido.periodoLocacao;
-    let horarioAtual = horarioInicioReserva;
+    const periodoLocacao = moment(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
+    let novoHorario = moment.utc(horarioInicioReserva, "HH:mm:ss");
     let horariosEncontrados = 0; // Para contar quantas vezes um horário disponível foi encontrado
 
+
     for (let indexMax = 1; indexMax <= maxLocacaoDia; indexMax++) {
-      const novoHorario = addTimes(horarioAtual, periodoLocacao);
-      console.log(`horario ${novoHorario} sendo testado`)
-      if (horariosDisponiveis.horariosDisponiveis.includes(novoHorario)) {
-        console.log(`horario ${novoHorario} passou no teste`)
+      novoHorario.add({
+        hours: periodoLocacao.hours(),
+        minutes: periodoLocacao.minutes(),
+        seconds: periodoLocacao.seconds()
+      });
+      let novoHorarioString = novoHorario.format("HH:mm:ss");
+      if (horariosDisponiveis.includes(novoHorarioString)) {
         horarioAtual = novoHorario;
         horariosEncontrados++;
       } else {
         break;
       }
     }
-    console.log(`foram encontrados ${horariosEncontrados} horarios`)
-    return horariosEncontrados;
+    if (horariosEncontrados === 0 && maxLocacaoDia > 1) {
+      return 1;
+    } else if (horariosEncontrados === 1 && maxLocacaoDia > 1) {
+      return 2;
+    } else {
+      return horariosEncontrados;
+    }
+
   };
 
   function addTimes(startTime, duration) {
@@ -255,22 +294,18 @@ const PageNovaReserva = ({ navigation }) => {
     };
 
     const initialSeconds = timeToSeconds(hoursString);
-
     const totalSeconds = initialSeconds * multiplier;
-
     return secondsToTime(totalSeconds);
   }
 
-  function addPeriodToDate(date, period, times = 1) {
-    const [hours, minutes, seconds] = period.split(":").map(Number); // Converte em números
-    // Adiciona o período múltiplas vezes
-    date.setHours(date.getHours() + hours * times);
-    date.setMinutes(date.getMinutes() + minutes * times);
-    date.setSeconds(date.getSeconds() + seconds * times);
-    return date;
+
+  function toTitleCase(str) {
+    return str.toLowerCase().split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
   }
 
-  const handleSubmit = async (formData) => {
+  const handleSubmit = async () => {
     let isValid = true;
     if (!inputLocalReserva) {
       setInputErrors((prevErrors) => ({ ...prevErrors, localInvalid: true }));
@@ -305,31 +340,32 @@ const PageNovaReserva = ({ navigation }) => {
       isValid = false;
     }
     if (isValid) {
-      console.log(horarioInicioReserva);
-      console.log(dataReserva);
       setIsSending(true);
-      const novaDataReservaInicio = moment(dataReserva);
-      const [horas, minutos] = horarioInicioReserva.split(":").map(Number);
-      novaDataReservaInicio.hours(horas - 3).minutes(minutos).seconds(0).milliseconds(0);
-      console.log('novadatareservainicio')
-      console.log(novaDataReservaInicio);
-      const novaDataReservaFim = new Date(novaDataReservaInicio);
-      addPeriodToDate(
-        novaDataReservaFim,
-        informacoesEspacoEscolhido.periodoLocacao,
-        botaoCount + 1
-      );
+      const novoHorarioInicioReserva = moment.utc(horarioInicioReserva, "HH:mm:ss")
+      const periodoLocacao = moment(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
+
+      //Incluindo dados sobre a data e hora inicial da reserva em uma nova const
+      const novaDataReservaInicio = moment.utc(dataReserva);
+      novaDataReservaInicio.add({
+        hours: novoHorarioInicioReserva.hours(),
+        minutes: novoHorarioInicioReserva.minutes(),
+        seconds: novoHorarioInicioReserva.seconds()
+      });
+
+      //Incluindo dados sobre a data e hora final da reserva em uma nova const
+      const novaDataReservaFim = moment.utc(novaDataReservaInicio);
+      novaDataReservaFim.add({
+        hours: (periodoLocacao.hours() * (botaoCount + 1)),
+        minutes: (periodoLocacao.minutes() * (botaoCount + 1)),
+        seconds: (periodoLocacao.seconds() * (botaoCount + 1))
+      });
+
       try {
-        console.log(motivoSolicitacao)
-        console.log(parseInt(qntParticipantesReserva))
-        console.log(novaDataReservaInicio.toISOString())
-        console.log(novaDataReservaFim.toISOString())
-        console.log(inputLocalReserva)
         const dadosDaLocacao = {
           motivoSolicitacao: motivoSolicitacao,
           qtdParticipantes: parseInt(qntParticipantesReserva),
-          dataHoraInicioReserva: novaDataReservaInicio.toISOString(),
-          dataHoraFimReserva: novaDataReservaFim.toISOString(),
+          dataHoraInicioReserva: novaDataReservaInicio,
+          dataHoraFimReserva: novaDataReservaFim,
           idEspacoEsportivo: inputLocalReserva,
         };
         const result = await createSolicitacaoLocacao(dadosDaLocacao);
@@ -341,6 +377,7 @@ const PageNovaReserva = ({ navigation }) => {
           console.log(result)
           setIsSending(false);
           Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
+          setDesmontarComponente(true);
           navigation.navigate('HomeScreen');
         }
       } catch (error) {
@@ -353,8 +390,6 @@ const PageNovaReserva = ({ navigation }) => {
       }
     }
   };
-
-
 
   return (
     <NativeBaseProvider theme={temaGeralFormulario}>
@@ -554,9 +589,8 @@ const PageNovaReserva = ({ navigation }) => {
                           setHorarioInicioReserva(horario);
                         }}
                       >
-                        {horarioDisponivelData &&
-                          horarioDisponivelData.horariosDisponiveis
-                          ? horarioDisponivelData.horariosDisponiveis.map(
+                        {horarioDisponivelData
+                          ? horarioDisponivelData.map(
                             (horario, index) => (
                               <Select.Item
                                 key={index}
@@ -582,7 +616,6 @@ const PageNovaReserva = ({ navigation }) => {
 
                     <FormControl
                       isRequired
-                    // isInvalid={inputErrors.qntHorasInvalid}
                     >
                       <FormControl.Label>
                         Por quanto tempo você deseja reservar o espaço?{" "}

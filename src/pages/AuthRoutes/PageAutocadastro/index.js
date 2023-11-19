@@ -5,11 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import styles from './styles';
 import { useAuth } from '../../../contexts/AuthContext';
-import { VStack, HStack, Pressable, Spinner, Heading, Switch } from 'native-base';
-//import { Switch } from 'react-native-elements';
-
+import { VStack, HStack, Pressable, Spinner, Heading, Switch, Button } from 'native-base';
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/BasicTextInput';
+import { validateCPF, validateEmail, validateSenha } from '../../../utils';
+
 
 export default function PageAutocadastro() {
   const { onCadastrar } = useAuth();
@@ -28,6 +28,14 @@ export default function PageAutocadastro() {
 
   const toggleIsStudent = () => setIsStudent(!isStudent);
 
+  const handleOnchangeCPF = (text, input) => {
+    let formatted = text.replace(/\D/g, ''); // Remove caracteres não numéricos
+    formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
+    formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
+    formatted = formatted.replace(/(\d{3})(\d{1,2})/, '$1-$2');
+    formatted = formatted.substring(0, 14); // Limita o tamanho
+    setInputs(prevState => ({ ...prevState, [input]: formatted }));
+  };
 
   const validate = async () => {
     Keyboard.dismiss();
@@ -40,53 +48,76 @@ export default function PageAutocadastro() {
     if (!inputs.email) {
       handleError('O endereço de e-mail é obrigatório', 'email');
       isValid = false;
+    } else if (!validateEmail(inputs.email)) {
+      handleError('O e-mail fornecido é inválido', 'email');
+      isValid = false;
     }
+
     if (!inputs.cpf) {
       handleError('CPF é obrigatório', 'cpf');
       isValid = false;
+    } else if (!validateCPF(inputs.cpf)) {
+      handleError('O CPF fornecido é inválido', 'cpf');
+      isValid = false;
     }
+
     if (isStudent && !inputs.grr) {
       handleError('GRR é obrigatório', 'grr');
+      isValid = false;
+    }
+
+    if (inputs.senha !== inputs.confirmacaoSenha) {
+      handleError('As senhas não coincidem', 'confirmacaoSenha');
+      handleError('As senhas não coincidem', 'senha');
       isValid = false;
     }
     if (!inputs.senha) {
       handleError('A senha é obrigatória', 'senha');
       isValid = false;
-    }
-    if (inputs.senha !== inputs.confirmacaoSenha) {
-      handleError('As senhas não coincidem', 'confirmacaoSenha');
+    } else if (!validateSenha(inputs.senha)) {
+      handleError('A senha deve conter 6 ou mais dígitos', 'senha');
       isValid = false;
     }
-
     if (isValid) {
+      setIsSending(true);
       autocadastro();
     }
   };
 
   const autocadastro = async () => {
+
     try {
       const response = await onCadastrar({
         nome: inputs.nomeCompleto,
         email: inputs.email,
         cpf: inputs.cpf,
         alunoUFPR: isStudent,
-        grr: isStudent ? inputs.grr.toUpperCase : null,
+        grr: isStudent ? inputs.grr.toUpperCase() : null,
         senha: inputs.senha
       });
-
       if (response.data && response.data.id) {
+        setIsSending(false);
         Alert.alert('Sucesso', 'Um e-mail com o link de ativação foi enviado para você!');
         navigation.navigate('Login');
       } else {
-        Alert.alert('Erro', response.msg);
+        setIsSending(false);
+        Alert.alert('Corrija os dados enviados', response.msg);
       }
     } catch (error) {
-      Alert.alert('Erro', 'Houve um erro ao realizar o autocadastro. Verifique seus dados e tente novamente.');
+      setIsSending(false);
+      Alert.alert('Erro ao processar solicitação', 'Houve um erro ao realizar o autocadastro. Tente novamente mais tarde.');
     }
   };
 
 
   const handleOnchange = (text, input) => {
+    if (input == "cpf") {
+      let formatted = text.replace(/\D/g, ''); // Remove caracteres não numéricos
+      formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
+      formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
+      formatted = formatted.replace(/(\d{3})(\d{1,2})/, '$1-$2');
+      formatted = formatted.substring(0, 14); // Limita o tamanho
+    }
     setInputs(prevState => ({ ...prevState, [input]: text }));
   };
 
@@ -136,11 +167,14 @@ export default function PageAutocadastro() {
           />
 
           <Input
-            onChangeText={text => handleOnchange(text, 'cpf')}
+            numeric={true}
+            value={inputs.cpf}
+            onChangeText={text => handleOnchangeCPF(text, 'cpf')}
             onFocus={() => handleError(null, 'cpf')}
             iconName="card-outline"
             placeholder="CPF..."
             error={errors.cpf}
+            maxLength={14}
           />
 
           <HStack mt="4" alignItems="center" space={2}>
@@ -177,11 +211,12 @@ export default function PageAutocadastro() {
             error={errors.confirmacaoSenha}
           />
         </View>
-        <Pressable
-          w={'4/5'}
-          maxH={60}
+        <Button
+          isDisabled={isSending}
+          w={'5/6'}
+          mt={'5'}
+          py={'5'}
           flex={1}
-          paddingY={5}
           borderRadius='full'
           backgroundColor={"success.500"}
           onPress={validate}
@@ -198,7 +233,7 @@ export default function PageAutocadastro() {
               {isSending ? ' Enviando...' : 'Cadastrar'}
             </Heading>
           </VStack>
-        </Pressable>
+        </Button>
 
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={[styles.simpleText, { marginBottom: 80 }]}>Cancelar</Text>

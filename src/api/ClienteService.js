@@ -41,11 +41,8 @@ export const editarDadosCliente = async (requestData) => {
         const response = await ApiClient.put('/clientes', requestData);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 404) {
-            return [];
-        } else {
-            console.error('Erro na requisição editarDadosCliente:', error.response ? error.response.data : error.message);
-        }
+        console.error('Erro na requisição editarDadosCliente:', error);
+        throw error;
     }
 }
 

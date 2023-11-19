@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import COLORS from '../../colors/colors';
 
 const Input = ({
+    value,
     label,
     placeholder,
     iconName,
@@ -11,7 +12,7 @@ const Input = ({
     password,
     onFocus = () => { },
     disabled = false,
-    numeric = false, 
+    numeric = false,
     ...props
 }) => {
     const [hidePassword, setHidePassword] = React.useState(password);
@@ -36,6 +37,7 @@ const Input = ({
                 ]}
             >
                 <TextInput
+                    value={value ? value : null}
                     placeholder={placeholder}
                     autoCorrect={false}
                     onFocus={() => {

@@ -6,8 +6,10 @@ import { Box, Flex, Heading, Text, Pressable } from 'native-base';
 import { useAuth } from '../../../contexts/AuthContext';
 import ClienteService from '../../../api/ClienteService';
 import COLORS from '../../../colors/colors';
+import { useFocusEffect } from '@react-navigation/native';
 
-const PageMeuPerfil = ({ navigation }) => {
+const PageMeuPerfil = ({ navigation, route }) => {
+    const param = route.params?.param || undefined;
     const { onLogout } = useAuth();
     const [headerText, setHeaderText] = useState('');
     const [user, setUser] = useState({
@@ -40,7 +42,17 @@ const PageMeuPerfil = ({ navigation }) => {
         }
     }
 
+    useFocusEffect(
+        React.useCallback(() => {
+            if (param === "reload") {
+                console.log('carregará usuário');
+                carregarUsuario();
+            }
+        }, [route]) // Inclua todas as dependências aqui
+    );
+
     useEffect(() => {
+        console.log('entrou no useEffect')
         carregarUsuario();
     }, [])
 

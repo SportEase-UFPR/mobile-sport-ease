@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, LocaleConfig } from "react-native-calendars";
-import moment from "moment";
+import moment from "moment-timezone";
 import COLORS from "../colors/colors";
 
 LocaleConfig.locales['pt-br'] = {
@@ -101,10 +101,11 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
             current={initDate.toISOString()}
             minDate={minimumDate.toISOString()}
             onDayPress={(day) => {
-                const selectedDate = moment(day.dateString, "YYYY-MM-DD");
-                selectedDate.hour(0).minute(0).second(0);
-                console.log(`data formatada: ${selectedDate.toDate()}`);
-                setDate(selectedDate.toDate());
+                const selectedDate = moment(`${day.dateString} 00:00:00`).format();
+                console.log(`dia formatado é ${selectedDate}`);
+                // console.log(`data formatada: ${selectedDate.tz("America/Sao_Paulo").format("YYYY-MM-DD, HH:mm")}`);
+                // console.log(`dia selecionado ${selectedDate.hour()}`);
+                setDate(selectedDate);
                 setShowCalendarModal(false);
             }}
             firstDay={0}
