@@ -178,7 +178,7 @@ const PageNovaReserva = ({ navigation }) => {
     dataReserva,
     idEspacoEsportivo
   ) => {
-    const dataReservaLocalDate = moment(dataReserva).format('YYYY-MM-DD')
+    const dataReservaLocalDate = moment.utc(dataReserva).format('YYYY-MM-DD')
     try {
       const requestData = {
         data: dataReservaLocalDate,
@@ -203,7 +203,7 @@ const PageNovaReserva = ({ navigation }) => {
 
   const calcularDisponibilidadeHorario = () => {
     const maxLocacaoDia = informacoesEspacoEscolhido.maxLocacaoDia;
-    const periodoLocacao = moment(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
+    const periodoLocacao = moment.utc(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
     let novoHorario = moment.utc(horarioInicioReserva, "HH:mm:ss");
     let horariosEncontrados = 0; // Para contar quantas vezes um horário disponível foi encontrado
 
@@ -326,7 +326,9 @@ const PageNovaReserva = ({ navigation }) => {
     if (isValid) {
       setIsSending(true);
       const novoHorarioInicioReserva = moment.utc(horarioInicioReserva, "HH:mm:ss")
-      const periodoLocacao = moment(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
+      console.log('INFORMAÇÕES NO MOMENTO DE ENVIO..........')
+      console.log(`novoHorarioInicioReserva: ${novoHorarioInicioReserva}`)
+      const periodoLocacao = moment.utc(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
 
       //Incluindo dados sobre a data e hora inicial da reserva em uma nova const
       const novaDataReservaInicio = moment.utc(dataReserva);
@@ -335,6 +337,8 @@ const PageNovaReserva = ({ navigation }) => {
         minutes: novoHorarioInicioReserva.minutes(),
         seconds: novoHorarioInicioReserva.seconds()
       });
+      console.log(`novaDataReservaInicio: ${novoHorarioInicioReserva}`)
+
 
       //Incluindo dados sobre a data e hora final da reserva em uma nova const
       const novaDataReservaFim = moment.utc(novaDataReservaInicio);
@@ -343,6 +347,8 @@ const PageNovaReserva = ({ navigation }) => {
         minutes: (periodoLocacao.minutes() * (botaoCount + 1)),
         seconds: (periodoLocacao.seconds() * (botaoCount + 1))
       });
+
+      console.log(`novaDataReservaFim: ${novaDataReservaFim}`)
 
       try {
         const dadosDaLocacao = {
@@ -545,7 +551,7 @@ const PageNovaReserva = ({ navigation }) => {
                         <Input
                           placeholder="Selecione o dia da reserva..."
                           isReadOnly
-                          value={dataReserva ? moment(dataReserva).format('DD/MM/YYYY') : ''}
+                          value={dataReserva ? moment.utc(dataReserva).format('DD/MM/YYYY') : ''}
                         />
                       </Pressable>
                       <FormControl.ErrorMessage

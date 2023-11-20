@@ -558,7 +558,7 @@ export default function PageHistorico() {
                       </Button>
                     ) : null}
 
-                    {showAvaliarReserva(card.comentario) &&
+                    {showAvaliarReserva(card.avaliacao) &&
                       card.status == 'FINALIZADA' ? (
                       <Button
                         variant={'solid'}
