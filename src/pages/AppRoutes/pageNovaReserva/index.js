@@ -72,27 +72,38 @@ const PageNovaReserva = ({ navigation }) => {
   }, []);
 
   //UseFocusEffect para limpar a navegação ao sair da pg
-  useFocusEffect(
-    useCallback(() => {
-      if (desmontarComponente) {
-        setDesmontarComponente(false);
-        setInputLocalReserva('');
-        setEspacosEsportivos(null);
-        setIsLoading(true);
-        const carregarEspacosEsportivos = async () => {
-          try {
-            const result = await LocacaoService.getEspacosEsportivosDisponiveis();
-            setEspacosEsportivos(result);
-          } catch (error) {
-            console.error("Erro ao carregar espaços esportivos:", error);
-            setIsLoading(false);
-          }
-        };
-        carregarEspacosEsportivos();
-        setIsLoading(false);
-      }
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (desmontarComponente) {
+  //       console.log('entrou aqui no useFocusEffect')
+  //       setInputLocalReserva(null);
+  //       setEspacosEsportivos(null);
+  //       setIsLoading(true);
+  //       const carregarEspacosEsportivos = async () => {
+  //         try {
+  //           const result = await LocacaoService.getEspacosEsportivosDisponiveis();
+  //           setEspacosEsportivos(result);
+  //         } catch (error) {
+  //           console.error("Erro ao carregar espaços esportivos:", error);
+  //           setIsLoading(false);
+  //         }
+  //       };
+  //       carregarEspacosEsportivos();
+  //       setDesmontarComponente(false);
+  //       console.log(inputLocalReserva);
+  //       setIsLoading(false);
+  //     }
+  //   }, [])
+  // );
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      console.log('teste');
+      setDesmontarComponente(true);
+    });
+
+    return unsubscribe;
+  }, [desmontarComponente]);
 
   //UseEffect para carregar os horários disponíveis de reserva
   useEffect(() => {
@@ -364,10 +375,33 @@ const PageNovaReserva = ({ navigation }) => {
           setIsSending(false);
           Alert.alert("Falha na solicitação", result.message);
         } else {
-          console.log(result)
+          console.log(result);
+
+          // Adicionar o listener 'blur'
+          const unsubscribe = navigation.addListener('blur', () => {
+            console.log("entrou no unsubscribe")
+            setInputLocalReserva(null);
+            setEspacosEsportivos(null);
+            setIsLoading(true);
+            const carregarEspacosEsportivos = async () => {
+              try {
+                const result = await LocacaoService.getEspacosEsportivosDisponiveis();
+                setEspacosEsportivos(result);
+              } catch (error) {
+                console.error("Erro ao carregar espaços esportivos:", error);
+                setIsLoading(false);
+              }
+            };
+            carregarEspacosEsportivos();
+            console.log('finalizou');
+            setIsLoading(false);
+            unsubscribe();
+          });
+
           setIsSending(false);
-          setDesmontarComponente(true);
           Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
+
+          // Isso acionará o listener 'blur', se ainda estiver ativo
           navigation.goBack();
         }
       } catch (error) {
@@ -437,6 +471,7 @@ const PageNovaReserva = ({ navigation }) => {
                   </FormControl.Label>
                   <Select
                     mt="1"
+                    value="teste"
                     isReadOnly
                     accessibilityLabel="Botão de seleção do local"
                     placeholder="Selecionar local..."
@@ -449,13 +484,15 @@ const PageNovaReserva = ({ navigation }) => {
                     }}
                   >
                     {espacosEsportivos && espacosEsportivos.length > 0
-                      ? espacosEsportivos.map((espaco, index) => (
-                        <Select.Item
-                          key={index}
-                          label={espaco.nome}
-                          value={espaco.id}
-                        />
-                      ))
+                      ? (
+                        espacosEsportivos.map((espaco, index) => (
+                          <Select.Item
+                            key={index}
+                            label={espaco.nome}
+                            value={espaco.id}
+                          />
+                        ))
+                      )
                       : null}
                   </Select>
                   <FormControl.ErrorMessage
@@ -524,19 +561,30 @@ const PageNovaReserva = ({ navigation }) => {
                         placeholder="Selecionar quantidade de pessoas..."
                         keyboardType="number-pad"
                         onChangeText={(text) => {
+                          const isInvalid = text < informacoesEspacoEscolhido.capacidadeMin ||
+                            text > informacoesEspacoEscolhido.capacidadeMax;
+
                           setInputErrors((prevErrors) => ({
                             ...prevErrors,
-                            qntParticipantesInvalid: false,
+                            qntParticipantesInvalid: isInvalid,
                           }));
                           setQntParticipantesReserva(text);
                         }}
                       />
 
-                      <FormControl.ErrorMessage
-                        leftIcon={<WarningOutlineIcon size="xs" />}
-                      >
-                        Indique a quantidade de participantes
-                      </FormControl.ErrorMessage>
+                      {inputErrors.qntParticipantesInvalid && (
+                        <FormControl.ErrorMessage
+                          leftIcon={<WarningOutlineIcon size="xs" />}
+                        >
+                          Selecione entre {informacoesEspacoEscolhido.capacidadeMin} e {informacoesEspacoEscolhido.capacidadeMax} pessoas.
+                        </FormControl.ErrorMessage>
+                      )}
+
+                      {!inputErrors.qntParticipantesInvalid && (
+                        <FormControl.HelperText flexDirection={'row'}>
+                          Selecione entre {informacoesEspacoEscolhido.capacidadeMin} e {informacoesEspacoEscolhido.capacidadeMax} pessoas.
+                        </FormControl.HelperText>
+                      )}
                     </FormControl>
 
                     <FormControl

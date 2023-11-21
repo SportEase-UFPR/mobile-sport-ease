@@ -59,15 +59,22 @@ export default function PageHomeScreen() {
   });
 
   const showConfirmacaoReserva = (horario, status) => {
-    if ((moment().diff(moment(horario), "minutes") >= 5) && status == 'APROVADA') {
+    if ((moment.tz('America/Sao_Paulo').diff(moment(horario), "minutes") >= 5) && status == 'APROVADA') {
       return true;
     }
     return false;
   };
 
-  const showCancelarReserva = (horario) => {
-    if (moment(horario).diff(moment(), "minutes") >= 15) {
+  const showCancelarReserva = (card) => {
+    let momentoInicio = card.dataHoraInicioReserva;
+    let statusReserva = card.status;
+    if (statusReserva === "SOLICITADA") {
       return true;
+    }
+    if (statusReserva === "APROVADA") {
+      if (moment.tz('America/Sao_Paulo').diff(moment(momentoInicio), "hours") < 24) {
+        return true
+      }
     }
     return false;
   };
@@ -219,17 +226,7 @@ export default function PageHomeScreen() {
               borderColor="coolGray.200"
               borderWidth="1"
               borderRadius={"21"}
-              _dark={{
-                borderColor: "coolGray.600",
-                backgroundColor: "gray.700",
-              }}
-              _web={{
-                shadow: 2,
-                borderWidth: 0,
-              }}
-              _light={{
-                backgroundColor: "gray.50",
-              }}
+              backgroundColor="gray.50"
             >
 
               <Stack p="4" space={3}>
@@ -277,7 +274,7 @@ export default function PageHomeScreen() {
                     </Button>
                   ) : null}
 
-                  {showCancelarReserva(card.dataHoraInicioReserva) ? (
+                  {showCancelarReserva(card) ? (
                     <Button
                       size="lg"
                       width={'full'}

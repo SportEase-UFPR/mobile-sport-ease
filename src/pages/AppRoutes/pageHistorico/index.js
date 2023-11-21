@@ -148,15 +148,22 @@ export default function PageHistorico() {
   }, []);
 
   const showConfirmacaoReserva = (horario, status) => {
-    if ((moment().diff(moment(horario), "minutes") >= 5) && status == 'APROVADA') {
+    if ((moment.tz('America/Sao_Paulo').diff(moment(horario), "minutes") >= 5) && status == 'APROVADA') {
       return true;
     }
     return false;
   };
 
-  const showCancelarReserva = (horario) => {
-    if (moment(horario).diff(moment(), "minutes") >= 15) {
+  const showCancelarReserva = (card) => {
+    let momentoInicio = card.dataHoraInicioReserva;
+    let statusReserva = card.status;
+    if (statusReserva === "SOLICITADA") {
       return true;
+    }
+    if (statusReserva === "APROVADA") {
+      if (moment.tz('America/Sao_Paulo').diff(moment(momentoInicio), "hours") < 24) {
+        return true
+      }
     }
     return false;
   };
@@ -546,7 +553,7 @@ export default function PageHistorico() {
                       </Button>
                     ) : null}
 
-                    {showCancelarReserva(card.dataHoraInicioReserva) && (card.status == 'SOLICITADA' || card.status == 'APROVADA') ? (
+                    {showCancelarReserva(card) ? (
                       <Button
                         size="lg"
                         borderRadius="full"
