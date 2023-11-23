@@ -33,7 +33,7 @@ function NotificationButton() {
     const [isNotification, setIsNotification] = useState(false);
 
     // useNotifications é um hook e deve ser chamado diretamente no corpo do componente
-    const { notifications } = useNotifications();
+    const { notifications, loadNotifications } = useNotifications();
 
     useEffect(() => {
         // Não precisa de uma função assíncrona aqui, pois os dados já estão no contexto
@@ -69,7 +69,11 @@ function NotificationButton() {
                     size: "2xl"
                 }
             }}
-            onPress={() => navigation.navigate("Notificacoes")}
+            onPress={() => {
+                loadNotifications();
+                navigation.navigate("Notificacoes")
+            }
+            }
         />
     );
 }

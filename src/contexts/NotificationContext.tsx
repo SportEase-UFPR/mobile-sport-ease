@@ -16,6 +16,7 @@ interface NotificationContextType {
     newNotifications: boolean;
     setNewNotifications: Dispatch<SetStateAction<boolean>>;
     markNotificationsAsRead: () => void;
+    loadNotifications: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType>({
@@ -24,6 +25,7 @@ const NotificationContext = createContext<NotificationContextType>({
     newNotifications: false,
     setNewNotifications: () => { },
     markNotificationsAsRead: () => { },
+    loadNotifications: () => { }
 });
 
 const NotificationProvider = ({ children }) => {
@@ -35,6 +37,11 @@ const NotificationProvider = ({ children }) => {
         setNotifications(updatedNotifications);
         setNewNotifications(false); // Atualizar o estado para não haver novas notificações
     };
+
+    const loadNotifications = async() => {
+        console.log('entrou aqui!')
+        carregarNotificacoes();
+    }
 
     const carregarNotificacoes = async () => {
         try {
@@ -64,7 +71,7 @@ const NotificationProvider = ({ children }) => {
 
 
     return (
-        <NotificationContext.Provider value={{ notifications, setNotifications, newNotifications, setNewNotifications, markNotificationsAsRead }}>
+        <NotificationContext.Provider value={{ notifications, setNotifications, newNotifications, setNewNotifications, markNotificationsAsRead, loadNotifications }}>
             {children}
         </NotificationContext.Provider>
     );

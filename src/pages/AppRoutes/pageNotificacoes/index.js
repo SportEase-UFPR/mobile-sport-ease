@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import { ActivityIndicator, Text as RNText } from 'react-native';
 import { View, FlatList, Text, Heading, Box, HStack, VStack, Divider, Badge } from 'native-base';
-import { useNotifications } from '../../../contexts/NotificationContext'; // Ajuste para importar o hook de contexto
+import { useNotifications } from '../../../contexts/NotificationContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { readNotifications } from '../../../api/ClienteService';
 import { formatDistanceToNow, parseISO } from 'date-fns';
