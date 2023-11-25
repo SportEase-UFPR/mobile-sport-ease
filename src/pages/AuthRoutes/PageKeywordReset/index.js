@@ -2,12 +2,14 @@ import * as React from 'react';
 import { View, Text, Image, Keyboard, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/BasicTextInput';
 import ButtonLogin from '../../../components/BasicButton';
+
+import { validateEmail } from '../../../utils';
+import ClienteService from '../../../api/ClienteService';
 
 export default function PageKeywordReset() {
 
@@ -18,7 +20,7 @@ export default function PageKeywordReset() {
   const [errors, setErrors] = React.useState({});
 
   const handleOnchange = (text, input) => {
-    setInputs(prevState => ({ ...prevState, [input]: text }));
+    setInputs(prevState => ({ ...prevState, [input]: text.trim() }));
   };
 
   const handleError = (error, input) => {
@@ -31,11 +33,36 @@ export default function PageKeywordReset() {
     if (!inputs.email) {
       handleError('O endereço de e-mail é obrigatório', 'email');
       isValid = false;
+    } else {
+      let emailTrim = inputs.email.trim()
+      setInputs({ "email": emailTrim})
+      console.log(emailTrim)
+      if (!validateEmail(inputs.email)) {
+        isValid = false;
+        handleError('Inclua um endereço de e-mail válido', 'email');
+      }
     }
     if (isValid) {
-      Alert.alert('E-mail enviado!', 'e-mail enviado ao usuário');
+      handleSubmit();
     }
   };
+
+  const handleSubmit = async () => {
+    const requestData = {
+      "email": inputs.email
+    }
+
+    try {
+      const response = await ClienteService.recuperarSenha(requestData);
+      if (response) {
+        Alert.alert("E-mail enviado", "Caso o usuário esteja registrado, ele receberá um e-mail contendo as instruções para redefinição de senha.")
+      }
+    } catch (error) {
+      Alert.alert("Opa...", error)
+      handleError(error, 'email');
+    }
+
+  }
 
   // Incluindo fonte Poppins --------------
   const [loaded] = useFonts({

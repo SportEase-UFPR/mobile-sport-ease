@@ -47,9 +47,25 @@ export const editarDadosCliente = async (requestData) => {
     }
 }
 
+export const recuperarSenha = async (requestData) => {
+    try {
+        const response = await ApiClient.post('/usuarios/email-recuperacao-senha', requestData);
+        console.log('dados da requisição:', response.data, response.status);
+        return response.status;
+    } catch (error) {
+        //console.error('Erro na requisição recuperarSenha:', error.response ? error.response.data : error.message);
+        if (error.response.data.status==400) {
+            throw "Por gentileza, revise o e-mail enviado";
+        } else {
+            throw "Por gentileza, tente novamente mais tarde";
+        }
+    }
+}
+
 export default {
     getInformacoesUsuario,
     getNotificacoes,
     readNotifications,
-    editarDadosCliente
+    editarDadosCliente,
+    recuperarSenha,
 };
