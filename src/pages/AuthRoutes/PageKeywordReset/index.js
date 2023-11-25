@@ -11,6 +11,8 @@ import ButtonLogin from '../../../components/BasicButton';
 import { validateEmail } from '../../../utils';
 import ClienteService from '../../../api/ClienteService';
 
+import { Pressable, VStack, Spinner, Heading} from 'native-base';
+
 export default function PageKeywordReset() {
 
   const navigation = useNavigation();
@@ -18,6 +20,7 @@ export default function PageKeywordReset() {
   // Variáveis
   const [inputs, setInputs] = React.useState({ email: '' });
   const [errors, setErrors] = React.useState({});
+  const [loading, setLoading] = React.useState(false);
 
   const handleOnchange = (text, input) => {
     setInputs(prevState => ({ ...prevState, [input]: text.trim() }));
@@ -28,18 +31,20 @@ export default function PageKeywordReset() {
   };
 
   const handleKeywordReset = async () => {
+    setLoading(true)
     Keyboard.dismiss();
     let isValid = true;
     if (!inputs.email) {
       handleError('O endereço de e-mail é obrigatório', 'email');
       isValid = false;
+      setLoading(false)
     } else {
       let emailTrim = inputs.email.trim()
-      setInputs({ "email": emailTrim})
-      console.log(emailTrim)
+      setInputs({ "email": emailTrim })
       if (!validateEmail(inputs.email)) {
         isValid = false;
         handleError('Inclua um endereço de e-mail válido', 'email');
+        setLoading(false)
       }
     }
     if (isValid) {
@@ -56,10 +61,14 @@ export default function PageKeywordReset() {
       const response = await ClienteService.recuperarSenha(requestData);
       if (response) {
         Alert.alert("E-mail enviado", "Caso o usuário esteja registrado, ele receberá um e-mail contendo as instruções para redefinição de senha.")
+        setLoading(false)
+
       }
     } catch (error) {
       Alert.alert("Opa...", error)
       handleError(error, 'email');
+      setLoading(false)
+
     }
 
   }
@@ -102,10 +111,35 @@ export default function PageKeywordReset() {
         />
       </View>
 
-      <ButtonLogin
+      {/* <ButtonLogin
         title={'Recuperar Senha'}
         onPress={handleKeywordReset}
-      />
+      /> */}
+
+
+      <Pressable
+        mt={'10'}
+        w={'4/5'}
+        maxH={60}
+        flex={1}
+        paddingY={5}
+        borderRadius='full'
+        backgroundColor={"success.500"}
+        onPress={handleKeywordReset}
+        mb={10}
+      >
+        <VStack
+          alignItems="center"
+          justifyContent="center"
+          flexDirection={'row'}
+          space={2}
+        >
+          {loading ? <Spinner accessibilityLabel="Enviando..." size={'sm'} color="white" /> : null}
+          <Heading color="white" fontSize="md">
+            {loading ? ' Enviando...' : 'Recuperar senha'}
+          </Heading>
+        </VStack>
+      </Pressable>
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={[styles.simpleText, { marginBottom: 20 }]}>Cancelar</Text>
