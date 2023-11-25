@@ -8,7 +8,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { VStack, HStack, Pressable, Spinner, Heading, Switch, Button } from 'native-base';
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/BasicTextInput';
-import { validateCPF, validateEmail, validateSenha } from '../../../utils';
+import { validateCPF, validateEmail, validateSenha, addGrrPrefix } from '../../../utils';
 
 
 export default function PageAutocadastro() {
@@ -29,11 +29,11 @@ export default function PageAutocadastro() {
   const toggleIsStudent = () => setIsStudent(!isStudent);
 
   const handleOnchangeCPF = (text, input) => {
-    let formatted = text.replace(/\D/g, ''); // Remove caracteres não numéricos
+    let formatted = text.replace(/\D/g, '');
     formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
     formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
     formatted = formatted.replace(/(\d{3})(\d{1,2})/, '$1-$2');
-    formatted = formatted.substring(0, 14); // Limita o tamanho
+    formatted = formatted.substring(0, 14);
     setInputs(prevState => ({ ...prevState, [input]: formatted }));
   };
 
@@ -62,7 +62,7 @@ export default function PageAutocadastro() {
     }
 
     if (isStudent && !inputs.grr) {
-      handleError('GRR é obrigatório', 'grr');
+      handleError('O número do GRR é obrigatório', 'grr');
       isValid = false;
     }
 
@@ -85,16 +85,27 @@ export default function PageAutocadastro() {
   };
 
   const autocadastro = async () => {
-
+    const cpfFormatted = inputs.cpf.replace(/[.-]/g, '');
+    const grrFormatted = addGrrPrefix(inputs.grr);
+    console.log('DADOS ENVIADOS!!----------')
+    console.log(inputs.nomeCompleto)
+    console.log(inputs.email)
+    console.log(cpfFormatted)
+    console.log(isStudent)
+    console.log(grrFormatted)
+    console.log(inputs.senha)
     try {
       const response = await onCadastrar({
         nome: inputs.nomeCompleto,
         email: inputs.email,
-        cpf: inputs.cpf,
+        cpf: cpfFormatted,
         alunoUFPR: isStudent,
-        grr: isStudent ? inputs.grr.toUpperCase() : null,
+        grr: isStudent ? grrFormatted : null,
         senha: inputs.senha
       });
+
+      console.log("retorno de sucesso da requisição ----------")
+      console.log(response.data)
       if (response.data && response.data.id) {
         setIsSending(false);
         Alert.alert('Sucesso', 'Um e-mail com o link de ativação foi enviado para você!');
@@ -185,10 +196,12 @@ export default function PageAutocadastro() {
 
           {isStudent && (
             <Input
+              numeric={true}
+              maxLength={8}
               onChangeText={text => handleOnchange(text, 'grr')}
               onFocus={() => handleError(null, 'grr')}
               iconName="account-card-details-outline"
-              placeholder="GRR completo. Ex.: GRR00010002"
+              placeholder="Número do GRR..."
               error={errors.grr}
             />
           )}

@@ -17,10 +17,19 @@ export const validateSenha = (senha) => {
     return true
 };
 
-
+export const addGrrPrefix = (numero) => {
+    if(numero) {
+        let prefix = 'GRR';
+        const grrCompleto = prefix + numero;
+        console.log(grrCompleto);
+        return grrCompleto;
+    }
+    return '';
+};
 
 export default {
     validateEmail,
     validateCPF,
-    validateSenha
+    validateSenha,
+    addGrrPrefix
 };

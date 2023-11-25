@@ -6,7 +6,6 @@ import styles from './styles';
 
 import LogoSportEase from '../../../../assets/logo-sport-ease.png';
 import Input from '../../../components/BasicTextInput';
-import ButtonLogin from '../../../components/BasicButton';
 
 import { validateEmail } from '../../../utils';
 import ClienteService from '../../../api/ClienteService';
@@ -110,12 +109,6 @@ export default function PageKeywordReset() {
           error={errors.email}
         />
       </View>
-
-      {/* <ButtonLogin
-        title={'Recuperar Senha'}
-        onPress={handleKeywordReset}
-      /> */}
-
 
       <Pressable
         mt={'10'}
