@@ -303,7 +303,7 @@ export default function PageLocaisEsportivos({ navigation }) {
                     }
                     onPress={() => navigation.navigate("Nova Reserva")}
                   >
-                    {card.disponivel ? "Reservar local" : "Indisponível"}
+                    {card.disponivel ? "Solicitar reservas" : "Indisponível"}
                   </Button>
                 </Flex>
               </Stack>
