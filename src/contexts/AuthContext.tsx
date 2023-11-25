@@ -113,6 +113,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             const result = await AuthService.login(email, password);
             const decodedToken = jwtDecode<DecodedToken>(result.data.token);
+            if (!(decodedToken.userProfile == "ROLE_CLIENTE")) {
+                return { error: true, msg: "Não é possível acessar essa aplicação utilizando o perfil de usuário indicado" };
+            }
             const id = decodedToken.idPessoa;
             setAuthState({
                 token: result.data.token,
@@ -126,7 +129,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // End of Native Notify Code
             return result;
         } catch (e) {
-            return { error: true, msg: (e as any).response.data.msg };
+            return { error: true, msg: 'Credenciais incorretas.' };
         }
     };
 

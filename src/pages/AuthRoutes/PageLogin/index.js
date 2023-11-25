@@ -34,6 +34,7 @@ export default function PageLogin() {
   const [loading, setLoading] = React.useState(false);
   const [isOpenTop, setIsOpenTop] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [errorModalMessage, setErrorModalMessage ] = React.useState('');
   const onClose = () => setIsOpen(false);
   const cancelRef = React.useRef(null);
 
@@ -63,9 +64,9 @@ export default function PageLogin() {
 
       const result = await onLogin(inputs.email, inputs.senha);
       if (result && result.error) {
-        setIsOpen(true)
+        setErrorModalMessage(result.error ? result.msg : 'Por gentileza, revise as credenciais de acesso');
+        setIsOpen(true);
       }
-
       setLoading(false);
     }
   };
@@ -106,7 +107,7 @@ export default function PageLogin() {
         <AlertDialog.Content>
           <AlertDialog.Header>Falha na autenticação</AlertDialog.Header>
           <AlertDialog.Body>
-            Ocorreu uma falha na autenticação. Revise suas credenciais e tente novamente.
+            {errorModalMessage}
           </AlertDialog.Body>
           <AlertDialog.Footer>
             <Button.Group space={2}>
