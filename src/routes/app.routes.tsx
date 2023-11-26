@@ -31,12 +31,9 @@ function LogoTitle() {
 function NotificationButton() {
     const navigation = useNavigation();
     const [isNotification, setIsNotification] = useState(false);
-
-    // useNotifications é um hook e deve ser chamado diretamente no corpo do componente
     const { notifications, loadNotifications } = useNotifications();
 
     useEffect(() => {
-        // Não precisa de uma função assíncrona aqui, pois os dados já estão no contexto
         const hasUnreadNotification = notifications.some(notificacao => !notificacao.lida);
         setIsNotification(hasUnreadNotification);
     }, [notifications])
@@ -70,7 +67,7 @@ function NotificationButton() {
                 }
             }}
             onPress={() => {
-                loadNotifications();
+                loadNotifications()
                 navigation.navigate("Notificacoes")
             }
             }

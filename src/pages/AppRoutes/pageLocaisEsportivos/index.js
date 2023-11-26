@@ -60,7 +60,6 @@ export default function PageLocaisEsportivos({ navigation }) {
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Erro ao carregar espaços esportivos:", error);
         setIsLoading(false);
       });
   };
@@ -69,7 +68,6 @@ export default function PageLocaisEsportivos({ navigation }) {
     setIsComentariosLoading(true);
     try {
       const response = await EspacoEsportivoService.getComentarios(idEspaco);
-      console.log(response);
       if (response) {
         response.sort((a, b) => {
           const dateA = new Date(a.dataHoraComentario);
@@ -81,7 +79,6 @@ export default function PageLocaisEsportivos({ navigation }) {
         setComentarios([]);
       }
     } catch (error) {
-      console.error("Erro ao carregar comentários:", error);
       setComentarios([]);
     }
     setIsComentariosLoading(false);
@@ -211,31 +208,33 @@ export default function PageLocaisEsportivos({ navigation }) {
                         <Spinner color="emerald.500" />
                       </Center>
                     ) : (
-                      comentarios.filter(comentario => comentario.avaliacao).length > 0 ? (
-                        comentarios.filter(comentario => comentario.avaliacao)
-                          .map((comentario, index) => (
-                            <Actionsheet.Item key={index} borderBottomColor={'gray.200'} borderBottomWidth={1}>
-                              <View style={{ alignItems: 'flex-start' }} >
-                                <Heading size="sm" ml="1">{comentario.nomeCliente.split(" ")[0].toUpperCase()}</Heading>
-                                <AirbnbRating
-                                  defaultRating={comentario.avaliacao}
-                                  size={19}
-                                  isDisabled
-                                  showRating={false}
-                                  starContainerStyle={{ justifyContent: 'flex-start' }}
-                                />
-                                {comentario.comentario ? <Text ml="1" italic>"{comentario.comentario}"</Text> : null}
-                                <Text ml="1" mt='1' fontSize={'xs'} color={'gray.500'}>{moment(comentario.dataHoraComentario).format('DD/MM/YYYY')}</Text>
-                              </View>
-                            </Actionsheet.Item>
-                          ))
-                      ) : (
-                        <Actionsheet.Item isDisabled>
-                          <Center>
-                            <Text>Não há comentários para este local.</Text>
-                          </Center>
-                        </Actionsheet.Item>
-                      )
+                      <ScrollView width={"full"}>
+                        {comentarios.filter(comentario => comentario.avaliacao).length > 0 ? (
+                          comentarios.filter(comentario => comentario.avaliacao)
+                            .map((comentario, index) => (
+                              <Actionsheet.Item key={index} borderBottomColor={'gray.200'} borderBottomWidth={1}>
+                                <View style={{ alignItems: 'flex-start' }} >
+                                  <Heading size="sm" ml="1">{comentario.nomeCliente.split(" ")[0].toUpperCase()}</Heading>
+                                  <AirbnbRating
+                                    defaultRating={comentario.avaliacao}
+                                    size={19}
+                                    isDisabled
+                                    showRating={false}
+                                    starContainerStyle={{ justifyContent: 'flex-start' }}
+                                  />
+                                  {comentario.comentario ? <Text ml="1" italic>"{comentario.comentario}"</Text> : null}
+                                  <Text ml="1" mt='1' fontSize={'xs'} color={'gray.500'}>{moment(comentario.dataHoraComentario).format('DD/MM/YYYY')}</Text>
+                                </View>
+                              </Actionsheet.Item>
+                            ))
+                        ) : (
+                          <Actionsheet.Item isDisabled>
+                            <Center>
+                              <Text>Não há comentários para este local.</Text>
+                            </Center>
+                          </Actionsheet.Item>
+                        )}
+                      </ScrollView>
                     )}
                   </Actionsheet.Content>
                 </Actionsheet>

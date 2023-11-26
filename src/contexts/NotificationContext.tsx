@@ -35,11 +35,10 @@ const NotificationProvider = ({ children }) => {
     const markNotificationsAsRead = () => {
         const updatedNotifications = notifications.map(notificacao => ({ ...notificacao, lida: true }));
         setNotifications(updatedNotifications);
-        setNewNotifications(false); // Atualizar o estado para não haver novas notificações
+        setNewNotifications(false);
     };
 
     const loadNotifications = async() => {
-        console.log('entrou aqui!')
         carregarNotificacoes();
     }
 
@@ -67,6 +66,11 @@ const NotificationProvider = ({ children }) => {
 
     useEffect(() => {
         carregarNotificacoes();
+        const cronCarregarNotificacoes = () => {
+            carregarNotificacoes();
+        };
+        const intervalId = setInterval(cronCarregarNotificacoes, 300000);
+        return () => clearInterval(intervalId);
     }, []);
 
 

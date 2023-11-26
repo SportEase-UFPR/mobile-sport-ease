@@ -45,14 +45,12 @@ const PageMeuPerfil = ({ navigation, route }) => {
     useFocusEffect(
         React.useCallback(() => {
             if (param === "reload") {
-                console.log('carregará usuário');
                 carregarUsuario();
             }
-        }, [route]) // Inclua todas as dependências aqui
+        }, [route])
     );
 
     useEffect(() => {
-        console.log('entrou no useEffect')
         carregarUsuario();
     }, [])
 

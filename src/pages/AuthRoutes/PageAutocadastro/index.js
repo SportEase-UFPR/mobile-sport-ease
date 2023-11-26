@@ -87,13 +87,6 @@ export default function PageAutocadastro() {
   const autocadastro = async () => {
     const cpfFormatted = inputs.cpf.replace(/[.-]/g, '');
     const grrFormatted = addGrrPrefix(inputs.grr);
-    console.log('DADOS ENVIADOS!!----------')
-    console.log(inputs.nomeCompleto)
-    console.log(inputs.email)
-    console.log(cpfFormatted)
-    console.log(isStudent)
-    console.log(grrFormatted)
-    console.log(inputs.senha)
     try {
       const response = await onCadastrar({
         nome: inputs.nomeCompleto,
@@ -104,30 +97,28 @@ export default function PageAutocadastro() {
         senha: inputs.senha
       });
 
-      console.log("retorno de sucesso da requisição ----------")
-      console.log(response.data)
       if (response.data && response.data.id) {
         setIsSending(false);
-        Alert.alert('Sucesso', 'Um e-mail com o link de ativação foi enviado para você!');
+        Alert.alert('Link de ativação enviado!', 'Um e-mail com o link de ativação da conta foi enviado para você! Por gentileza, verifique o passo a passo contido nesse e-mail.');
         navigation.navigate('Login');
       } else {
         setIsSending(false);
-        Alert.alert('Corrija os dados enviados', response.msg);
+        Alert.alert('Corrija os dados enviados...', response.msg);
       }
     } catch (error) {
       setIsSending(false);
-      Alert.alert('Erro ao processar solicitação', 'Houve um erro ao realizar o autocadastro. Tente novamente mais tarde.');
+      Alert.alert('Erro ao processar solicitação...', 'Houve um erro ao realizar o autocadastro. Tente novamente mais tarde.');
     }
   };
 
 
   const handleOnchange = (text, input) => {
     if (input == "cpf") {
-      let formatted = text.replace(/\D/g, ''); // Remove caracteres não numéricos
+      let formatted = text.replace(/\D/g, '');
       formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
       formatted = formatted.replace(/(\d{3})(\d)/, '$1.$2');
       formatted = formatted.replace(/(\d{3})(\d{1,2})/, '$1-$2');
-      formatted = formatted.substring(0, 14); // Limita o tamanho
+      formatted = formatted.substring(0, 14);
     }
     setInputs(prevState => ({ ...prevState, [input]: text }));
   };

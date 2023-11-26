@@ -9,9 +9,9 @@ import { readNotifications } from '../../../api/ClienteService';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+
 function NotificationItem({ item }) {
     const dataHoraFormatada = formatDistanceToNow(parseISO(item.dataHora), { addSuffix: true, locale: ptBR });
-
     return (
         <Box>
             <Text ml="1" fontSize={'sm'} color={'gray.700'}>
@@ -57,20 +57,16 @@ function NotificationItem({ item }) {
 }
 
 export default function PageNotificacoes() {
-    const { notifications, newNotifications, markNotificationsAsRead } = useNotifications();
+    const { notifications, newNotifications, markNotificationsAsRead, loadNotifications } = useNotifications();
 
     useFocusEffect(
         React.useCallback(() => {
+            loadNotifications()
+            readNotifications()
             return () => {
-                if (notifications.some(notificacao => !notificacao.lida)) {
-                    readNotifications().then(() => {
-                        markNotificationsAsRead();
-                    }).catch(error => {
-                        console.log("Um erro ocorreu ao ler as notificações");
-                    });
-                }
+                markNotificationsAsRead();
             };
-        }, [notifications])
+        }, [])
     );
 
     if (newNotifications === null) {

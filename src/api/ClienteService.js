@@ -5,7 +5,6 @@ export const getInformacoesUsuario = async () => {
         const response = await ApiClient.get('/clientes/cliente-logado');
         return response.data;
     } catch (error) {
-        console.error('Erro na requisição getInformacoesUsuario:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
@@ -18,7 +17,6 @@ export const getNotificacoes = async () => {
         if (error.response && error.response.status === 404) {
             return [];
         } else {
-            console.error('Erro na requisição getNotificacoes:', error.response ? error.response.data : error.message);
             throw error;
         }
     }
@@ -32,7 +30,6 @@ export const readNotifications = async () => {
         if (error.response && error.response.status === 404) {
             return [];
         } else {
-            console.error('Erro na requisição readNotifications:', error.response ? error.response.data : error.message);
             throw error;
         }
     }
@@ -53,7 +50,6 @@ export const recuperarSenha = async (requestData) => {
         console.log('dados da requisição:', response.data, response.status);
         return response.status;
     } catch (error) {
-        //console.error('Erro na requisição recuperarSenha:', error.response ? error.response.data : error.message);
         if (error.response.data.status==400) {
             throw "Por gentileza, revise o e-mail enviado";
         } else {

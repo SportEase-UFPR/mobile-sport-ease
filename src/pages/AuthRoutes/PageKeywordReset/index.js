@@ -16,7 +16,6 @@ export default function PageKeywordReset() {
 
   const navigation = useNavigation();
 
-  // Variáveis
   const [inputs, setInputs] = React.useState({ email: '' });
   const [errors, setErrors] = React.useState({});
   const [loading, setLoading] = React.useState(false);

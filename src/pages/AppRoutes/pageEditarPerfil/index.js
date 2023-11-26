@@ -132,7 +132,6 @@ export default function PageEditarPerfil({ navigation, route }) {
   }
 
   useEffect(() => {
-    console.log(route.params);
     if (route?.params) {
       const { nome, email, cpf, grr } = route.params;
       setUser(prevUser => ({

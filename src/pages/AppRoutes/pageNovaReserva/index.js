@@ -64,41 +64,14 @@ const PageNovaReserva = ({ navigation }) => {
         setEspacosEsportivos(result);
         setIsLoading(false);
       } catch (error) {
-        console.error("Erro ao carregar espaços esportivos:", error);
         setIsLoading(false);
       }
     };
     carregarEspacosEsportivos();
   }, []);
 
-  //UseFocusEffect para limpar a navegação ao sair da pg
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     if (desmontarComponente) {
-  //       console.log('entrou aqui no useFocusEffect')
-  //       setInputLocalReserva(null);
-  //       setEspacosEsportivos(null);
-  //       setIsLoading(true);
-  //       const carregarEspacosEsportivos = async () => {
-  //         try {
-  //           const result = await LocacaoService.getEspacosEsportivosDisponiveis();
-  //           setEspacosEsportivos(result);
-  //         } catch (error) {
-  //           console.error("Erro ao carregar espaços esportivos:", error);
-  //           setIsLoading(false);
-  //         }
-  //       };
-  //       carregarEspacosEsportivos();
-  //       setDesmontarComponente(false);
-  //       console.log(inputLocalReserva);
-  //       setIsLoading(false);
-  //     }
-  //   }, [])
-  // );
-
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
-      console.log('teste');
       setDesmontarComponente(true);
     });
 
@@ -143,11 +116,6 @@ const PageNovaReserva = ({ navigation }) => {
         )
         setBotaoMax(max)
         setBotaoCount(0)
-      } else {
-        console.error(
-          "calcularDisponibilidadeHorario did not return a number:",
-          max
-        );
       }
     }
   }, [horarioInicioReserva]);
@@ -198,7 +166,7 @@ const PageNovaReserva = ({ navigation }) => {
       const result = await getHorariosDisponiveis(requestData);
       setHorariosDisponiveis(result.horariosDisponiveis);
     } catch (error) {
-      console.error("Erro ao carregar horários disponíveis:", error);
+      Alert.alert("Erro ao solicitar listagem de horários...", "Por gentileza, selecione outro dia.")
     }
   };
 
@@ -207,7 +175,7 @@ const PageNovaReserva = ({ navigation }) => {
       const result = await getInformacoesEspacoEsportivo(idEspacoEsportivo);
       setInformacoesEspacoEscolhido(result);
     } catch (error) {
-      console.error("Erro ao carregar informações do local:", error);
+      Alert.alert("Erro ao solicitar informações do local...", "Por gentileza, selecione outro espaço esportivo");
     }
     setIsLoadingForm(false);
   };
@@ -337,8 +305,6 @@ const PageNovaReserva = ({ navigation }) => {
     if (isValid) {
       setIsSending(true);
       const novoHorarioInicioReserva = moment.utc(horarioInicioReserva, "HH:mm:ss")
-      console.log('INFORMAÇÕES NO MOMENTO DE ENVIO..........')
-      console.log(`novoHorarioInicioReserva: ${novoHorarioInicioReserva}`)
       const periodoLocacao = moment.utc(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
 
       //Incluindo dados sobre a data e hora inicial da reserva em uma nova const
@@ -348,8 +314,6 @@ const PageNovaReserva = ({ navigation }) => {
         minutes: novoHorarioInicioReserva.minutes(),
         seconds: novoHorarioInicioReserva.seconds()
       });
-      console.log(`novaDataReservaInicio: ${novoHorarioInicioReserva}`)
-
 
       //Incluindo dados sobre a data e hora final da reserva em uma nova const
       const novaDataReservaFim = moment.utc(novaDataReservaInicio);
@@ -358,8 +322,6 @@ const PageNovaReserva = ({ navigation }) => {
         minutes: (periodoLocacao.minutes() * (botaoCount + 1)),
         seconds: (periodoLocacao.seconds() * (botaoCount + 1))
       });
-
-      console.log(`novaDataReservaFim: ${novaDataReservaFim}`)
 
       try {
         const dadosDaLocacao = {
@@ -371,15 +333,12 @@ const PageNovaReserva = ({ navigation }) => {
         };
         const result = await createSolicitacaoLocacao(dadosDaLocacao);
         if (result.isSuccess == false) {
-          console.log(result)
           setIsSending(false);
           Alert.alert("Falha na solicitação", result.message);
         } else {
-          console.log(result);
 
-          // Adicionar o listener 'blur'
+          // Adicionando listener para limpar a página após sair da tela
           const unsubscribe = navigation.addListener('blur', () => {
-            console.log("entrou no unsubscribe")
             setInputLocalReserva(null);
             setEspacosEsportivos(null);
             setIsLoading(true);
@@ -388,12 +347,10 @@ const PageNovaReserva = ({ navigation }) => {
                 const result = await LocacaoService.getEspacosEsportivosDisponiveis();
                 setEspacosEsportivos(result);
               } catch (error) {
-                console.error("Erro ao carregar espaços esportivos:", error);
                 setIsLoading(false);
               }
             };
             carregarEspacosEsportivos();
-            console.log('finalizou');
             setIsLoading(false);
             unsubscribe();
           });

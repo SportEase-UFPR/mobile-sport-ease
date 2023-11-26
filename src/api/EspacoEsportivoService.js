@@ -5,7 +5,6 @@ export const getComentarios = async (idEspaco) => {
         const response = await ApiClient.get(`/espacos-esportivos/comentarios/${idEspaco}`);
         return response.data;
     } catch (error) {
-        console.error('Erro na requisição getComentarios:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
