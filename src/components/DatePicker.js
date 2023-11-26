@@ -5,57 +5,57 @@ import COLORS from "../colors/colors";
 
 LocaleConfig.locales['pt-br'] = {
     monthNames: [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro'
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
     ],
     monthNamesShort: [
-      'Jan',
-      'Fev',
-      'Mar',
-      'Abr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Set',
-      'Out',
-      'Nov',
-      'Dez'
+        'Jan',
+        'Fev',
+        'Mar',
+        'Abr',
+        'Mai',
+        'Jun',
+        'Jul',
+        'Ago',
+        'Set',
+        'Out',
+        'Nov',
+        'Dez'
     ],
     dayNames: [
-      'Domingo',
-      'Segunda-feira',
-      'Terça-feira',
-      'Quarta-feira',
-      'Quinta-feira',
-      'Sexta-feira',
-      'Sábado'
+        'Domingo',
+        'Segunda-feira',
+        'Terça-feira',
+        'Quarta-feira',
+        'Quinta-feira',
+        'Sexta-feira',
+        'Sábado'
     ],
     dayNamesShort: [
-      'Dom',
-      'Seg',
-      'Ter',
-      'Qua',
-      'Qui',
-      'Sex',
-      'Sáb'
+        'Dom',
+        'Seg',
+        'Ter',
+        'Qua',
+        'Qui',
+        'Sex',
+        'Sáb'
     ],
     today: 'Hoje'
-  };
-  LocaleConfig.defaultLocale = 'pt-br';
-  
+};
+LocaleConfig.defaultLocale = 'pt-br';
 
-export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = new Date(), minimumDate = new Date(), availableDays = [0, 1, 2, 3, 4, 5, 6] }) => {
+
+export default DatePicker = ({ setInputErrors, date, setDate, setShowCalendarModal, initDate = new Date(), minimumDate = new Date(), availableDays = [0, 1, 2, 3, 4, 5, 6] }) => {
     const [markedDates, setMarkedDates] = useState({});
 
     useEffect(() => {
@@ -103,6 +103,12 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
             onDayPress={(day) => {
                 const selectedDate = moment.utc(`${day.dateString} 00:00:00`).format();
                 setDate(selectedDate);
+
+                setInputErrors((prevErrors) => ({
+                    ...prevErrors,
+                    dataReservaInvalid: false,
+                }))
+
                 setShowCalendarModal(false);
             }}
             firstDay={0}

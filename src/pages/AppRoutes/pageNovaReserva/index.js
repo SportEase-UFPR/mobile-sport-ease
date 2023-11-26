@@ -72,7 +72,7 @@ const PageNovaReserva = ({ navigation, route }) => {
       }
     };
     carregarEspacosEsportivos();
-    if(route.params?.idEspacoPadrao){
+    if (route.params?.idEspacoPadrao) {
       setInputLocalReserva(route.params?.idEspacoPadrao)
     }
   }, [route.params?.idEspacoPadrao]);
@@ -375,12 +375,25 @@ const PageNovaReserva = ({ navigation, route }) => {
     <NativeBaseProvider theme={temaGeralFormulario}>
       <ScrollView>
         {/* Modal com DatePicker */}
-        <Modal isOpen={showCalendarModal} onClose={() => setShowCalendarModal(false)}>
+        <Modal isOpen={showCalendarModal}
+          onClose={() => {
+            setShowCalendarModal(false);
+          }}
+          onPress={() => {
+            setInputErrors((prevErrors) => ({
+              ...prevErrors,
+              dataReservaInvalid: false,
+            }))
+          }
+
+          }
+        >
           <Modal.Content maxWidth="600px">
             <Modal.CloseButton />
             <Modal.Header>Dia da Reserva</Modal.Header>
             <Modal.Body >
               <DatePicker
+                setInputErrors={setInputErrors}
                 date={dataReserva}
                 setDate={setDataReserva}
                 availableDays={informacoesEspacoEscolhido.diasFuncionamento}
@@ -492,7 +505,7 @@ const PageNovaReserva = ({ navigation, route }) => {
                 </Flex>
               </Box>
 
-              <Divider></Divider>
+              <Divider mt={2}></Divider>
 
               {inputLocalReserva ? (
                 <>
@@ -504,7 +517,6 @@ const PageNovaReserva = ({ navigation, route }) => {
                     >
                       2. Dados da reserva
                     </Text>
-
                     <FormControl
                       isRequired
                       isInvalid={inputErrors.qntParticipantesInvalid}
@@ -519,14 +531,11 @@ const PageNovaReserva = ({ navigation, route }) => {
                         onChangeText={(text) => {
                           const isInvalid = text < informacoesEspacoEscolhido.capacidadeMin ||
                             text > informacoesEspacoEscolhido.capacidadeMax;
-
                           setInputErrors((prevErrors) => ({
                             ...prevErrors,
                             qntParticipantesInvalid: isInvalid,
                           }));
-
                           isInvalid ? setQntParticipantesReserva(null) : setQntParticipantesReserva(text)
-
                         }}
                       />
 

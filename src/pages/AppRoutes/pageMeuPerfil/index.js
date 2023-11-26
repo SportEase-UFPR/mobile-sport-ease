@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import styles from './styles';
-import { Box, Flex, Heading, Text, Pressable } from 'native-base';
+import { Box, Flex, Heading, Text, Pressable, Skeleton } from 'native-base';
 import { useAuth } from '../../../contexts/AuthContext';
 import ClienteService from '../../../api/ClienteService';
 import COLORS from '../../../colors/colors';
@@ -12,6 +12,7 @@ const PageMeuPerfil = ({ navigation, route }) => {
     const param = route.params?.param || undefined;
     const { onLogout } = useAuth();
     const [headerText, setHeaderText] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState({
         nome: '',
         email: '',
@@ -40,6 +41,7 @@ const PageMeuPerfil = ({ navigation, route }) => {
         } else {
             setHeaderText('');
         }
+        setIsLoading(false);
     }
 
     useFocusEffect(
@@ -51,16 +53,19 @@ const PageMeuPerfil = ({ navigation, route }) => {
     );
 
     useEffect(() => {
+        setIsLoading(true);
         carregarUsuario();
     }, [])
 
     return (
         <Box mt={25} mb={25} paddingX={5}>
-
             <Heading borderColor={COLORS.green} borderLeftWidth={20} color={COLORS.green} fontSize={'3xl'} marginBottom={10} paddingLeft={'30px'}>
-                {headerText}
+                {isLoading ? (
+                    <Skeleton w={'xs'} h={9} rounded="full" startColor={COLORS.lightGreen} />
+                ) : (
+                    headerText
+                )}
             </Heading>
-
             <Pressable
                 onPress={() => navigation.navigate('PageEditarPerfil', user)}
                 overflow="hidden"

@@ -11,6 +11,7 @@ const COLORS = {
   yellow: "#ffe500",
   darkGrayText: "#737791",
   darkBlueText: "#05004E",
+  lightGreen: "#49d180"
 };
 
 export default COLORS;
