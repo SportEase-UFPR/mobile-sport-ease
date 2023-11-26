@@ -198,10 +198,16 @@ export default function PageHistorico() {
 
   const handleCancelarUso = async (idLocacao) => {
     setIsLoadingModal(true);
+
     try {
       const result = await cancelarUsoLocacao(idLocacao);
-      const updatedCardData = cardData.filter(card => card.id !== idLocacao);
-      setCardData(updatedCardData);
+      setCardData(currentCards => currentCards.map(card => {
+        if (card.id === idLocacao) {
+          // Atualizar o status do card ou outras propriedades conforme necessário
+          return { ...card, status: 'CANCELADA' };
+        }
+        return card;
+      }));
       setIsLoadingModal(false);
       setIsOpen(false);
       const toastConfig = ToastDetails[0];
@@ -218,9 +224,13 @@ export default function PageHistorico() {
   const handleConfirmarUso = async (idLocacao) => {
     setIsLoadingModal(true);
     try {
-      const result = await confirmarUsoLocacao(idLocacao)
-      const updatedCardData = cardData.filter(card => card.id !== idLocacao);
-      setCardData(updatedCardData);
+      const result = await confirmarUsoLocacao(idLocacao);
+      setCardData(currentCards => currentCards.map(card => {
+        if (card.id === idLocacao) {
+          return { ...card, status: 'FINALIZADA' };
+        }
+        return card;
+      }));
       setIsLoadingModal(false);
       const toastConfig = ToastDetails[1];
       toast.show(toastConfig);
@@ -240,8 +250,13 @@ export default function PageHistorico() {
     }
     setIsLoadingModal(true);
     try {
-      const result = await avaliarLocacao(idLocacao, requestData)
-      await carregarReservas();
+      const result = await avaliarLocacao(idLocacao, requestData);
+      setCardData(currentCards => currentCards.map(card => {
+        if (card.id === idLocacao) {
+          return { ...card, avaliacao, comentario };
+        }
+        return card;
+      }));
       setIsLoadingModal(false);
       setModalVisible(false)
       const toastConfig = ToastDetails[2];
