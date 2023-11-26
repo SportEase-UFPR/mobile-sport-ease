@@ -102,9 +102,6 @@ export default DatePicker = ({ date, setDate, setShowCalendarModal, initDate = n
             minDate={minimumDate.toISOString()}
             onDayPress={(day) => {
                 const selectedDate = moment.utc(`${day.dateString} 00:00:00`).format();
-                console.log(`dia formatado é ${selectedDate}`);
-                // console.log(`data formatada: ${selectedDate.tz("America/Sao_Paulo").format("YYYY-MM-DD, HH:mm")}`);
-                // console.log(`dia selecionado ${selectedDate.hour()}`);
                 setDate(selectedDate);
                 setShowCalendarModal(false);
             }}

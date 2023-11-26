@@ -300,9 +300,9 @@ export default function PageLocaisEsportivos({ navigation }) {
                         <WarningOutlineIcon />
                       )
                     }
-                    onPress={() => navigation.navigate("Nova Reserva")}
+                    onPress={() => navigation.navigate("Nova Reserva", {idEspacoPadrao: card.id})}
                   >
-                    {card.disponivel ? "Solicitar reservas" : "Indisponível"}
+                    {card.disponivel ? "Solicitar reserva" : "Indisponível"}
                   </Button>
                 </Flex>
               </Stack>

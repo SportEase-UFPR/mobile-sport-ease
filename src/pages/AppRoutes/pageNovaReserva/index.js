@@ -29,12 +29,13 @@ import {
   IconButton,
   Modal,
   HStack,
+  Center,
 } from "native-base";
 import moment from "moment-timezone";
 import temaGeralFormulario from "./nativeBaseTheme";
 import COLORS from "../../../colors/colors";
 
-const PageNovaReserva = ({ navigation }) => {
+const PageNovaReserva = ({ navigation, route }) => {
   const [inputLocalReserva, setInputLocalReserva] = useState(null);
   const [horarioInicioReserva, setHorarioInicioReserva] = useState(null);
   const [horarioFimReserva, setHorarioFimReserva] = useState(null);
@@ -54,7 +55,10 @@ const PageNovaReserva = ({ navigation }) => {
   const [inputErrors, setInputErrors] = useState({});
   const [desmontarComponente, setDesmontarComponente] = useState(false);
 
+  const idEspacoPadrao = route.params?.idEspacoPadrao;
+
   // USEEFFECTS, --------------------------------
+
   // UseEffect para carregar a listagem inicial dos espaços esportivos
   useEffect(() => {
     setIsLoading(true);
@@ -68,7 +72,12 @@ const PageNovaReserva = ({ navigation }) => {
       }
     };
     carregarEspacosEsportivos();
-  }, []);
+    if(route.params?.idEspacoPadrao){
+      setInputLocalReserva(route.params?.idEspacoPadrao)
+    }
+  }, [route.params?.idEspacoPadrao]);
+
+
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -89,6 +98,8 @@ const PageNovaReserva = ({ navigation }) => {
     if (inputLocalReserva) {
       setIsLoadingForm(true);
       carregarInformacoesEspacoEscolhido(inputLocalReserva);
+      setDataReserva(null)
+      setHorarioInicioReserva(null)
     }
   }, [inputLocalReserva]);
 
@@ -125,20 +136,10 @@ const PageNovaReserva = ({ navigation }) => {
     setHorarioDisponivelData(horariosDisponiveis);
   }, [horariosDisponiveis]);
 
-  useEffect(() => {
-    setHorarioInicioReserva(null);
-    setHorarioFimReserva(null);
-  }, [inputLocalReserva]);
-
-
-
-
   // FUNÇÕES PARA TRATAR HORÁRIOS E DATAS ------------------------------------ 
   const atualizarHorarioFim = () => {
-
     const novoFim = addTimes(horarioInicioReserva, multTime(informacoesEspacoEscolhido.periodoLocacao, (botaoCount + 1)));
     setHorarioFimReserva(novoFim);
-
   };
 
   const aumentarHorario = () => {
@@ -166,7 +167,9 @@ const PageNovaReserva = ({ navigation }) => {
       const result = await getHorariosDisponiveis(requestData);
       setHorariosDisponiveis(result.horariosDisponiveis);
     } catch (error) {
-      Alert.alert("Erro ao solicitar listagem de horários...", "Por gentileza, selecione outro dia.")
+      Alert.alert("Dia indisponível para reserva do local...", error.response.data.message)
+      setHorariosDisponiveis([])
+      setDataReserva(null)
     }
   };
 
@@ -184,7 +187,7 @@ const PageNovaReserva = ({ navigation }) => {
     const maxLocacaoDia = informacoesEspacoEscolhido.maxLocacaoDia;
     const periodoLocacao = moment.utc(informacoesEspacoEscolhido.periodoLocacao, "HH:mm:ss");
     let novoHorario = moment.utc(horarioInicioReserva, "HH:mm:ss");
-    let horariosEncontrados = 0; // Para contar quantas vezes um horário disponível foi encontrado
+    let horariosEncontrados = 0;
 
 
     for (let indexMax = 1; indexMax <= maxLocacaoDia; indexMax++) {
@@ -208,7 +211,6 @@ const PageNovaReserva = ({ navigation }) => {
     } else {
       return horariosEncontrados;
     }
-
   };
 
   function addTimes(startTime, duration) {
@@ -354,11 +356,8 @@ const PageNovaReserva = ({ navigation }) => {
             setIsLoading(false);
             unsubscribe();
           });
-
           setIsSending(false);
-          Alert.alert("Sucesso!", "Solicitação criada com sucesso!");
-
-          // Isso acionará o listener 'blur', se ainda estiver ativo
+          Alert.alert("Solicitação bem sucedida!", "Sua solicitação foi criada com sucesso! É necessário aguardar a aprovação/reprovação da solicitação.");
           navigation.goBack();
         }
       } catch (error) {
@@ -427,8 +426,8 @@ const PageNovaReserva = ({ navigation }) => {
                     Selecione o local desejado{" "}
                   </FormControl.Label>
                   <Select
+                    defaultValue={idEspacoPadrao}
                     mt="1"
-                    value="teste"
                     isReadOnly
                     accessibilityLabel="Botão de seleção do local"
                     placeholder="Selecionar local..."
@@ -525,7 +524,9 @@ const PageNovaReserva = ({ navigation }) => {
                             ...prevErrors,
                             qntParticipantesInvalid: isInvalid,
                           }));
-                          setQntParticipantesReserva(text);
+
+                          isInvalid ? setQntParticipantesReserva(null) : setQntParticipantesReserva(text)
+
                         }}
                       />
 
@@ -619,35 +620,43 @@ const PageNovaReserva = ({ navigation }) => {
                         Por quanto tempo você deseja reservar o espaço?{" "}
                       </FormControl.Label>
                       {horarioInicioReserva ? (
-                        <HStack alignItems="center" justifyContent="space-around">
-                          <IconButton
-                            isDisabled={botaoCount === 0}
-                            size={'sm'}
-                            colorScheme="success"
-                            variant="outline"
-                            _icon={{
-                              as: Entypo,
-                              name: "minus",
-                            }}
-                            onPress={diminuirHorario}
-                          />
-                          <Text fontSize={'md'}>
-                            {horarioInicioReserva} até{" "}
-                            {horarioFimReserva}
-                          </Text>
-                          <IconButton
-                            isDisabled={(botaoCount === (botaoMax - 1) && botaoMax != 0)}
-                            size={'sm'}
-                            colorScheme="success"
-                            variant="outline"
-                            _icon={{
-                              as: Entypo,
-                              name: "plus",
-                            }}
-                            onPress={aumentarHorario}
-                          />
-                        </HStack>
+                        <>
+                          <HStack alignItems="center" justifyContent="space-around">
 
+                            <IconButton
+                              isDisabled={botaoCount === 0 || informacoesEspacoEscolhido.maxLocacaoDia == 1}
+                              size={'sm'}
+                              colorScheme="success"
+                              variant="outline"
+                              _icon={{
+                                as: Entypo,
+                                name: "minus",
+                              }}
+                              onPress={diminuirHorario}
+                            />
+                            <Text fontSize={'md'}>
+                              {horarioInicioReserva} até{" "}
+                              {horarioFimReserva}
+                            </Text>
+                            <IconButton
+                              isDisabled={(botaoCount === (botaoMax - 1) && botaoMax != 0) || informacoesEspacoEscolhido.maxLocacaoDia == 1}
+                              size={'sm'}
+                              colorScheme="success"
+                              variant="outline"
+                              _icon={{
+                                as: Entypo,
+                                name: "plus",
+                              }}
+                              onPress={aumentarHorario}
+                            />
+                          </HStack>
+                          {informacoesEspacoEscolhido.maxLocacaoDia == 1 ?
+                            <Center>
+                              <Text textAlign={'center'} fontWeight={'semibold'} fontSize={'xs'} color={'red.500'}>O período de locação desse espaço é fixado em {informacoesEspacoEscolhido.periodoLocacao} hora(s)</Text>
+                            </Center>
+                            : null
+                          }
+                        </>
                       ) : (
                         <>
                           <FormControl.HelperText>
